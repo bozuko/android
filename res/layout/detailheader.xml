@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:orientation="vertical">
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="44dp" android:background="@drawable/topheaderbg">
+		
+		<FrameLayout android:layout_width="wrap_content"
+			android:layout_height="44dp"
+			android:layout_alignParentRight="true" android:id="@+id/rightview" android:layout_marginRight="5dp"/>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/superhome" android:background="@drawable/bozukologo" android:layout_centerVertical="true" android:layout_marginLeft="10dp"></Button>
+</RelativeLayout>
+	
+</LinearLayout>

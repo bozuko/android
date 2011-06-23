@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<drawable name="white">#ffffff</drawable>
+	<drawable name="black">#000000</drawable>
+	<color name="transparent">#00000000</color>
+	<color name="titlebackgroundcolor">#6b2b77</color>
+    <color name="titletextcolor">#FFFFFF</color>
+	<drawable name="newsTitleBlue">#16418e</drawable>
+	<color name="cmtbluetext">#19b9c4</color>
+		<color name="dragndrop_background">#e0103010</color>
+	
+</resources>

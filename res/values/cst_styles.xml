@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+	<!-- Bottom text in gallery items -->
+	<style name="GalleryItemPortraitLabel">
+		<item name="android:textColor">#FF000000</item>
+		<item name="android:textSize">11sp</item>
+	</style>
+	<style name="GalleryItemLandscapeLabel" parent="GalleryItemPortraitLabel">
+		<item name="android:textSize">9sp</item>
+	</style>
+
+	<!-- Ticker text -->
+	<style name="TickerText">
+		<item name="android:textColor">#FFFFFFFF</item>
+		<item name="android:textSize">14sp</item>
+	</style>
+
+	<!-- Dialog text -->
+	<style name="DialogText">
+		<item name="android:textColor">#FF000000</item>
+		<item name="android:textSize">12sp</item>
+	</style>
+	<style name="DialogButtonText">
+		<item name="android:textColor">#FFFFFFFF</item>
+		<item name="android:textSize">12sp</item>
+	</style>
+
+	<!-- Toast text -->
+	<style name="ToastText">
+		<item name="android:textColor">#FF000000</item>
+		<item name="android:textSize">12sp</item>
+	</style>
+
+	<!-- UpdateBannersCacheButton text -->
+	<style name="UpdateBannersCacheButtonText">
+		<item name="android:textColor">#FF000000</item>
+		<item name="android:textSize">14sp</item>
+	</style>
+
+</resources> 

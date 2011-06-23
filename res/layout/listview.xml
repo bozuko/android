@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout android:id="@+id/RelativeLayout01"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<ListView android:id="@+id/ListView01" android:background="#FFFFFFFF"
+		android:layout_alignWithParentIfMissing="true"
+		android:layout_height="fill_parent" android:layout_width="fill_parent"
+	 	android:cacheColorHint="#FFFFFFFF">
+	</ListView>
+	
+	<TextView android:gravity="center" android:id="@+id/errmessage"
+		android:layout_alignWithParentIfMissing="true" android:layout_above="@+id/Ad"
+		android:layout_height="fill_parent" android:layout_width="fill_parent"
+		android:visibility="invisible" android:layout_margin="30dp" android:textColor="#000000">
+	</TextView>
+
+</RelativeLayout>

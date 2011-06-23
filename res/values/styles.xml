@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources> 
+   
+	<!-- IfYouLike text -->
+	<style name="IfYouLikeText">
+		<item name="android:textColor">#FFFFFFFF</item>
+		<item name="android:textSize">14sp</item>
+	</style>
+      
+</resources>

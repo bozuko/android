@@ -1,0 +1,208 @@
+package com.bozuko.bozuko.views;
+
+import java.net.URL;
+
+import org.json.JSONObject;
+
+import com.bozuko.bozuko.R;
+import com.bozuko.bozuko.datamodel.PageObject;
+import com.fuzz.android.datahandler.DataBaseHelper;
+import com.fuzz.android.globals.GlobalConstants;
+import com.fuzz.android.http.HttpRequest;
+import com.fuzz.android.ui.URLImageView;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.preference.PreferenceManager;
+import android.text.TextUtils.TruncateAt;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ImageView.ScaleType;
+
+public class PageHeaderView extends RelativeLayout implements OnClickListener {
+
+	URLImageView _image;
+	TextView _title;
+	TextView _category;
+	TextView _address;
+	ImageButton _star;
+	PageObject page;
+
+	public PageHeaderView(Context context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+		createUI(context);
+	}
+
+	private void createUI(Context mContext){
+		LinearLayout image = new LinearLayout(mContext);
+		image.setBackgroundResource(R.drawable.photoboarder);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams((int)(80*getResources().getDisplayMetrics().density),(int)(80*getResources().getDisplayMetrics().density));
+		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
+		params.setMargins(5, 0, 0, 0);
+		image.setLayoutParams(params);
+		image.setId(100);
+		addView(image);
+
+		_image = new URLImageView(mContext);
+		_image.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+		_image.setScaleType(ScaleType.CENTER_CROP);
+		_image.setPlaceHolder(R.drawable.defaultphoto);
+		image.addView(_image);
+
+		_star = new ImageButton(mContext);
+		params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,1);
+		params.addRule(RelativeLayout.ALIGN_TOP,100);
+		params.setMargins(0, 0, 5, 0);
+		_star.setScaleType(ScaleType.CENTER);
+		_star.setBackgroundResource(R.drawable.starbutton);
+		_star.setLayoutParams(params);
+		_star.setId(101);
+		_star.setFocusable(false);
+		_star.setOnClickListener(this);
+		addView(_star);
+
+		ImageView check = new ImageView(mContext);
+		check.setImageResource(R.drawable.arrowgrey);
+		check.setScaleType(ScaleType.CENTER);
+		params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,1);
+		params.addRule(RelativeLayout.ALIGN_BOTTOM,100);
+		params.setMargins(0, 0, 5, 0);
+		check.setLayoutParams(params);
+		addView(check);
+
+		_title = new TextView(mContext);
+		_title.setTextColor(Color.BLACK);
+		_title.setTypeface(Typeface.DEFAULT_BOLD);
+		_title.setTextSize(16);
+		//_title.setSingleLine(true);
+		//_title.setEllipsize(TruncateAt.END);
+		_title.setId(102);
+		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.RIGHT_OF,100);
+		params.addRule(RelativeLayout.LEFT_OF,101);
+		params.addRule(RelativeLayout.ALIGN_TOP,100);
+		params.setMargins(5, 0, 0, 0);
+		_title.setLayoutParams(params);
+		addView(_title);
+
+
+		_category = new TextView(mContext);
+		_category.setTextColor(Color.GRAY);
+		_category.setTextSize(14);
+		_category.setSingleLine(true);
+		_category.setEllipsize(TruncateAt.END);
+		_category.setId(103);
+		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.RIGHT_OF,100);
+		params.addRule(RelativeLayout.LEFT_OF,101);
+		params.addRule(RelativeLayout.BELOW,102);
+		params.setMargins(5, 0, 0, 0);
+		_category.setLayoutParams(params);
+		addView(_category);
+
+		ImageView seperator = new ImageView(mContext);
+		seperator.setImageResource(R.drawable.pxdividinglinewhite);
+		seperator.setScaleType(ScaleType.CENTER);
+		params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.RIGHT_OF,100);
+		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,1);
+		params.addRule(RelativeLayout.BELOW,103);
+		params.setMargins(5, 0, 5, 0);
+		seperator.setLayoutParams(params);
+		addView(seperator);
+
+		_address = new TextView(mContext);
+		_address.setTextColor(Color.DKGRAY);
+		_address.setTextSize(14);
+		_address.setTypeface(Typeface.DEFAULT_BOLD);
+		_address.setSingleLine(true);
+		_address.setEllipsize(TruncateAt.END);
+		_address.setId(104);
+		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.RIGHT_OF,100);
+		params.addRule(RelativeLayout.LEFT_OF,101);
+		params.addRule(RelativeLayout.ALIGN_BOTTOM,100);
+		params.setMargins(5, 0, 0, 0);
+		_address.setLayoutParams(params);
+		addView(_address);
+	}
+
+	public void display(PageObject inPage){
+		page = inPage;
+		_image.setURL(page.requestInfo("image"));
+		_category.setText(page.requestInfo("category"));
+		_title.setText(page.requestInfo("name"));
+		_address.setText(page.requestInfo("locationcity") + ", " + page.requestInfo("locationstate"));
+		if(page.requestInfo("favorite").compareTo("true")==0){
+			_star.setSelected(true);
+		}else{
+			_star.setSelected(false);
+		}
+	}
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		//_star.setSelected(!_star.isSelected());
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		if(mprefs.getBoolean("facebook_login", false)){
+			Thread th = new Thread(){
+				public void run(){
+					sendRequest();
+				}
+			};
+			th.start();
+		}else{
+			Toast.makeText(getContext(), "You need to be logged in to add favorites", Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	public void sendRequest(){
+		if(!DataBaseHelper.isOnline(getContext())){
+			post(new Runnable(){
+				public void run(){
+					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+		try {
+			String url = GlobalConstants.BASE_URL + page.requestInfo("linksfavorite");
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "")));
+			req.setMethodType("POST");
+			JSONObject json = req.AutoJSON();
+			if(json.getBoolean("added")){
+				page.add("favorite", "true");
+			}else{
+				page.add("favorite", "false");
+			}
+			post(new Runnable(){
+				public void run(){
+					_star.setSelected(!_star.isSelected());
+					
+					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+					SharedPreferences.Editor edit = mprefs.edit();
+					edit.putBoolean("ReloadFavorites", true);
+					edit.commit();
+				}
+			});
+		} catch (Throwable e) {
+			e.printStackTrace();
+			post(new Runnable(){
+				public void run(){
+					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+	}
+}

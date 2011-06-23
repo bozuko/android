@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical">
+	<LinearLayout android:id="@+id/Header"
+		android:layout_width="fill_parent" android:layout_height="wrap_content" android:visibility="gone">
+
+		<RelativeLayout android:id="@+id/RelativeLayout01"
+			android:layout_height="44dp" android:layout_width="fill_parent"
+			android:background="#000000">
+			<FrameLayout android:id="@+id/leftview"
+				android:layout_height="44dp" android:layout_marginLeft="10dp"
+				android:layout_alignParentLeft="true" android:layout_width="wrap_content"/>
+			<TextView android:layout_width="wrap_content"
+				android:layout_centerInParent="true" android:textColor="#FFFFFF"
+				android:textStyle="bold" android:id="@+id/title"
+				android:layout_height="44dp" android:lines="1"
+				android:ellipsize="end" android:layout_gravity="center"
+				android:gravity="center|left" android:layout_toRightOf="@+id/leftview" android:layout_toLeftOf="@+id/rightview" android:textSize="20dp"/>
+			<ImageView android:layout_width="wrap_content" android:id="@+id/ImageView01" android:layout_height="wrap_content" android:layout_centerInParent="true"></ImageView><FrameLayout android:id="@+id/rightview"
+				android:layout_height="44dp" android:layout_alignParentRight="true"
+				android:layout_marginRight="10dp" android:layout_width="wrap_content"/>
+
+		
+</RelativeLayout>
+	</LinearLayout>
+	<FrameLayout android:id="@+id/ContentView"
+		android:layout_width="fill_parent" android:layout_height="fill_parent" />
+
+</LinearLayout>

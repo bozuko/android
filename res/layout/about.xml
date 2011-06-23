@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent" android:background="@drawable/helpbg">
+    <HorizontalScrollView android:id="@+id/scrollbg" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <ImageView android:id="@+id/imageView1" android:layout_width="wrap_content" android:src="@drawable/helpscrollbg" android:layout_height="wrap_content"></ImageView>
+    </HorizontalScrollView>
+    
+     <HorizontalScrollView android:id="@+id/scrollclouds" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true">
+        <ImageView android:id="@+id/imageView1" android:layout_width="wrap_content" android:src="@drawable/helpscrollcloudsbg" android:layout_height="wrap_content"></ImageView>
+    </HorizontalScrollView>
+    
+    <com.fuzz.android.ui.PagingScrollView android:id="@+id/page_view" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_marginBottom="10dp">
+    </com.fuzz.android.ui.PagingScrollView>
+</RelativeLayout>

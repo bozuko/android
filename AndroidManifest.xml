@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.bozuko.bozuko"
+      android:versionCode="1"
+      android:versionName="1.0" android:installLocation="auto">
+    <application android:icon="@drawable/launcher" android:label="@string/app_name" android:name="BozukoApplication">
+        <activity android:name="MainBozukoActivity" android:configChanges="orientation|keyboardHidden"
+                  android:label="@string/app_name" android:theme="@style/customTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+	<!-- Games -->
+	<activity android:label="GamesTabController" android:configChanges="orientation|keyboardHidden"
+			android:name="GamesTabController" android:theme="@style/customTheme"/>
+	<activity android:label="NearByGamesBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="NearByGamesBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="GamesMapController" android:configChanges="orientation|keyboardHidden"
+			android:name="GamesMapController" android:theme="@style/customTheme"/>
+	<activity android:label="FavoriteGamesBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="FavoriteGamesBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="PageBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PageBozukoActivity" android:theme="@style/customTheme"/>
+	
+	<!-- Prizes -->
+	<activity android:label="PrizesBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PrizesBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="PrizeBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PrizeBozukoActivity" android:theme="@style/customTheme"/>
+			
+	<!-- Settings -->
+	<activity android:label="SettingsBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="SettingsBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="InAppWebViewControllerActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="InAppWebViewControllerActivity" android:theme="@style/customTheme"/>
+	<activity android:label="SocialMediaWebViewActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="SocialMediaWebViewActivity" android:theme="@style/customTheme"/>
+	<activity android:label="AboutBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="AboutBozukoActivity" android:theme="@style/customTheme"/>
+
+	 <uses-library android:name="com.google.android.maps" />
+    </application>
+   
+    <uses-sdk android:minSdkVersion="5" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+</manifest>
