@@ -14,21 +14,37 @@
 
 	<!-- Games -->
 	<activity android:label="GamesTabController" android:configChanges="orientation|keyboardHidden"
-			android:name="GamesTabController" android:theme="@style/customTheme"/>
+			android:name="GamesTabController" android:theme="@style/customTheme"  android:windowSoftInputMode="stateHidden|adjustResize"/>
 	<activity android:label="NearByGamesBozukoActivity" android:configChanges="orientation|keyboardHidden"
-			android:name="NearByGamesBozukoActivity" android:theme="@style/customTheme"/>
+			android:name="NearByGamesBozukoActivity" android:theme="@style/customTheme"  android:windowSoftInputMode="stateHidden|adjustResize"/>
 	<activity android:label="GamesMapController" android:configChanges="orientation|keyboardHidden"
 			android:name="GamesMapController" android:theme="@style/customTheme"/>
 	<activity android:label="FavoriteGamesBozukoActivity" android:configChanges="orientation|keyboardHidden"
-			android:name="FavoriteGamesBozukoActivity" android:theme="@style/customTheme"/>
+			android:name="FavoriteGamesBozukoActivity" android:theme="@style/customTheme"  android:windowSoftInputMode="stateHidden|adjustResize"/>
 	<activity android:label="PageBozukoActivity" android:configChanges="orientation|keyboardHidden"
 			android:name="PageBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="MapItMapActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="MapItMapActivity" android:theme="@style/customTheme"/>
+	<activity android:label="GameEntryBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="GameEntryBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="ScratchGameBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="ScratchGameBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="SlotsGameBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="SlotsGameBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="OfficialBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="OfficialBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="PrizeListBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PrizeListBozukoActivity" android:theme="@style/customTheme"/>
 	
 	<!-- Prizes -->
 	<activity android:label="PrizesBozukoActivity" android:configChanges="orientation|keyboardHidden"
 			android:name="PrizesBozukoActivity" android:theme="@style/customTheme"/>
 	<activity android:label="PrizeBozukoActivity" android:configChanges="orientation|keyboardHidden"
 			android:name="PrizeBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="PrizeRedeemBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PrizeRedeemBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="PrizeDetailBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="PrizeDetailBozukoActivity" android:theme="@style/customTheme"/>
 			
 	<!-- Settings -->
 	<activity android:label="SettingsBozukoActivity" android:configChanges="orientation|keyboardHidden"
@@ -39,16 +55,19 @@
 			android:name="SocialMediaWebViewActivity" android:theme="@style/customTheme"/>
 	<activity android:label="AboutBozukoActivity" android:configChanges="orientation|keyboardHidden"
 			android:name="AboutBozukoActivity" android:theme="@style/customTheme"/>
+	<activity android:label="FeedbackBozukoActivity" android:configChanges="orientation|keyboardHidden"
+			android:name="FeedbackBozukoActivity" android:theme="@style/customTheme" android:windowSoftInputMode="stateVisible"/>
 
 	 <uses-library android:name="com.google.android.maps" />
     </application>
    
     <uses-sdk android:minSdkVersion="5" />
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	
+	
 </manifest>

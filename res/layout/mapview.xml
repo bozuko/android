@@ -10,9 +10,10 @@ android:layout_height="fill_parent"
 android:layout_x="0px"
 android:enabled="true"
 android:clickable="true"
-android:apiKey="05I6AqV6qeRzeAskXfCMnw025OLyaOqaTjfESsg"
+android:apiKey="0V086SX6yx7FPZSn-kQtW4LaG11GXR6dsg9__ww"
 android:layout_y="105px" android:layout_alignWithParentIfMissing="true" android:layout_above="@+id/Ad">
 </com.google.android.maps.MapView>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/myMapView1" android:layout_marginLeft="20dp" android:background="@drawable/currentlocbutton" android:id="@+id/currentloc" android:layout_marginBottom="40dp"></Button>
 </RelativeLayout>
 <!-- Fuzz.key android:apiKey="0V086SX6yx7FPZSn-kQtW4LaG11GXR6dsg9__ww" -->
 <!-- Dev.key android:apiKey="0V086SX6yx7HPnSQwSc42VtXxsXIFCQp_8TsjjQ" -->

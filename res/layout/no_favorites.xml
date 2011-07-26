@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent" android:background="@drawable/nofavorites">
-</LinearLayout>
+  android:layout_height="fill_parent" android:background="#CFD1CF" android:orientation="vertical">
+    <TextView android:id="@+id/textView1" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="Favorites" android:background="@drawable/listheader" android:textSize="16dp" android:textStyle="bold" android:textColor="#FFFFFF"></TextView>
+    <ImageView android:id="@+id/imageView1" android:layout_width="wrap_content" android:src="@drawable/nofavorites" android:layout_height="fill_parent" android:scaleType="fitEnd"></ImageView>
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView2" android:layout_below="@+id/textView1" android:src="@drawable/nofavoritestxt" android:layout_marginTop="14dp" android:layout_marginLeft="13dp"></ImageView>
+</RelativeLayout>

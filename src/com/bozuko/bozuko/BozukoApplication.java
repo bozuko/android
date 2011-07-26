@@ -12,10 +12,11 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.bozuko.bozuko.datamodel.Bozuko;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
+import com.bozuko.bozuko.datamodel.GameObject;
+import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.datamodel.User;
 import com.fuzz.android.activities.CustomApplication;
 import com.fuzz.android.datahandler.DataBaseHelper;
@@ -24,17 +25,29 @@ import com.fuzz.android.http.HttpRequest;
 
 public class BozukoApplication extends CustomApplication {
 
+	public PageObject currentPageObject;
+	public GameObject currentGameObject;
+	
+	public String searchTerm = "";
+	
 	@Override
 	public void LocationFailed() {
 		// TODO Auto-generated method stub
 		
 		if(!lHandler.isLocationEnabled()){
 			endLocation();
-			Toast.makeText(this, "Check you gps and network connections.", Toast.LENGTH_LONG).show();
+			try{
+				Toast.makeText(this, "Check you gps and network connections.", Toast.LENGTH_LONG).show();
+			}catch(Throwable t){
+				
+			}
 		}else if(lHandler.loc == null){
 			endLocation();
-			Toast.makeText(this, "Your current location is temporarily unavailable", Toast.LENGTH_LONG).show();
-			
+			try{
+				Toast.makeText(this, "Your current location is temporarily unavailable", Toast.LENGTH_LONG).show();
+			}catch(Throwable t){
+				
+			}
 		}
 		
 		Intent broad = new Intent("LOCATIONSUPDATED");
@@ -106,13 +119,16 @@ public class BozukoApplication extends CustomApplication {
 	public void onCreate (){
 		super.onCreate();
 
-		getEntry();
+		//getEntry();
+		startLocation();
 	}
 	
 	public void getEntry(){
 		Thread th = new Thread(){
 			public void run(){
 				sendRequest();
+				Intent intent = new Intent("SETTINGSUPDATED");
+				sendBroadcast(intent);
 			}
 		};
 		th.start();
@@ -126,8 +142,7 @@ public class BozukoApplication extends CustomApplication {
 			String url = GlobalConstants.API_URL;
 			
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			
-			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "")));
+			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
 			JSONObject json = req.AutoJSON();
 			EntryPointObject entry = new EntryPointObject(json);
@@ -136,7 +151,7 @@ public class BozukoApplication extends CustomApplication {
 			entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 			
 			url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
-			req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "")));
+			req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
 			json = req.AutoJSON();
 			Bozuko bozuko = new Bozuko(json);
@@ -146,7 +161,7 @@ public class BozukoApplication extends CustomApplication {
 			
 			if(entry.checkInfo("linksuser")){
 				url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
-				req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "")));
+				req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 				req.setMethodType("GET");
 				json = req.AutoJSON();
 				User user = new User(json);

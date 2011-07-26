@@ -246,7 +246,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		return p;
 	}
 
-	private static String md5(String s) {
+	public static String md5(String s) {
 		// TODO Auto-generated method stub
 		try {
 			// Create MD5 Hash
@@ -259,6 +259,37 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			StringBuffer hexString = new StringBuffer();
 			for (int i = 0; i < messageDigest.length; i++)
 				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+			return hexString.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
+	public static String sha1(String s) {
+		// TODO Auto-generated method stub
+		try {
+			// Create MD5 Hash
+			MessageDigest digest = java.security.MessageDigest
+			.getInstance("SHA1");
+			digest.update(s.getBytes());
+			byte messageDigest[] = digest.digest();
+
+			// Create Hex String
+			StringBuffer hexString = new StringBuffer();
+			for (int i = 0; i < messageDigest.length; i++){
+				//hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+				  int halfbyte = (messageDigest[i] >>> 4) & 0x0F;
+		            int two_halfs = 0;
+		            do { 
+		                if ((0 <= halfbyte) && (halfbyte <= 9)) 
+		                	hexString.append((char) ('0' + halfbyte));
+		                else 
+		                	hexString.append((char) ('a' + (halfbyte - 10)));
+		                halfbyte = messageDigest[i] & 0x0F;
+		            } while(two_halfs++ < 1);
+			}
 			return hexString.toString();
 
 		} catch (NoSuchAlgorithmException e) {

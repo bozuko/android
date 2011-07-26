@@ -3,6 +3,7 @@ package com.bozuko.bozuko.views;
 import java.net.URL;
 import org.json.JSONObject;
 
+import com.bozuko.bozuko.BozukoControllerActivity;
 import com.bozuko.bozuko.FavoriteGamesBozukoActivity;
 import com.bozuko.bozuko.R;
 import com.bozuko.bozuko.datamodel.PageObject;
@@ -11,12 +12,12 @@ import com.fuzz.android.globals.GlobalConstants;
 import com.fuzz.android.http.HttpRequest;
 import com.fuzz.android.ui.URLImageView;
 import android.content.Context;
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.TextUtils.TruncateAt;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -42,15 +43,21 @@ public class PageView extends RelativeLayout implements OnClickListener {
 	}
 
 	private void createUI(Context mContext){
+		//setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+		setPadding(0,5,0,5);
+		
 		_star = new ImageButton(mContext);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
 		params.setMargins(5, 0, 0, 0);
 		_star.setScaleType(ScaleType.CENTER);
-		_star.setBackgroundResource(R.drawable.starbutton);
+		_star.setBackgroundResource(R.drawable.transparent);
+		_star.setImageResource(R.drawable.starbutton);
 		_star.setLayoutParams(params);
 		_star.setId(100);
 		_star.setFocusable(false);
+		_star.setFocusableInTouchMode(false);
+		
 		_star.setOnClickListener(this);
 		addView(_star);
 
@@ -79,7 +86,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		_title.setId(102);
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.RIGHT_OF,99);
-		params.setMargins(5, 0, 0, 0);
+		params.setMargins(10, 0, 0, 0);
 		_title.setLayoutParams(params);
 		addView(_title);
 
@@ -94,7 +101,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.RIGHT_OF,99);
 		params.addRule(RelativeLayout.BELOW,102);
-		params.setMargins(5, 0, 0, 0);
+		params.setMargins(10, 0, 0, 0);
 		_address.setLayoutParams(params);
 		addView(_address);
 
@@ -107,14 +114,14 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.RIGHT_OF,99);
 		params.addRule(RelativeLayout.BELOW,103);
-		params.setMargins(5, 0, 0, 0);
+		params.setMargins(10, 0, 0, 0);
 		_distance.setLayoutParams(params);
 		addView(_distance);
 	}
 
 	public void display(PageObject inPage){
 		page = inPage;
-		Log.v("PAGE",page.toString());
+		//Log.v("PAGE",page.toString());
 		_image.setURL(page.requestInfo("image"));
 		_distance.setText(page.requestInfo("distance"));
 		_title.setText(page.requestInfo("name"));
@@ -124,6 +131,14 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		}else{
 			_star.setSelected(false);
 		}
+		
+
+		if(page.requestInfo("featured").compareTo("true")==0 || page.requestInfo("registered").compareTo("true")==0){
+			_star.setVisibility(View.VISIBLE);
+		}else{
+			_star.setVisibility(View.INVISIBLE);
+		}
+		
 	}
 
 	@Override
@@ -154,13 +169,20 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		try {
 			String url = GlobalConstants.BASE_URL + page.requestInfo("linksfavorite");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "")));
+			HttpRequest req = new HttpRequest(new URL(url));
+			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
+			req.add("token", mprefs.getString("token", ""));
 			req.setMethodType("POST");
-			JSONObject json = req.AutoJSON();
-			if(json.getBoolean("added")){
-				page.add("favorite", "true");
-			}else{
-				page.add("favorite", "false");
+			JSONObject json = req.AutoJSONError();
+			try{
+			try{
+				if(json.getBoolean("added")){
+					page.add("favorite", "true");
+				}
+			}catch(Throwable t){
+				if(json.getBoolean("removed")){
+					page.add("favorite", "false");
+				}
 			}
 			post(new Runnable(){
 				public void run(){
@@ -176,6 +198,15 @@ public class PageView extends RelativeLayout implements OnClickListener {
 					}
 				}
 			});
+		}catch(Throwable t){
+			String errorTitle = json.getString("title");
+			String errorMessage = json.getString("message");
+			String errorType = json.getString("name");
+			((BozukoControllerActivity)getContext()).errorTitle = errorTitle;
+			((BozukoControllerActivity)getContext()).errorMessage = errorMessage;
+			((BozukoControllerActivity)getContext()).errorType = errorType;
+			((BozukoControllerActivity)getContext()).progressRunnableError();
+		}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			post(new Runnable(){

@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -100,7 +99,7 @@ public class PrizeView extends RelativeLayout{
 	}
 
 	public void display(PrizeObject page){
-		Log.v("GAME",page.toString());
+		//Log.v("GAME",page.toString());
 		//_image.setURL(page.requestInfo("image"));
 		_title.setText(page.requestInfo("name"));
 		_subtitle.setText(page.requestInfo("page_name"));

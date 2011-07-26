@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.helpers.DefaultHandler;
@@ -156,7 +158,7 @@ public class HttpRequest {
 				wr = new OutputStreamWriter(conn.getOutputStream());
 				if(wr == null){
 				}
-				
+				DEBUGREQUEST();
 				wr.write(n);
 				
 				wr.flush();
@@ -397,6 +399,59 @@ public class HttpRequest {
 	    }
 	    return null;
 	}
+	
+	public JSONArray AutoJSONArrayNoWrite(){
+		conn.setConnectTimeout(timeout);
+		conn.setReadTimeout(readtimeout);
+		try {
+			if(conn.getResponseCode() == 200){
+				return new JSONArray(getResponse());
+			}else{
+				return new JSONArray(getResponse());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public JSONArray AutoJSONArray(){
+		conn.setConnectTimeout(timeout);
+		conn.setReadTimeout(readtimeout);
+		try {
+			Setup();
+			DEBUGSETUP();
+			SendRequest();
+			if(conn.getResponseCode() == 200){
+				DEBUGCONNECTION();
+				return new JSONArray(getResponse());
+			}else{
+				DEBUGCONNECTION();
+				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				return new JSONArray(getResponse());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();	
+		}
+		return null;
+	}
+	
+	public JSONArray AutoJSONArrayCustom(){
+		conn.setConnectTimeout(timeout);
+		conn.setReadTimeout(readtimeout);
+		try {
+			SendRequest();
+			if(conn.getResponseCode() == 200){
+				return new JSONArray(getResponse());
+			}else{
+				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				return new JSONArray(getResponse());
+			}	
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public JSONObject AutoJSONNoWrite(){
 		conn.setConnectTimeout(timeout);
@@ -405,7 +460,7 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return new JSONObject(getResponse());
 			}else{
-				return null;
+				return new JSONObject(getResponse());
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -418,12 +473,35 @@ public class HttpRequest {
 		conn.setReadTimeout(readtimeout);
 		try {
 			Setup();
+			DEBUGSETUP();
 			SendRequest();
 			if(conn.getResponseCode() == 200){
+				DEBUGCONNECTION();
 				return new JSONObject(getResponse());
 			}else{
+				DEBUGCONNECTION();
 				Log.v("HTTP REQUEST ERROR",getErrorResponse());
-				return null;
+				return new JSONObject(getResponse());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();	
+		}
+		return null;
+	}
+	
+	public JSONObject AutoJSONError(){
+		conn.setConnectTimeout(timeout);
+		conn.setReadTimeout(readtimeout);
+		try {
+			Setup();
+			DEBUGSETUP();
+			SendRequest();
+			if(conn.getResponseCode() == 200){
+				DEBUGCONNECTION();
+				return new JSONObject(getResponse());
+			}else{
+				DEBUGCONNECTION();
+				return new JSONObject(getErrorResponse());
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();	
@@ -440,7 +518,7 @@ public class HttpRequest {
 				return new JSONObject(getResponse());
 			}else{
 				Log.v("HTTP REQUEST ERROR",getErrorResponse());
-				return null;
+				return new JSONObject(getResponse());
 			}	
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -494,11 +572,21 @@ public class HttpRequest {
 //		Log.v("ipAddress",HttpRequest.getLocalIpAddress());
 	}
 	
+	private void DEBUGREQUEST(){
+//		Log.v("Request",n);
+	}
+	
 	private void DEBUGCONNECTION(){
 //		try {
 //			Log.v("Response Message",conn.getResponseMessage());
+//		} catch (Throwable e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		try{
 //			Log.v("Response Code",conn.getResponseCode() + "");
-//		} catch (IOException e) {
+//		}catch (Throwable e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}

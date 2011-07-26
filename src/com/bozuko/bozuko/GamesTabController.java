@@ -1,5 +1,6 @@
 package com.bozuko.bozuko;
 
+import android.app.LocalActivityManager;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -43,6 +44,13 @@ public class GamesTabController extends TabActivity implements OnClickListener {
 	    tabHost.addTab(spec);
 
 	    tabHost.setCurrentTab(0);
+	    
+	    Button nearby = (Button)findViewById(R.id.nearby);
+		Button favorites = (Button)findViewById(R.id.favorites);
+		Button map = (Button)findViewById(R.id.map);
+	    nearby.setSelected(true);
+		favorites.setSelected(false);
+		map.setSelected(false);
 	}
 
 	@Override
@@ -75,6 +83,7 @@ public class GamesTabController extends TabActivity implements OnClickListener {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu){
+		menu.add(0, R.drawable.ic_menu_refresh, 0, "Refresh").setIcon(R.drawable.ic_menu_refresh);
 		menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
 		menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
 		return super.onCreateOptionsMenu(menu);
@@ -82,6 +91,14 @@ public class GamesTabController extends TabActivity implements OnClickListener {
 
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
+			case R.drawable.ic_menu_refresh:
+				LocalActivityManager m = getLocalActivityManager();
+				try{
+					((BozukoControllerActivity)m.getCurrentActivity()).refresh();
+				}catch(Throwable t){
+					
+				}
+				break;
 			case R.drawable.iconbozuko:
 				Intent bozuko = new Intent(this,SettingsBozukoActivity.class);
 				bozuko.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

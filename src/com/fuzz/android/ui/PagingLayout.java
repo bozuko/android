@@ -124,7 +124,7 @@ public class PagingLayout extends LinearLayout {
     		int pagesPerWindow = provider.pagesPerWindow();
     		int childcount = getChildCount();
     		int numOfPages = pagesPerWindow*provider.preLoadedSize();
-    		int startAt = firstPageInWindow - (pagesPerWindow);
+    		int startAt = firstPageInWindow - (pagesPerWindow*(provider.preLoadedSize()/2));
             final int count = getVirtualChildCount();
             int virtualcount = 0;
     		final SparseIntArray pageToChild = mPageToChildIndex;
@@ -160,10 +160,15 @@ public class PagingLayout extends LinearLayout {
         			else{
         				if(i> firstPageInWindow){
         					addView(fromprovider);
+        					soft = new SoftReference<View>(fromprovider);
+        					
+        					pageReferences.put(getPageID(i), soft);
         					pageToChild.put(i, indexOfChild(fromprovider));
         					found = true;
         				}else{
         					addView(fromprovider,virtualcount++);
+        					soft = new SoftReference<View>(fromprovider);     					
+        					pageReferences.put(getPageID(i), soft);
         					pageToChild.put(i, indexOfChild(fromprovider));
         					found = true;
         				}

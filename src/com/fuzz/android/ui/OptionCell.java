@@ -6,6 +6,7 @@ import com.fuzz.android.ui.MenuOption.MenuOptionType;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -19,7 +20,7 @@ public class OptionCell extends RelativeLayout {
 	TextView _title;
 	ImageView _cell;
 	ImageView _accessory;
-	
+	public MenuOption option;
 	CheckBox _checkMark;
 	
 	
@@ -75,6 +76,7 @@ public class OptionCell extends RelativeLayout {
 		_title.setLayoutParams(params);
 		_title.setTextColor(Color.BLACK);
 		_title.setTextSize(14);
+		_title.setGravity(Gravity.CENTER);
 		_title.setTypeface(Typeface.DEFAULT_BOLD);
 		_title.setMaxLines(1);
 		_title.setId(103);
@@ -83,13 +85,16 @@ public class OptionCell extends RelativeLayout {
 
 	@SuppressWarnings("static-access")
 	public void display(MenuOption inOption, int resource){
+		option = inOption;
 		_image.setImageResource(inOption.image);
 		_title.setText(inOption.title);
 		_cell.setImageResource(resource);
 		
 		if(inOption.arrow){
+			_accessory.setVisibility(View.VISIBLE);
 			_accessory.setImageResource(Res.drawable.arrowgrey);
 		}else{
+			_accessory.setVisibility(View.GONE);
 			_accessory.setImageResource(0);
 		}
 		

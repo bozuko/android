@@ -4,10 +4,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import com.cooliris.media.Utils;
 import com.fuzz.android.concurrent.WorkQueue;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalEnum;
+import com.fuzz.android.globals.GlobalFunctions;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -63,7 +63,7 @@ public class URLBitmapDrawable extends Drawable {
 		computeBitmapSize();
 		mURL = url;
 		mContext = context;
-		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(Utils.Crc64Long(mURL),128),mContext)){
+		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(GlobalFunctions.Crc64Long(mURL),128),mContext)){
 			imageopt = new GetImageOperation(mURL);
 			WorkQueue.getInstance().execute(imageopt);
 		}else{
@@ -82,7 +82,7 @@ public class URLBitmapDrawable extends Drawable {
 		computeBitmapSize();
 		mURL = url;
 		mContext = context;
-		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(Utils.Crc64Long(mURL),128),mContext)){
+		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(GlobalFunctions.Crc64Long(mURL),128),mContext)){
 			imageopt = new GetImageOperation(mURL);
 			WorkQueue.getInstance().execute(imageopt);
 		}else{
@@ -102,7 +102,7 @@ public class URLBitmapDrawable extends Drawable {
 		computeBitmapSize();
 		mURL = url;
 		mContext = context;
-		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(Utils.Crc64Long(mURL),128),mContext)){
+		if(DataBaseHelper.isImageCached(createFilePathFromCrc64(GlobalFunctions.Crc64Long(mURL),128),mContext)){
 			imageopt = new GetImageOperation(mURL);
 			WorkQueue.getInstance().execute(imageopt);
 		}else{
@@ -225,6 +225,12 @@ public class URLBitmapDrawable extends Drawable {
 	}
 	
 	private void computeBitmapSize() {
+		if(mBitmap == null){
+			mBitmapWidth = (int) 80;
+	        mBitmapHeight = (int) 80;
+	        setBounds(getBounds().left, getBounds().top,getBounds().left+mBitmapWidth, getBounds().top+mBitmapHeight);
+		}
+		
         mBitmapWidth = (int) (mBitmap.getWidth()*mTargetDPI);
         mBitmapHeight = (int) (mBitmap.getHeight()*mTargetDPI);
         setBounds(getBounds().left, getBounds().top,getBounds().left+mBitmapWidth, getBounds().top+mBitmapHeight);
@@ -300,7 +306,7 @@ public class URLBitmapDrawable extends Drawable {
 				opts.inPurgeable=true;
 				opts.inScaled = false;
 
-				Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(Utils.Crc64Long(url2),128), opts);
+				Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128), opts);
 				if(newB!= null){
 					switch(TYPE){
 						case NORMAL_IMAGE:
@@ -339,7 +345,7 @@ public class URLBitmapDrawable extends Drawable {
 				opts.inPurgeable=true;
 				opts.inScaled = false;
 				Bitmap copy = mBitmap;
-				Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(Utils.Crc64Long(url2),128), opts);
+				Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128), opts);
 				if(newB!= null){
 					
 					switch(TYPE){
@@ -370,7 +376,7 @@ public class URLBitmapDrawable extends Drawable {
 					conn.setUseCaches(false);
 					conn.setDoInput(true);
 					InputStream inputStream = conn.getInputStream();
-					FileOutputStream out = new FileOutputStream(createFilePathFromCrc64(Utils.Crc64Long(url2),128));
+					FileOutputStream out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
 					byte buf[] = new byte[1024];
 					int len;
 					while ((len = inputStream.read(buf)) > 0) {
@@ -382,7 +388,7 @@ public class URLBitmapDrawable extends Drawable {
 					BitmapFactory.Options opts = new BitmapFactory.Options();
 					opts.inPurgeable=true;
 					opts.inScaled = false;
-					Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(Utils.Crc64Long(url2),128), opts);
+					Bitmap newB = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128), opts);
 					if(newB!= null){
 						switch(TYPE){
 							case NORMAL_IMAGE:

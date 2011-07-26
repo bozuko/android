@@ -603,15 +603,21 @@ public class TouchImageView extends ImageView {
 	}
 	
 	public void rotateBy(int degrees){
+		rotation += degrees;
+		rotation = rotation%360;
+		try{
+		
 		float x = getCenterX();
 		float y = getCenterY();
 		
-		rotation += degrees;
-		rotation = rotation%360;
+		
 		
 		matrix2.set(getImageMatrix());
 		matrix2.postRotate(degrees,x,y);
 		setImageMatrix(matrix2);
+		}catch(Throwable t){
+			
+		}
 	}
 	
 	Point center;

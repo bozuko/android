@@ -11,10 +11,20 @@ public class FlipAnimation  extends Animation {
 	private float mCenterX;
 	private float mCenterY;
 	private Camera mCamera;
+	private int mAxis = YAXIS;
+	
+	public static int XAXIS = 1;
+	public static int YAXIS = 0;
 
 	public FlipAnimation(float fromDegrees, float toDegrees) {
 		mFromDegrees = fromDegrees;
 		mToDegrees = toDegrees;
+	}
+	
+	public FlipAnimation(float fromDegrees, float toDegrees,int inAxis) {
+		mFromDegrees = fromDegrees;
+		mToDegrees = toDegrees;
+		mAxis = inAxis;
 	}
 
 	@Override
@@ -38,8 +48,11 @@ public class FlipAnimation  extends Animation {
 
 		camera.save();
 
-		camera.rotateY(degrees);
-
+		if(mAxis == YAXIS){
+			camera.rotateY(degrees);
+		}else{
+			camera.rotateX(degrees);
+		}
 		camera.getMatrix(matrix);
 		camera.restore();
 

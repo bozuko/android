@@ -56,8 +56,8 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 	protected Handler mHandler = new Handler();
 	protected Thread runnable;
 	
-	protected String errorMessage = "Unable to connect to the internet";
-	protected String errorTitle = "No Connection";
+	public String errorMessage = "Unable to connect to the internet";
+	public String errorTitle = "No Connection";
 	
 	
 	protected Runnable mUpdateResults = new Runnable(){

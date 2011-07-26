@@ -6,6 +6,7 @@ import com.fuzz.android.ui.PagingScrollView;
 import com.fuzz.android.ui.PagingLayout.PagingAdapter;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.HorizontalScrollView;
@@ -68,13 +69,15 @@ public class AboutBozukoActivity extends BozukoControllerActivity {
 		public View getView(int position,View ConvertView) {
 			// TODO Auto-generated method stub
 			ImageView view = null;
-			if(view == null){
+			if(ConvertView == null){
+				Log.v("MAKING VIEW", "VIEW WAS NULL SAD");
 				view = new ImageView(getBaseContext());
 				DisplayMetrics metrics = new DisplayMetrics();
 		        getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		        LayoutParams params = new LayoutParams(metrics.widthPixels,LayoutParams.WRAP_CONTENT);
 		        view.setLayoutParams(params);
 			}else{
+				Log.v("GETTING VIEW", "VIEW BEING REUSED HAPPY");
 				view = (ImageView)ConvertView;
 			}
 			view.setImageResource(about.get(position));
@@ -88,7 +91,7 @@ public class AboutBozukoActivity extends BozukoControllerActivity {
 		}
     	
 		public int preLoadedSize(){
-			return 4;
+			return 7;
 		}
 
 		@Override

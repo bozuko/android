@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -157,6 +158,9 @@ public class URLImageView extends TouchImageView{
 	final Runnable setImageFailedToLoad = new Runnable() {
 		public void run() {	
 			loading = false;
+			if(mListener != null){
+				mListener.imageDidFailLoad();
+			}
 			if(imageopt != null){
 				imageopt = null;
 			}
@@ -170,6 +174,9 @@ public class URLImageView extends TouchImageView{
 			loading = false;
 			if(imageweb != null){
 				imageweb = null;
+			}
+			if(mListener != null){
+				mListener.imageDidFailLoad();
 			}
 			if(TYPE == CROSSFADE_IMAGE)
 				setURL(url);
@@ -203,6 +210,10 @@ public class URLImageView extends TouchImageView{
 			if(imageopt != null){
 				imageopt = null;
 			}
+
+			if(mListener != null){
+				mListener.imageDidLoad();
+			}
 		}
 	};
 
@@ -230,6 +241,9 @@ public class URLImageView extends TouchImageView{
 
 			if(imageweb != null){
 				imageweb = null;
+			}
+			if(mListener != null){
+				mListener.imageDidLoad();
 			}
 		}
 	};
@@ -440,11 +454,32 @@ public class URLImageView extends TouchImageView{
 		}
 	}
 
-	
+	@Override
+	protected void onLayout(boolean changed, int left, int top,
+			int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+		 if(getScaleType() == ScaleType.MATRIX){
+	        	Matrix matrix = new Matrix();
+	        	matrix.set(getImageMatrix());
+	        	matrix.postRotate(-30, mThisWidth/2, mThisHeight/2);
+	        	setImageMatrix(matrix);
+	     }
+	}
 	
 	public void setLoadType(int load_type) {
 		// TODO Auto-generated method stub
 		LOAD_TYPE = load_type;
 	}
 
+	
+	OnLoadListener mListener;
+	public void setOnLoadListener(OnLoadListener listener) {
+		// TODO Auto-generated method stub
+		mListener = listener;
+	}
+
+	public interface OnLoadListener{
+		public void imageDidLoad();
+		public void imageDidFailLoad();
+	}
 }

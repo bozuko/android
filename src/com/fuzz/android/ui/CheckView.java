@@ -32,7 +32,7 @@ public class CheckView extends RelativeLayout {
 		
 		_imageView = new ImageView(mContext);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-		params.setMargins(0, 0,0, 0);
+		params.setMargins(0, 0,15, 0);
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,1);
 		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
 		_imageView.setLayoutParams(params);
@@ -65,24 +65,30 @@ public class CheckView extends RelativeLayout {
 	
 	public void showArrowWhite(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.arrowwhite);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}
 	
 	public void showArrow(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.arrowgrey);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}
 	
 	public void showCheckmark(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.checkmark);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}

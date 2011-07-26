@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils.TruncateAt;
-import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
@@ -46,7 +45,7 @@ public class GameView extends RelativeLayout{
 		_title.setId(101);
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.RIGHT_OF,100);
-		params.setMargins(5, 0, 0, 0);
+		params.setMargins(10, 0, 0, 0);
 		_title.setLayoutParams(params);
 		addView(_title);
 		
@@ -61,16 +60,22 @@ public class GameView extends RelativeLayout{
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.RIGHT_OF,100);
 		params.addRule(RelativeLayout.BELOW,101);
-		params.setMargins(5, 0, 0, 0);
+		params.setMargins(10, 0, 0, 0);
 		_subtitle.setLayoutParams(params);
 		addView(_subtitle);
 		
 	}
 
 	public void display(GameObject page){
-		Log.v("GAME",page.toString());
+		//Log.v("GAME",page.toString());
+		if(page.requestInfo("type").compareTo("scratch")==0){
+			_image.setPlaceHolder(R.drawable.scratchicon);
+		}else if(page.requestInfo("type").compareTo("scratch")==0){
+			_image.setPlaceHolder(R.drawable.slotsicon);
+		}
+		
 		_image.setURL(page.requestInfo("image"));
-		_title.setText(page.requestInfo("type"));
+		_title.setText(page.requestInfo("name"));
 		_subtitle.setText(page.requestInfo("list_message"));
 	}
 }

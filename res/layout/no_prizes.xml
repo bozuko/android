@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent" android:background="@drawable/noprizes">
-</LinearLayout>
+  android:layout_height="fill_parent" android:background="#D0D1D0" android:orientation="vertical">
+    <TextView android:id="@+id/textView1" android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="@drawable/listheader" android:textColor="#FFFFFF" android:text="Prizes" android:textSize="16dp" android:textStyle="bold"></TextView>
+    <ImageView android:id="@+id/imageView1" android:src="@drawable/noprizes" android:layout_width="wrap_content" android:layout_height="fill_parent" android:scaleType="fitEnd"></ImageView>
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/imageView2" android:src="@drawable/noprizestxt" android:layout_below="@+id/textView1" android:layout_marginLeft="13dp" android:layout_marginTop="14dp"></ImageView>
+    <TextView android:layout_alignParentBottom="true" android:layout_height="wrap_content" android:text="Learn more about how to play" android:layout_width="fill_parent" android:gravity="center" android:textColor="#FFFFFF" android:paddingBottom="16dp" android:id="@+id/learnhow"></TextView>
+</RelativeLayout>

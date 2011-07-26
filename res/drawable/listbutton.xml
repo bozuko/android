@@ -3,6 +3,6 @@
      <item android:state_pressed="true"
            android:drawable="@drawable/listbghightlight" /> <!-- pressed -->
      <item android:state_focused="true"
-           android:drawable="@drawable/listbg" /> <!-- focused -->
+           android:drawable="@drawable/listbgfocus" /> <!-- focused -->
      <item android:drawable="@drawable/listbg" /> <!-- default -->
  </selector>

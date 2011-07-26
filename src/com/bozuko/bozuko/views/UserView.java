@@ -71,6 +71,7 @@ public class UserView extends RelativeLayout{
 	}
 
 	public void display(User page){
+		//Log.v("USER",page.toString());
 		_image.setURL(page.requestInfo("image"));
 		_name.setText(page.requestInfo("name"));
 		_email.setText(page.requestInfo("email"));

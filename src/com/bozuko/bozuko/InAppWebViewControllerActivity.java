@@ -1,11 +1,9 @@
 package com.bozuko.bozuko;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -32,17 +30,7 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 		
 		CookieSyncManager.createInstance(this);
 		CookieManager cookieManager = CookieManager.getInstance();
-		cookieManager.removeAllCookie();
 		cookieManager.setAcceptCookie(true);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String sessionCookie = prefs.getString("full_cookie", "");
-		
-		if (sessionCookie.compareTo("") != 0) {
-		    cookieManager.removeSessionCookie();
-		    String cookieString = sessionCookie;
-		    cookieManager.setCookie("superglued.com", cookieString);
-		    CookieSyncManager.getInstance().sync();
-		}   
 		
 		RelativeLayout rel = new RelativeLayout(this);
 	    LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
@@ -55,7 +43,7 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 		webview.getSettings().setBuiltInZoomControls(true);
 		webview.setWebViewClient(new CustomWebClient());
 		//webview.getSettings().setUserAgentString("Mobile/Safari");
-		webview.getSettings().setUserAgentString("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7");
+		webview.getSettings().setUserAgentString("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7 android");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.loadUrl(url);
 		webview.setBackgroundColor(Color.WHITE);

@@ -18,17 +18,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PrizesBozukoActivity extends BozukoControllerActivity implements OnItemClickListener {
+public class PrizesBozukoActivity extends BozukoControllerActivity implements OnItemClickListener, OnClickListener {
 	ArrayList<PrizeObject> activePrizes = new ArrayList<PrizeObject>();
 	ArrayList<PrizeObject> pastPrizes = new ArrayList<PrizeObject>();
 	
@@ -43,7 +43,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			setContent(R.layout.listview);
 			listview = (ListView)findViewById(R.id.ListView01);
 		}
-		
+		listview.setDivider(getResources().getDrawable(R.drawable.pxdividinglinewhite));
 		listview.setSelector(R.drawable.listbutton);
 
 		MergeAdapter mergeAdapter = new MergeAdapter();
@@ -65,6 +65,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		super.onCreate(savedInstanceState);
 		setContent(R.layout.no_prizes);
 		setHeader(R.layout.detailheader);
+		
+		
 	}
 	
 	public void getPrizes(){
@@ -85,17 +87,26 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			}else if(activePrizes.size()==0 && pastPrizes.size()==0){
 				getPrizes();
 			}else{
-				
+				getPrizes();
 			}
-			
 		}else{
 			setContent(R.layout.no_prizes);
 		}
 		super.onResume();
+		
+		
+		try{
+			findViewById(R.id.learnhow).setOnClickListener(this);
+		}catch(Throwable t){
+			
+		}
 	}
 	
 	public void sendRequest(EntryPointObject entry){
 		if(!DataBaseHelper.isOnline(this)){
+			errorMessage = "Unable to connect to the internet";
+    		errorTitle = "No Connection";
+    		RUNNABLE_STATE = RUNNABLE_FAILED;
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
 		try {
@@ -104,14 +115,15 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			String url = GlobalConstants.BASE_URL + entry.requestInfo("linksprizes");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			url += String.format("?token=%s",mprefs.getString("token", ""));
-			Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url));
+			//Log.v("URL",url);
+			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSON();
+			JSONObject json = req.AutoJSONError();
+			try{
 			JSONArray objects = json.getJSONArray("prizes");
 			for(int i=0; i<objects.length(); i++){
 				PrizeObject page = new PrizeObject(objects.getJSONObject(i));
-				Log.v("Page",page.toString());
+				//Log.v("Page",page.toString());
 				//prizes.add(page);
 				if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
 					pastPrizes.add(page);
@@ -120,8 +132,17 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				}
 			}
 			RUNNABLE_STATE = RUNNABLE_SUCCESS;
+			}catch(Throwable t){
+				errorTitle = json.getString("title");
+				errorMessage = json.getString("message");
+				errorType = json.getString("name");
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			errorMessage = "Unable to connect to the internet";
+    		errorTitle = "No Connection";
+    		RUNNABLE_STATE = RUNNABLE_FAILED;
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
 	}
@@ -211,8 +232,32 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				intent.putExtra("Package", prize);
 				startActivity(intent);
 			}else{
-				//TODO redeem
+				Intent intent = new Intent(this,PrizeRedeemBozukoActivity.class);
+				intent.putExtra("Package", prize);
+				startActivityForResult(intent,666);
 			}
 		}
+	}
+	
+	 protected void onActivityResult(int requestCode, int resultCode,
+             Intent data) {
+         if (requestCode == 666) {
+             if (resultCode == RESULT_OK) {
+            	 unProgressRunnable(new Runnable(){
+         			public void run(){
+         				EntryPointObject entry = new EntryPointObject("1");
+         				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+         				sendRequest(entry);
+         			}
+            	 });
+             }
+         }
+     }
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(this,AboutBozukoActivity.class);
+		startActivity(intent);
 	}
 }

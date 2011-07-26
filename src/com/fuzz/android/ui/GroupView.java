@@ -26,18 +26,19 @@ public class GroupView extends RelativeLayout {
 		
 		_cell = new RelativeLayout(mContext);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
-		params.setMargins((int)(10*density), 0, (int)(10*density), 0);
+		params.setMargins((int)(10*density),0, (int)(10*density),0);
 		_cell.setLayoutParams(params);
 		_cell.setId(99);
 		addView(_cell);
 		
 		_imageView = new ImageView(mContext);
 		params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-		params.setMargins(0, 0,0, 0);
+		params.setMargins(0, 0,10, 0);
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,1);
 		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
 		_imageView.setLayoutParams(params);
 		_imageView.setId(100);
+		_imageView.setVisibility(View.GONE);
 		_cell.addView(_imageView);
 		
 		_contentView = new FrameLayout(mContext);
@@ -66,24 +67,30 @@ public class GroupView extends RelativeLayout {
 	
 	public void showArrowWhite(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.arrowwhite);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}
 	
 	public void showArrow(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.arrowgrey);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}
 	
 	public void showCheckmark(boolean show){
 		if(show){
+			_imageView.setVisibility(View.VISIBLE);
 			_imageView.setImageResource(Res.drawable.checkmark);
 		}else{
+			_imageView.setVisibility(View.GONE);
 			_imageView.setImageResource(0);
 		}
 	}

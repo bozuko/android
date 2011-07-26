@@ -10,19 +10,17 @@ public class PrizeObject extends DataObject {
 
 	public PrizeObject(JSONObject json){
 		super(json);
-		queryid = "prizeid";
+		queryid = "gameid";
 		tablename = "prizes";
 	}
 
-	
 	public PrizeObject(String string) {
 		// TODO Auto-generated constructor stub
 		super();
-		map.put("prizeid", string);
-		queryid = "prizeid";
+		map.put("gameid", string);
+		queryid = "gameid";
 		tablename = "prizes";
 	}
-
 
 	@SuppressWarnings("unchecked")
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -37,7 +35,7 @@ public class PrizeObject extends DataObject {
 
 	protected PrizeObject(Parcel in) {
 		super(in);
-		queryid = "prizeid";
+		queryid = "gameid";
 		tablename = "prizes";
 	}
 }
