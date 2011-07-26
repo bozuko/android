@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="fill_parent" android:layout_width="fill_parent" android:background="@drawable/listbghightlight">
+    <TextView android:layout_alignParentTop="true" android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="fill_parent" android:text="Official Rules" android:textColor="#000000" android:textStyle="bold" android:textSize="32dp" android:gravity="center" android:layout_marginTop="10dp" android:layout_marginBottom="10dp"></TextView>
+    <ScrollView android:id="@+id/scrollView1" android:layout_below="@+id/textView1" android:layout_alignLeft="@+id/textView1" android:layout_height="fill_parent" android:layout_width="fill_parent">
+        <LinearLayout android:id="@+id/linearLayout1" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:textColor="#000000" android:id="@+id/rules" android:layout_marginTop="10dp" android:layout_marginLeft="10dp"></TextView>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

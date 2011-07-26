@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  
+  <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  android:layout_alignParentBottom="true" android:id="@+id/linearlayout1" android:background="#000000" android:orientation="vertical" android:layout_marginBottom="5dp">
+      <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginLeft="20dp" android:layout_marginRight="20dp" android:layout_marginTop="5dp" android:id="@+id/entergame" android:background="@drawable/greenbutton" android:layout_marginBottom="5dp" android:textColor="#FFFFFF" android:textStyle="bold" android:text="Check in and Play" android:textSize="20dp"></Button>
+      <TextView android:id="@+id/agree" android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center" android:textColor="#FFFFFF" android:text="I agree to the terms and conditions above." android:layout_marginBottom="5dp" android:layout_below="@+id/entergame"></TextView>
+   	
+   	  <TextView android:id="@+id/nextgame" android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center" android:textColor="#FFFFFF" android:layout_alignBottom="@+id/agree" android:layout_alignTop="@+id/entergame" android:text="Next Game 09:12:34" android:visibility="invisible" android:textStyle="bold" android:textSize="24dp"></TextView>
+  </RelativeLayout>
+  
+  <include android:layout_above="@+id/linearlayout1" layout="@layout/listview" android:layout_width="fill_parent" android:layout_height="fill_parent"/>
+</RelativeLayout>

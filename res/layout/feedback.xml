@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent" android:background="#000000">
+    <EditText android:layout_alignParentTop="true" android:layout_width="fill_parent" android:layout_marginRight="10dp" android:layout_marginLeft="10dp" android:layout_marginTop="10dp" android:layout_height="200dp" android:background="@drawable/cellbutton" android:gravity="left" android:hint="Enter message" android:id="@+id/feedback"></EditText>
+    
+</RelativeLayout>

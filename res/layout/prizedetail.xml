@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="fill_parent" android:layout_width="fill_parent" android:background="@drawable/listbghightlight">
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_marginTop="10dp" android:layout_marginLeft="10dp" android:id="@+id/bozuko" android:src="@drawable/bozukologo" android:layout_alignTop="@+id/prizeicon" android:layout_alignBottom="@+id/prizeicon" android:scaleType="center"></ImageView>
+    <TextView android:layout_height="wrap_content" android:layout_below="@+id/bozuko" android:layout_width="fill_parent" android:gravity="center" android:text="YOU WIN!" android:textStyle="bold" android:layout_marginTop="5dp" android:textSize="28dp" android:textColor="#000000" android:layout_marginRight="20dp" android:layout_marginLeft="20dp" android:id="@+id/prizename"></TextView>
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#000000" android:text="T-Shirt" android:layout_marginTop="20dp" android:textSize="16dp" android:id="@+id/prizedescrip" android:layout_alignLeft="@+id/prizename" android:layout_alignRight="@+id/prizename" android:layout_below="@+id/prizename"></TextView>
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentRight="true" android:layout_marginTop="10dp" android:layout_marginRight="10dp" android:id="@+id/prizeicon" android:src="@drawable/prizesicong"></ImageView>
+</RelativeLayout>

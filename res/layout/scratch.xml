@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="fill_parent" android:layout_width="fill_parent" android:background="#222222">
+    <com.fuzz.android.ui.URLImageView android:scaleType="fitXY" android:layout_alignLeft="@+id/ticket" android:layout_alignTop="@+id/ticket" android:id="@+id/businessimage" android:layout_marginLeft="7px" android:layout_height="76px" android:layout_width="76px" android:layout_marginTop="9px"></com.fuzz.android.ui.URLImageView>
+   	<com.fuzz.android.ui.URLImageView android:layout_centerInParent="true" android:id="@+id/ticket" android:layout_width="320px" android:layout_height="416px" android:scaleType="fitXY"></com.fuzz.android.ui.URLImageView>
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/ticket" android:layout_alignLeft="@+id/ticket" android:layout_alignRight="@+id/ticket" android:layout_alignTop="@+id/ticket" android:id="@+id/scratcharea">
+     	<TextView android:layout_height="40px" android:layout_width="40px" android:layout_marginTop="4px" android:layout_marginLeft="102px" android:textStyle="bold" android:gravity="center" android:textColor="#FFFFFF" android:text="0" android:textSize="20px" android:id="@+id/credits"></TextView>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/prizestext" android:text="Prizes" android:textColor="#FFFFFF" android:textSize="12dp" android:layout_alignParentBottom="true" android:layout_marginBottom="5dp" android:layout_marginLeft="10dp"></TextView>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:text="Official Rules" android:textSize="12dp" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_marginRight="10dp" android:layout_marginBottom="5dp" android:id="@+id/officialrules"></TextView>
+  		<ImageView android:id="@+id/cardBackground" android:src="@drawable/scratchyoulosebg" android:visibility="gone" android:layout_height="300px" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_marginTop="40px" android:layout_width="300px" android:scaleType="fitXY"></ImageView>
+        <ImageView android:src="@drawable/scratchstarsbg" android:id="@+id/cardStars" android:visibility="gone" android:layout_marginTop="40px" android:scaleType="fitXY" android:layout_height="320px" android:layout_width="320px"></ImageView>
+        <ImageView android:id="@+id/cardText" android:src="@drawable/scratchyouloseplayagaintxt" android:visibility="gone" android:scaleType="fitCenter" android:layout_height="300px" android:layout_marginLeft="10px" android:layout_marginRight="10px" android:layout_marginTop="40px" android:layout_width="300px"></ImageView>
+        
+   </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="fill_parent" android:layout_width="fill_parent" android:background="@drawable/listbghightlight">
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_marginTop="10dp" android:layout_marginLeft="10dp" android:id="@+id/bozuko" android:src="@drawable/bozukologo" android:layout_alignTop="@+id/prizeicon" android:layout_alignBottom="@+id/prizeicon" android:scaleType="center"></ImageView>
+    <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentRight="true" android:src="@drawable/prizesiconb" android:layout_marginTop="10dp" android:layout_marginRight="10dp" android:id="@+id/prizeicon"></ImageView>
+    <ImageView android:id="@+id/imageview01" android:layout_width="fill_parent" android:layout_marginRight="10dp" android:layout_marginLeft="10dp" android:src="@drawable/pxdividinglinewhite" android:layout_below="@+id/prizeicon" android:layout_marginTop="5dp" android:layout_height="2dp" android:scaleType="fitXY" android:layout_marginBottom="10dp"></ImageView>
+    
+    <LinearLayout android:layout_alignParentRight="true" android:layout_below="@+id/imageview01"  android:id="@+id/countdownlayout" android:layout_marginRight="10dp" android:layout_height="wrap_content" android:layout_width="fill_parent">
+       	<LinearLayout android:orientation="vertical" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1.0">
+        <TextView android:textColor="#999999" android:layout_height="wrap_content" android:textStyle="bold" android:text="Prize:" android:id="@+id/textView1" android:textSize="18dp" android:layout_width="wrap_content" android:layout_marginLeft="15dp"></TextView>
+        <TextView android:textColor="#000000" android:layout_height="wrap_content" android:textStyle="bold" android:id="@+id/prizename" android:textSize="24dp" android:layout_width="wrap_content" android:layout_marginRight="10dp" android:layout_marginLeft="15dp"></TextView>
+        <TextView android:layout_marginTop="10dp" android:textColor="#999999" android:layout_height="wrap_content" android:textStyle="bold" android:text="Code:" android:id="@+id/textView2" android:textSize="16dp" android:layout_width="wrap_content" android:layout_marginLeft="15dp"></TextView>
+        <TextView android:textColor="#000000" android:layout_height="wrap_content" android:textStyle="bold" android:id="@+id/prizecode" android:textSize="24dp" android:layout_width="wrap_content" android:layout_marginRight="10dp" android:layout_marginLeft="15dp"></TextView>
+       </LinearLayout>
+        <ImageView android:id="@+id/ImageView01" android:scaleType="fitXY" android:src="@drawable/pxdividinglinewhite" android:layout_height="fill_parent" android:layout_width="2dp" android:layout_marginTop="10dp"></ImageView>
+    
+    <LinearLayout android:layout_height="wrap_content" android:orientation="vertical" android:layout_gravity="center" android:layout_width="110dp">
+        <TextView android:textStyle="bold" android:gravity="center" android:id="@+id/TextView01" android:layout_height="wrap_content" android:text="Expires in" android:textColor="#333333" android:textSize="20dp" android:layout_width="110dp"></TextView>
+    <TextView android:layout_height="wrap_content"  android:id="@+id/countdown"   android:gravity="center" android:textStyle="bold" android:textColor="#CC0000" android:textSize="50dp" android:text="60" android:layout_width="110dp"></TextView>
+    <TextView android:layout_height="wrap_content" android:gravity="center" android:id="@+id/TextView02" android:textSize="20dp" android:text="Seconds" android:textColor="#999999" android:layout_width="110dp"></TextView>
+    </LinearLayout>
+    
+    </LinearLayout>
+    <ImageView android:id="@+id/imageView1" android:layout_width="fill_parent" android:layout_marginRight="10dp" android:layout_marginLeft="10dp" android:src="@drawable/pxdividinglinewhite" android:layout_marginTop="10dp" android:scaleType="fitXY" android:layout_height="2dp" android:layout_below="@+id/countdownlayout"></ImageView>
+    <LinearLayout android:layout_width="80dp" android:layout_height="80dp" android:layout_marginLeft="15dp" android:layout_below="@+id/imageView1" android:layout_marginTop="10dp" android:background="@drawable/photoboarder" android:id="@+id/imageframe1">
+        <com.fuzz.android.ui.URLImageView android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/userimage"></com.fuzz.android.ui.URLImageView>
+    </LinearLayout>
+    <LinearLayout android:layout_marginTop="10dp" android:layout_height="80dp" android:background="@drawable/photoboarder" android:layout_marginLeft="15dp" android:layout_width="80dp" android:id="@+id/imageframe2" android:layout_below="@+id/imageframe1">
+        <com.fuzz.android.ui.URLImageView android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/pageimage"></com.fuzz.android.ui.URLImageView>
+    </LinearLayout>
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toRightOf="@+id/imageframe1" android:layout_alignTop="@+id/imageframe1" android:layout_alignBottom="@+id/imageframe2" android:layout_marginRight="10dp" android:layout_marginLeft="10dp">
+        <com.fuzz.android.ui.URLImageView android:layout_height="fill_parent" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:id="@+id/securityimage"></com.fuzz.android.ui.URLImageView>
+        <TextView android:layout_height="fill_parent" android:layout_width="fill_parent" android:gravity="center" android:textColor="#000000" android:textStyle="bold" android:textSize="24dp" android:id="@+id/clock"></TextView>
+    </RelativeLayout>
+</RelativeLayout>

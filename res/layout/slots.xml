@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@drawable/slotframebg" android:layout_width="fill_parent" android:layout_height="fill_parent">
+    <com.fuzz.android.ui.URLImageView android:background="@drawable/photoboarder" android:src="@drawable/defaultphoto" android:scaleType="fitXY" android:id="@+id/gameimage" android:layout_height="140dp" android:layout_width="140dp" android:layout_alignLeft="@+id/slots" android:layout_below="@+id/slots" android:layout_marginTop="20dp"></com.fuzz.android.ui.URLImageView>
+    <TextView android:gravity="center" android:textStyle="bold" android:textSize="32dp" android:textColor="#cc0000" android:id="@+id/credits" android:text="0" android:background="@drawable/slotcredits" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignRight="@+id/slots" android:layout_below="@+id/slots" android:layout_marginTop="20dp"></TextView>
+    <com.bozuko.bozuko.views.SlotBannerAnimator android:layout_height="42dp" android:layout_width="fill_parent" android:scaleType="fitCenter" android:id="@+id/animator"></com.bozuko.bozuko.views.SlotBannerAnimator>
+    
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/slots" android:layout_marginTop="44dp">
+    <RelativeLayout android:layout_alignParentLeft="true" android:background="@drawable/slotframeleft" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/slot1">
+        <ImageView android:layout_width="wrap_content" android:scaleType="fitXY" android:layout_height="wrap_content" android:id="@+id/ImageView03" android:src="@drawable/slotyellowbg" android:layout_marginTop="10dp" android:layout_marginLeft="8dp"></ImageView>
+       	<com.bozuko.bozuko.views.SlotWheelView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ImageView03" android:layout_alignBottom="@+id/ImageView03" android:layout_alignRight="@+id/ImageView03" android:layout_alignTop="@+id/ImageView03" android:id="@+id/slotwheel1"/>
+        <ImageView android:id="@+id/imageView1" android:layout_alignParentLeft="true" android:src="@drawable/slotshadowoverlay" android:scaleType="fitXY" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginTop="10dp" android:layout_marginLeft="8dp"></ImageView>
+    </RelativeLayout>
+    <RelativeLayout android:background="@drawable/slotframecenter" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_toRightOf="@+id/slot1" android:id="@+id/slot2">
+        <ImageView android:layout_width="wrap_content" android:scaleType="fitXY" android:layout_height="wrap_content" android:id="@+id/ImageView03" android:src="@drawable/slotyellowbg" android:layout_marginTop="10dp" android:layout_marginLeft="6dp"></ImageView>
+       	<com.bozuko.bozuko.views.SlotWheelView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ImageView03" android:layout_alignBottom="@+id/ImageView03" android:layout_alignRight="@+id/ImageView03" android:layout_alignTop="@+id/ImageView03" android:id="@+id/slotwheel2"/>
+        <ImageView android:id="@+id/imageView1" android:layout_alignParentLeft="true" android:src="@drawable/slotshadowoverlay" android:scaleType="fitXY" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginTop="10dp" android:layout_marginLeft="6dp"></ImageView>
+    </RelativeLayout>
+    <RelativeLayout android:background="@drawable/slotframeright" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@+id/slot2" android:id="@+id/slot3">
+         <ImageView android:layout_width="wrap_content" android:scaleType="fitXY" android:layout_height="wrap_content" android:id="@+id/ImageView03" android:src="@drawable/slotyellowbg" android:layout_marginTop="10dp" android:layout_marginLeft="3dp"></ImageView>
+       	<com.bozuko.bozuko.views.SlotWheelView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/ImageView03" android:layout_alignBottom="@+id/ImageView03" android:layout_alignRight="@+id/ImageView03" android:layout_alignTop="@+id/ImageView03" android:id="@+id/slotwheel3"/>
+        <ImageView android:id="@+id/imageView1" android:layout_alignParentLeft="true" android:src="@drawable/slotshadowoverlay" android:scaleType="fitXY" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginTop="10dp" android:layout_marginLeft="3dp"></ImageView>
+    </RelativeLayout>
+    </LinearLayout>
+    
+    <Button android:background="@drawable/spinbutton" android:id="@+id/spin" android:layout_alignRight="@+id/credits" android:layout_below="@+id/credits" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginRight="-5dp"></Button>
+    <com.bozuko.bozuko.views.SequencerImageView android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:id="@+id/sequencer" android:layout_height="42dp" android:layout_width="fill_parent" android:scaleType="fitCenter" android:visibility="invisible"></com.bozuko.bozuko.views.SequencerImageView>
+    <TextView android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_marginBottom="5dp" android:layout_marginLeft="10dp" android:textColor="#FFFFFF" android:text="Prizes" android:textSize="12dp" android:id="@+id/prizestext"></TextView>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentBottom="true" android:layout_marginBottom="5dp" android:layout_marginRight="10dp" android:text="Official Rules" android:textColor="#FFFFFF" android:textSize="12dp" android:id="@+id/officialrules"></TextView>
+</RelativeLayout>

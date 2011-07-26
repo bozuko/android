@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <com.fuzz.android.ui.URLImageView android:layout_centerInParent="true" android:id="@+id/ticket" android:scaleType="fitXY" android:layout_width="640px" android:layout_height="832px"></com.fuzz.android.ui.URLImageView>
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignBottom="@+id/ticket" android:layout_alignLeft="@+id/ticket" android:layout_alignRight="@+id/ticket" android:layout_alignTop="@+id/ticket" android:id="@+id/scratcharea">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/prizestext" android:text="Prizes" android:textColor="#FFFFFF" android:textSize="12dp" android:layout_alignParentBottom="true" android:layout_marginBottom="5dp" android:layout_marginLeft="10dp"></TextView>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:text="Official Rules" android:textSize="12dp" android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:layout_marginRight="10dp" android:layout_marginBottom="5dp" android:id="@+id/officialrules"></TextView>
+   	    <ImageView android:id="@+id/cardBackground" android:scaleType="fitXY" android:src="@drawable/scratchyoulosebg" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:visibility="gone"></ImageView>
+        <ImageView android:src="@drawable/scratchstarsbg" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_centerInParent="true" android:id="@+id/cardStars" android:visibility="gone"></ImageView>
+        <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cardText" android:layout_centerInParent="true" android:src="@drawable/scratchyouloseplayagaintxt" android:visibility="gone"></ImageView>
+    </RelativeLayout>
+</RelativeLayout>
