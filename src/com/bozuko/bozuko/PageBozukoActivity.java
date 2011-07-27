@@ -3,6 +3,7 @@ package com.bozuko.bozuko;
 import java.net.URL;
 import org.json.JSONObject;
 
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.views.GameView;
@@ -334,10 +335,11 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	}
 
 	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			String url;
@@ -369,6 +371,7 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

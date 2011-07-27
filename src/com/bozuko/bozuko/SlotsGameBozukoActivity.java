@@ -7,6 +7,8 @@ import java.util.TimerTask;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.GameResult;
@@ -167,7 +169,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex + "");
 				//Log.v("SLOTWHEEL2",((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex + "");
 				//Log.v("SLOTWHEEL3",((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex + "");
-				((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
+				
 
 				((SlotWheelView)findViewById(R.id.slotwheel1)).stop();
 			}catch(Throwable t){
@@ -231,10 +233,11 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	public void enterGame(){
 		METHOD_TYPE = GAME_ENTER;
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
@@ -273,6 +276,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		}catch(Throwable t){
+			mHandler.post(new DisplayThrowable(t));
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -281,10 +285,11 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	public void getGameResults(){
 		METHOD_TYPE = GAME_RESULTS;
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
@@ -319,6 +324,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		}catch(Throwable t){
+			mHandler.post(new DisplayThrowable(t));
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -352,6 +358,15 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					result = null;
 					return;
 				}
+			}
+			try{
+				//((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
+				
+				int count = Integer.valueOf(((TextView)findViewById(R.id.credits)).getText().toString());
+				((TextView)findViewById(R.id.credits)).setText((count - 1) + "");
+				
+			}catch(Throwable t){
+				
 			}
 			
 			findViewById(R.id.spin).setEnabled(false);
@@ -480,6 +495,8 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			((SlotWheelView)findViewById(R.id.slotwheel3)).stop();
 		}
 		if(view.getId() == R.id.slotwheel3){
+			((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
+			
 			if(gameState.requestInfo("user_tokens").compareTo("0") != 0){
 				findViewById(R.id.spin).setEnabled(true);
 			}
@@ -598,6 +615,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	}
 	
 	public void goRedeem(){
+		
 		if(timer != null){
 			timer.cancel();
 			timer.purge();

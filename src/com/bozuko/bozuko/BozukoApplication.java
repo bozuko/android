@@ -135,7 +135,7 @@ public class BozukoApplication extends CustomApplication {
 	}
 
 	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			return;
 		}
 		try {

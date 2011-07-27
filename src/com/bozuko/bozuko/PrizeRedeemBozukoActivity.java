@@ -2,6 +2,8 @@ package com.bozuko.bozuko;
 
 import java.net.URL;
 import org.json.JSONObject;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.RedemptionObject;
@@ -127,10 +129,11 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 	}
 	
 	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
+    		return;
 		}
 		try {
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
@@ -171,6 +174,7 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Sorry, unable to redeem prize at this time.";
     		errorTitle = "Request Error";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

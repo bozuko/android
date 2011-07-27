@@ -214,10 +214,11 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	}
 	
 	public void getGameState(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
+    		return;
 		}
 		try {
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -238,6 +239,8 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 			RUNNABLE_STATE = RUNNABLE_SUCCESS;
 		}
 		}catch(Throwable t){
+			mHandler.post(new DisplayThrowable(t));
+			
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

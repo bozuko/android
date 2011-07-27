@@ -185,7 +185,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 	}
 	
 	public void sendFacebookRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
@@ -237,5 +237,18 @@ public class BozukoControllerActivity extends ControllerActivity {
 	
 	public void refresh(){
 		
+	}
+
+	protected class DisplayThrowable implements Runnable{
+		
+		Throwable inThrowable;
+		
+		public DisplayThrowable(Throwable e){
+			inThrowable = e;
+		}
+		
+		public void run(){
+			makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
+		}
 	}
 }

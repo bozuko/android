@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
 import com.bozuko.bozuko.datamodel.PageObject;
@@ -173,10 +175,11 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
     }
     
     public void sendRequest(EntryPointObject entry){
-    	if(!DataBaseHelper.isOnline(this)){
+    	if(!DataBaseHelper.isOnline(this,0)){
     		errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
+    		return;
 		}
 		try {
 			games.clear();
@@ -212,6 +215,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		} catch (Throwable e) {
+			mHandler.post(new DisplayThrowable(e));
 			e.printStackTrace();
 			errorMessage = "Failed to get places from server.";
     		errorTitle = "Request Error";
@@ -220,10 +224,11 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
     }
     
     public void sendSearchRequest(EntryPointObject entry){
-    	if(!DataBaseHelper.isOnline(this)){
+    	if(!DataBaseHelper.isOnline(this,0)){
     		errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
+    		return;
 		}
 		try {
 			search.clear();
@@ -248,6 +253,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		} catch (Throwable e) {
+			mHandler.post(new DisplayThrowable(e));
 			e.printStackTrace();
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";

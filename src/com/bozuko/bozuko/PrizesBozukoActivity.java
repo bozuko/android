@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
 import com.bozuko.bozuko.datamodel.PrizeObject;
@@ -103,11 +105,12 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	}
 	
 	public void sendRequest(EntryPointObject entry){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			activePrizes.clear();
@@ -140,6 +143,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
     		RUNNABLE_STATE = RUNNABLE_FAILED;

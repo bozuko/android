@@ -314,12 +314,26 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		return p;
 	}
 	
-	public static boolean isOnline(Context context) {
+	
+	
+	public static boolean isOnline(Context context,int currentTimeout) {
 		ConnectivityManager cm = (ConnectivityManager) context
 		.getSystemService(Context.CONNECTIVITY_SERVICE);
 		//Log.v("database", cm.toString());
-		if (cm.getActiveNetworkInfo() == null)
+		if (cm.getActiveNetworkInfo() == null){
+			if(currentTimeout > 20000){
+				return false;
+			}
+			
+			try {
+				Thread.sleep(2000);
+				return isOnline(context,currentTimeout+2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return false;
+		}
 		return cm.getActiveNetworkInfo().isConnected();
 
 	}

@@ -4,6 +4,8 @@ import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.User;
 import com.fuzz.android.datahandler.DataBaseHelper;
@@ -78,10 +80,11 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public void sendRequest(String message){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
     		RUNNABLE_STATE = RUNNABLE_FAILED;
     		errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
+    		return;
 		}
 		try {
 			String request = GlobalConstants.BASE_URL + url;
@@ -137,6 +140,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 			
 			
 		} catch (Throwable e) {
+			mHandler.post(new DisplayThrowable(e));
 			e.printStackTrace();
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";

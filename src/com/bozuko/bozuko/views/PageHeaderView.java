@@ -224,12 +224,13 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 	}
 
 	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(getContext())){
+		if(!DataBaseHelper.isOnline(getContext(),0)){
 			post(new Runnable(){
 				public void run(){
 					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();
 				}
 			});
+			return;
 		}
 		try {
 			String url = GlobalConstants.BASE_URL + page.requestInfo("linksfavorite");

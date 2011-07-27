@@ -9,6 +9,7 @@ import com.bozuko.bozuko.datamodel.Bozuko;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
 import com.bozuko.bozuko.datamodel.User;
+import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
 import com.fuzz.android.http.HttpRequest;
 import android.content.DialogInterface;
@@ -20,16 +21,10 @@ import android.util.Log;
 
 public class MainBozukoActivity extends BozukoControllerActivity {
 	
-	Timer timer = new Timer();
+	//Timer timer = new Timer();
 	
 	public void progressRunnableComplete(){
-		try{
-		timer.cancel();
-		timer.purge();
-		timer = null;
-		}catch(Throwable t){
-			
-		}
+	
 		if(isFinishing()){
 			return;
 		}
@@ -42,34 +37,18 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 	
 	public void progressRunnableError(){
 		if(isFinishing()){
-			if(timer != null){
-				try{
-				timer.cancel();
-				timer.purge();
-				timer = null;
-				}catch(Throwable t){
-					
-				}
-			}
+			
 			
 			return;
 		}
-		if(timer == null){
-			makeDialog("Please check your connection. Could not initialize Bozuko.","Connection Error",new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					finish();
-				}
-			});
-		}else{
-			 unProgressRunnable(new Runnable(){
-		        	public void run(){
-		        		sendRequest();
-		        	}
-		        });
-		}
+		makeDialog("Please check your connection. Could not initialize Bozuko.","Connection Error",new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+		});
 	}
 	
     /** Called when the activity is first created. */
@@ -97,16 +76,20 @@ public class MainBozukoActivity extends BozukoControllerActivity {
         		sendRequest();
         	}
         });
-        timer.schedule(new TimerTask(){
-        	public void run(){
-        		timer.cancel();
-        		timer.purge();
-        		timer = null;
-        	}
-        }, 15000);
+//        timer.schedule(new TimerTask(){
+//        	public void run(){
+//        		timer.cancel();
+//        		timer.purge();
+//        		timer = null;
+//        	}
+//        }, 15000);
     }
     
     public void sendRequest(){
+    	if(!DataBaseHelper.isOnline(this,0)){
+			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
+		}
 		try {
 			String url = GlobalConstants.API_URL;
 			

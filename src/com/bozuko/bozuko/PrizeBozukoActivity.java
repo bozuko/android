@@ -111,7 +111,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 					expired.setText("REDEEMED\n" + dateFormat.format(date));
 				}
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 			try{
 				if(prize.requestInfo("is_email").compareTo("true") == 0){
@@ -120,7 +120,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 					try{
 						user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
 					}catch(Throwable t){
-						
+						t.printStackTrace();
 					}
 					TextView thanks = (TextView)findViewById(R.id.thankyou);
 					thanks.setText(Html.fromHtml("This prize has been emailed to:<BR><font size='+2' color='#333333'><b>"+user.requestInfo("email")+"</b></font>"));
@@ -131,7 +131,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 					
 				}
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 		}else if(prize.requestInfo("state").compareTo("expired") == 0){
 			ImageView prizeIcon = (ImageView)findViewById(R.id.prizeicon);
@@ -142,14 +142,14 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 				Date date = dateParser.parse(prize.requestInfo("expiration_timestamp"));
 				expired.setText("EXPIRED\n" + dateFormat.format(date));
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 			
 			try{
 				TextView thanks = (TextView)findViewById(R.id.thankyou);
 				thanks.setText(Html.fromHtml("Sorry, this prize has expired<BR><font size='+2' color='#333333'><b>Thank You</b></font>"));
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 		}else{
 			ImageView prizeIcon = (ImageView)findViewById(R.id.prizeicon);
@@ -160,14 +160,14 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 				Date date = dateParser.parse(prize.requestInfo("redeemed_timestamp"));
 				expired.setText("EMAILED\n" + dateFormat.format(date));
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 			
 			try{
 				TextView thanks = (TextView)findViewById(R.id.thankyou);
 				thanks.setText(Html.fromHtml(""));
 			}catch(Throwable t){
-				
+				t.printStackTrace();
 			}
 		}
 	}
@@ -212,7 +212,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 						timer.cancel();
 						timer = new Timer();
 					}catch(Throwable t){
-						
+						t.printStackTrace();
 					}
 					
 					Intent intent = new Intent(PrizeBozukoActivity.this,PrizeBozukoActivity.class);
@@ -246,7 +246,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 			timer.cancel();
 			timer = new Timer();
 		}catch(Throwable t){
-			
+			t.printStackTrace();
 		}
 		finish();
 	}

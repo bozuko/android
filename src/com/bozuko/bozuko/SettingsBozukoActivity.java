@@ -248,7 +248,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}

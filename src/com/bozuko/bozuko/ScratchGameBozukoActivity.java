@@ -26,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
+
+import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.GameResult;
@@ -33,8 +35,8 @@ import com.bozuko.bozuko.datamodel.GameState;
 import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.User;
-import com.bozuko.bozuko.views.AnimationFactory;
 import com.bozuko.bozuko.views.ScratchView;
+import com.bozuko.bozuko.views.SlotBannerAnimator;
 import com.bozuko.bozuko.views.ScratchView.ScratchListener;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
@@ -302,12 +304,13 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	public void enterGame(){
 		popped.clear();
 		scoreCard.clear();
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			result = null;
 			prize = null;
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
@@ -351,6 +354,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}catch(Throwable t){
 			result = null;
 			prize = null;
+			mHandler.post(new DisplayThrowable(t));
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -360,12 +364,13 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	public void getGameResults(){
 		popped.clear();
 		scoreCard.clear();
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			result = null;
 			prize = null;
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
@@ -403,6 +408,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		}catch(Throwable t){
+			mHandler.post(new DisplayThrowable(t));
 			result = null;
 			prize = null;
 			errorTitle = "Request Error";
@@ -501,8 +507,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 		ImageView cardBackground = (ImageView)findViewById(R.id.cardBackground);
 		ImageView cardText = (ImageView)findViewById(R.id.cardText);
-		ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
-
+		//ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
+		SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
+		
+		animator.setVisibility(View.VISIBLE);
 		
 		cardText.setEnabled(true);
 		cardText.setClickable(true);
@@ -511,52 +519,59 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 					cardBackground.setImageResource(R.drawable.scratchnomoreplaysbg);
 					cardText.setImageResource(R.drawable.scratchnomoreplaystxt);
-					cardBackground.setVisibility(View.VISIBLE);
+					cardBackground.setVisibility(View.GONE);
 					cardText.setVisibility(View.VISIBLE);
-					cardStars.setVisibility(View.GONE);
+					//cardStars.setVisibility(View.GONE);
+					animator.playNoMore();
 				}else{
 					cardBackground.setImageResource(R.drawable.scratchyouloseplayagainbg);
 					cardText.setImageResource(R.drawable.scratchyouloseplayagaintxt);
-					cardBackground.setVisibility(View.VISIBLE);
+					cardBackground.setVisibility(View.GONE);
 					cardText.setVisibility(View.VISIBLE);
-					cardStars.setVisibility(View.GONE);
+					//cardStars.setVisibility(View.GONE);
+					animator.playLose();
 				}
 			}else{
 				if(result.requestInfo("free_play").compareTo("true") == 0){
 					cardBackground.setImageResource(R.drawable.scratchbonustixbg);
 					cardText.setImageResource(R.drawable.scratchbonustixtxt);
-					cardBackground.setVisibility(View.VISIBLE);
+					cardBackground.setVisibility(View.GONE);
 					cardText.setVisibility(View.VISIBLE);
-					cardStars.setVisibility(View.GONE);
+					//cardStars.setVisibility(View.GONE);
+					animator.playBonus();
 				}else{
 					cardBackground.setImageResource(R.drawable.scratchyouwinbg);
 					cardText.setImageResource(R.drawable.scratchyouwintxt);
-					cardBackground.setVisibility(View.VISIBLE);
+					cardBackground.setVisibility(View.GONE);
 					cardText.setVisibility(View.VISIBLE);
-					cardStars.setVisibility(View.GONE);
+					//cardStars.setVisibility(View.GONE);
+					animator.playWin();
 				}
 			}
 		}else{
 			cardBackground.setImageResource(R.drawable.scratchnomoreplaysbg);
 			cardText.setImageResource(R.drawable.scratchnomoreplaystxt);
-			cardBackground.setVisibility(View.VISIBLE);
+			cardBackground.setVisibility(View.GONE);
 			cardText.setVisibility(View.VISIBLE);
-			cardStars.setVisibility(View.GONE);
+			//cardStars.setVisibility(View.GONE);
+			animator.playNoMore();
+			
 		}
 
 		cardText.setOnClickListener(this);
 
 		//startAnimation
 
-		try{
-			if(result.requestInfo("win").compareTo("false")!=0){
-				//cardStars.startAnimation(getRotateAnimation());
-			}
-			cardBackground.startAnimation(AnimationFactory.getScratchBgAnimation(getResources()));
-			//cardText.startAnimation(AnimationFactory.getScratchTextAnimation(getResources()));
-		}catch(Throwable t){
-			t.printStackTrace();
-		}
+		
+//		try{
+//			if(result.requestInfo("win").compareTo("false")!=0){
+//				//cardStars.startAnimation(getRotateAnimation());
+//			}
+//			//cardBackground.startAnimation(AnimationFactory.getScratchBgAnimation(getResources()));
+//			//cardText.startAnimation(AnimationFactory.getScratchTextAnimation(getResources()));
+//		}catch(Throwable t){
+//			t.printStackTrace();
+//		}
 	}
 
 	public void animationDone(){
@@ -568,22 +583,26 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}
 		ImageView cardBackground = (ImageView)findViewById(R.id.cardBackground);
 		ImageView cardText = (ImageView)findViewById(R.id.cardText);
-		ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
+		//ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
 
 		try{
 			cardBackground.clearAnimation();
 			cardBackground.setAnimation(null);
 			cardText.clearAnimation();
 			cardText.setAnimation(null);
-			cardStars.clearAnimation();
-			cardStars.setAnimation(null);
+			//cardStars.clearAnimation();
+			//cardStars.setAnimation(null);
 		}catch(Throwable t){
 
 		}
+		
+		SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
+		animator.setVisibility(View.GONE);
+		animator.stop();
 
 		cardBackground.setVisibility(View.GONE);
 		cardText.setVisibility(View.GONE);
-		cardStars.setVisibility(View.GONE);
+		//cardStars.setVisibility(View.GONE);
 
 		if(result != null){
 			if(result.requestInfo("win").compareTo("false")==0){

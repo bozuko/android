@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.CookieManager;
@@ -216,10 +217,11 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	}
 
 	public void sendRequest(EntryPointObject entry){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
 		}
 		try {
 			ArrayList<PageObject> tempGames = new ArrayList<PageObject>();
@@ -229,7 +231,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			GeoPoint center = this.mapView.getMapCenter();
 			url += String.format("?ll=%f,%f&limit=25&offset=%d",((float)center.getLatitudeE6())/1000000,((float)center.getLongitudeE6())/1000000,0);
 			url += String.format("&bounds=%f,%f,%f,%f", bounds[1][0],bounds[1][1],bounds[0][0],bounds[0][1]);
-			//Log.v("URL",url);
+			Log.v("MAPURL",url);
 			HttpRequest req = new HttpRequest(new URL(url + "&token=" + mprefs.getString("token", "") + "&mobileversion="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
 			JSONObject json = req.AutoJSONError();
@@ -321,7 +323,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	}
 	
 	public void sendFacebookRequest(){
-		if(!DataBaseHelper.isOnline(this)){
+		if(!DataBaseHelper.isOnline(this,0)){
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
