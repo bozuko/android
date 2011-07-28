@@ -1,6 +1,5 @@
 package com.bozuko.bozuko.views;
 
-import com.bozuko.bozuko.R;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.fuzz.android.ui.URLImageView;
 import android.content.Context;
@@ -31,7 +30,7 @@ public class GameView extends RelativeLayout{
 		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
 		params.setMargins(5, 0, 0, 0);
 		_image.setLayoutParams(params);
-		_image.setPlaceHolder(R.drawable.defaultphoto);
+		//_image.setPlaceHolder(R.drawable.defaultphoto);
 		_image.setScaleType(ScaleType.CENTER_CROP);
 		_image.setId(100);
 		addView(_image);
@@ -69,9 +68,9 @@ public class GameView extends RelativeLayout{
 	public void display(GameObject page){
 		//Log.v("GAME",page.toString());
 		if(page.requestInfo("type").compareTo("scratch")==0){
-			_image.setPlaceHolder(R.drawable.scratchicon);
+			//_image.setPlaceHolder(R.drawable.scratchicon);
 		}else if(page.requestInfo("type").compareTo("scratch")==0){
-			_image.setPlaceHolder(R.drawable.slotsicon);
+			//_image.setPlaceHolder(R.drawable.slotsicon);
 		}
 		
 		_image.setURL(page.requestInfo("image"));

@@ -4,8 +4,6 @@ import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.User;
 import com.fuzz.android.datahandler.DataBaseHelper;

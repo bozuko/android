@@ -13,6 +13,8 @@
         </activity>
 
 	<!-- Games -->
+	<activity android:label="TabController" android:configChanges="orientation|keyboardHidden"
+			android:name="TabController" android:theme="@style/customTheme"  android:windowSoftInputMode="stateHidden|adjustPan"/>
 	<activity android:label="GamesTabController" android:configChanges="orientation|keyboardHidden"
 			android:name="GamesTabController" android:theme="@style/customTheme"  android:windowSoftInputMode="stateHidden|adjustResize"/>
 	<activity android:label="NearByGamesBozukoActivity" android:configChanges="orientation|keyboardHidden"

@@ -2,10 +2,8 @@ package com.bozuko.bozuko;
 
 import java.net.URL;
 import java.util.ArrayList;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
 import com.bozuko.bozuko.datamodel.PrizeObject;
@@ -34,8 +32,17 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	ArrayList<PrizeObject> activePrizes = new ArrayList<PrizeObject>();
 	ArrayList<PrizeObject> pastPrizes = new ArrayList<PrizeObject>();
 	
+	ArrayList<PrizeObject> tmpActivePrizes = new ArrayList<PrizeObject>();
+	ArrayList<PrizeObject> tmpPastPrizes = new ArrayList<PrizeObject>();
+	
 	public void progressRunnableComplete(){
 		ListView listview = (ListView)findViewById(R.id.ListView01);
+		
+		pastPrizes.clear();
+		activePrizes.clear();
+		pastPrizes.addAll(tmpPastPrizes);
+		activePrizes.addAll(tmpActivePrizes);
+		
 		if(activePrizes.size()==0 && pastPrizes.size()==0){
 			setContent(R.layout.no_prizes);
 			return;
@@ -48,6 +55,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		listview.setDivider(getResources().getDrawable(R.drawable.pxdividinglinewhite));
 		listview.setSelector(R.drawable.listbutton);
 
+		
+		
 		MergeAdapter mergeAdapter = new MergeAdapter();
 		if(activePrizes.size()>0){
 			mergeAdapter.addView(getTitleView("Active Prizes"), false);
@@ -78,20 +87,16 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
 				sendRequest(entry);
 			}
-		},"Loading...",CANCELABLE);
+		},"Loading...",NOT_CANCELABLE);
 	}
 	
 	public void onResume(){
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mprefs.getBoolean("facebook_login", false)){
-			if(activePrizes == null && pastPrizes == null){
-				getPrizes();
-			}else if(activePrizes.size()==0 && pastPrizes.size()==0){
-				getPrizes();
-			}else{
-				getPrizes();
-			}
+			getPrizes();
 		}else{
+			activePrizes.clear();
+			pastPrizes.clear();
 			setContent(R.layout.no_prizes);
 		}
 		super.onResume();
@@ -113,39 +118,69 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			return;
 		}
 		try {
-			activePrizes.clear();
-			pastPrizes.clear();
+			tmpActivePrizes.clear();
+			tmpPastPrizes.clear();
 			String url = GlobalConstants.BASE_URL + entry.requestInfo("linksprizes");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			url += String.format("?token=%s",mprefs.getString("token", ""));
 			//Log.v("URL",url);
 			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSONError();
-			try{
-			JSONArray objects = json.getJSONArray("prizes");
-			for(int i=0; i<objects.length(); i++){
-				PrizeObject page = new PrizeObject(objects.getJSONObject(i));
-				//Log.v("Page",page.toString());
-				//prizes.add(page);
-				if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
-					pastPrizes.add(page);
-				}else{
-					activePrizes.add(page);
+			JsonParser jp = req.AutoStreamJSONError();
+			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String fieldname = jp.getCurrentName();
+				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if ("prizes".equals(fieldname)) { 
+					//DO parse json
+					while (jp.nextToken() != JsonToken.END_ARRAY) {
+						PrizeObject page = new PrizeObject(jp);
+						//Log.v("Page",page.toString());
+						//prizes.add(page);
+						if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
+							tmpPastPrizes.add(page);
+						}else{
+							tmpActivePrizes.add(page);
+						}
+					}
+					
+					RUNNABLE_STATE = RUNNABLE_SUCCESS;
+				}else if ("title".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorTitle = jp.getText();
+				}else if ("message".equals(fieldname)) {
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorMessage = jp.getText();
+				}else if ("name".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorType = jp.getText();
 				}
 			}
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			}catch(Throwable t){
-				errorTitle = json.getString("title");
-				errorMessage = json.getString("message");
-				errorType = json.getString("name");
-				RUNNABLE_STATE = RUNNABLE_FAILED;
-			}
+//			JSONObject json = req.AutoJSONError();
+//			try{
+//			JSONArray objects = json.getJSONArray("prizes");
+//			for(int i=0; i<objects.length(); i++){
+//				PrizeObject page = new PrizeObject(objects.getJSONObject(i));
+//				//Log.v("Page",page.toString());
+//				//prizes.add(page);
+//				if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
+//					tmpPastPrizes.add(page);
+//				}else{
+//					tmpActivePrizes.add(page);
+//				}
+//			}
+//			RUNNABLE_STATE = RUNNABLE_SUCCESS;
+//			}catch(Throwable t){
+//				errorTitle = json.getString("title");
+//				errorMessage = json.getString("message");
+//				errorType = json.getString("name");
+//				RUNNABLE_STATE = RUNNABLE_FAILED;
+//			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
-			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
+			errorMessage = "Please try again in a moment.";
+    		errorTitle = "Request Error";
     		RUNNABLE_STATE = RUNNABLE_FAILED;
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
@@ -204,8 +239,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-		menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
+		//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
+		//menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -247,13 +282,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
              Intent data) {
          if (requestCode == 666) {
              if (resultCode == RESULT_OK) {
-            	 unProgressRunnable(new Runnable(){
-         			public void run(){
-         				EntryPointObject entry = new EntryPointObject("1");
-         				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
-         				sendRequest(entry);
-         			}
-            	 });
+            	
              }
          }
      }

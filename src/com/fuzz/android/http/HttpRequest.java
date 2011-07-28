@@ -19,6 +19,8 @@ import java.util.Hashtable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -502,6 +504,28 @@ public class HttpRequest {
 			}else{
 				DEBUGCONNECTION();
 				return new JSONObject(getErrorResponse());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();	
+		}
+		return null;
+	}
+	
+	public JsonParser AutoStreamJSONError(){
+		conn.setConnectTimeout(timeout);
+		conn.setReadTimeout(readtimeout);
+		try {
+			Setup();
+			DEBUGSETUP();
+			SendRequest();
+			if(conn.getResponseCode() == 200){
+				DEBUGCONNECTION();
+				JsonFactory f = new JsonFactory();
+				return f.createJsonParser(conn.getInputStream());
+			}else{
+				DEBUGCONNECTION();
+				JsonFactory f = new JsonFactory();
+				return f.createJsonParser(conn.getErrorStream());
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();	

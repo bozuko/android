@@ -266,9 +266,9 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 	
 	public boolean onCreateOptionsMenu(Menu menu){
 		if(redemption == null){
-			menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-			menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
-			menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
+			//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
+			//menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
+			//menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
 		}
 		return super.onCreateOptionsMenu(menu);
 	}

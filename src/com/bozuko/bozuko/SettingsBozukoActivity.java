@@ -203,8 +203,8 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-		menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
+		//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
+		//menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
 		return super.onCreateOptionsMenu(menu);
 	}
 

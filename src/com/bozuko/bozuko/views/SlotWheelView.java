@@ -1,6 +1,7 @@
 package com.bozuko.bozuko.views;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.content.Context;
@@ -111,8 +112,12 @@ public class SlotWheelView extends FrameLayout {
 	public void randomizeScrollPosition(){
 		listView.post(new Runnable(){
 			public void run(){
+				Random seedRandom = new Random();
+				
+				Random random = new Random(seedRandom.nextInt(1000000) + System.currentTimeMillis());
+				int number = random.nextInt(images.size());
 				int size = (int)(80*getResources().getDisplayMetrics().density);
-				spinPosition = (int) (((int)(Math.random()*(images.size())))*size);
+				spinPosition = (int) (number*size);
 				listView.scrollTo(0, spinPosition);
 			}
 		});
@@ -246,5 +251,11 @@ public class SlotWheelView extends FrameLayout {
 	public boolean isSlowingDown() {
 		// TODO Auto-generated method stub
 		return _isSlowing;
+	}
+
+	
+	public void clear() {
+		// TODO Auto-generated method stub
+		images.clear();
 	}
 }

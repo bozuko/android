@@ -1,9 +1,6 @@
 package com.bozuko.bozuko;
 
 import java.net.URL;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.json.JSONObject;
 import com.bozuko.bozuko.datamodel.Bozuko;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
@@ -30,7 +27,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 		}
 		
 		Intent myIntent = new Intent();
-		myIntent.setClassName("com.bozuko.bozuko","com.bozuko.bozuko.GamesTabController");
+		myIntent.setClassName("com.bozuko.bozuko","com.bozuko.bozuko.TabController");
 		startActivity(myIntent);
 		finish();
 	}
@@ -58,7 +55,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
         setContent(R.layout.main);
         getCacheDir();
         ((BozukoApplication)getApp()).searchTerm = "";
-        ((BozukoApplication)getApp()).getEntry();
+        //((BozukoApplication)getApp()).getEntry();
         
 //        Timer n = new Timer();
 //		TimerTask task = new TimerTask(){

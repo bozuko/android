@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.TextUtils.TruncateAt;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -35,6 +36,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 	TextView _distance;
 	ImageButton _star;
 	PageObject page;
+	LinearLayout image;
 
 	public PageView(Context context) {
 		super(context);
@@ -61,7 +63,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		_star.setOnClickListener(this);
 		addView(_star);
 
-		LinearLayout image = new LinearLayout(mContext);
+		image = new LinearLayout(mContext);
 		image.setBackgroundResource(R.drawable.photoboarder);
 		params = new RelativeLayout.LayoutParams((int)(46*getResources().getDisplayMetrics().density),(int)(46*getResources().getDisplayMetrics().density));
 		params.addRule(RelativeLayout.RIGHT_OF,100);
@@ -120,6 +122,29 @@ public class PageView extends RelativeLayout implements OnClickListener {
 	}
 
 	public void display(PageObject inPage){
+		if(inPage == null){
+			_image.setVisibility(View.GONE);
+			_address.setVisibility(View.GONE);
+			_title.setVisibility(View.GONE);
+			_distance.setVisibility(View.GONE);
+			_star.setVisibility(View.GONE);
+			image.setVisibility(View.GONE);
+			_title.setVisibility(View.VISIBLE);
+			_title.setText("Load More");
+			_title.setGravity(Gravity.CENTER);
+			return;
+		}else{
+			image.setVisibility(View.VISIBLE);
+			_image.setVisibility(View.VISIBLE);
+			_address.setVisibility(View.VISIBLE);
+			_title.setVisibility(View.VISIBLE);
+			_distance.setVisibility(View.VISIBLE);
+			_star.setVisibility(View.VISIBLE);
+			_title.setGravity(Gravity.LEFT);
+			_title.setText("");
+		}
+		
+		
 		page = inPage;
 		//Log.v("PAGE",page.toString());
 		_image.setURL(page.requestInfo("image"));

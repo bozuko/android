@@ -1,5 +1,6 @@
 package com.bozuko.bozuko.datamodel;
 
+import org.codehaus.jackson.JsonParser;
 import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -35,6 +36,14 @@ public class PrizeObject extends DataObject {
 
 	protected PrizeObject(Parcel in) {
 		super(in);
+		queryid = "gameid";
+		tablename = "prizes";
+	}
+
+	
+	public PrizeObject(JsonParser jp) {
+		// TODO Auto-generated constructor stub
+		super(jp);
 		queryid = "gameid";
 		tablename = "prizes";
 	}

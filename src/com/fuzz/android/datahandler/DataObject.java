@@ -2,13 +2,13 @@ package com.fuzz.android.datahandler;
 
 import java.util.HashMap;
 import java.util.Iterator;
-
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -68,6 +68,29 @@ public class DataObject implements Parcelable{
 		processJson(json,"");
 	}
 	
+	public DataObject(JsonParser jp) {
+		// TODO Auto-generated constructor stub
+		processJsonParser(jp,"");
+	}
+	
+	public void processJsonParser(JsonParser jp,String masterKey){
+		try {
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String key = jp.getCurrentName();
+				JsonToken token = jp.nextToken();
+				if(token == JsonToken.START_OBJECT){
+					processJsonParser(jp,masterKey+key);
+				}else{
+					map.put(masterKey+key, jp.getText());
+				}
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+
 	@SuppressWarnings("unchecked")
 	public void processJson(JSONObject object,String masterKey){
 		for(Iterator<String> it = object.keys(); it.hasNext();){

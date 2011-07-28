@@ -2,8 +2,6 @@ package com.bozuko.bozuko;
 
 import java.net.URL;
 import org.json.JSONObject;
-
-import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.views.GameView;
@@ -380,9 +378,9 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	
 	public boolean onCreateOptionsMenu(Menu menu){
 		
-		menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-		menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
-		menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
+		//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
+		//menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
+		//menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
 		return super.onCreateOptionsMenu(menu);
 	}
 

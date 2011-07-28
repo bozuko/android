@@ -1,7 +1,11 @@
 package com.bozuko.bozuko;
 
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,6 +41,10 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	ArrayList<PageObject> games = new ArrayList<PageObject>();
 	ArrayList<PageObject> search = new ArrayList<PageObject>();
 	private int currentPage = 0;
+	private int searchCurrentPage = 0;
+
+	boolean loadMore = false;
+	boolean loadMoreSearch = false;
 
 	public void progressRunnableComplete(){
 		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0){
@@ -45,62 +53,73 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			setupSearch();
 		}
 	}
-	
+
 	public void setupSearch(){
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setSelector(R.drawable.listbutton);
 		listview.setItemsCanFocus(false);
-		MergeAdapter mergeAdapter = new MergeAdapter();
-		if(search.size()>0){
-			mergeAdapter.addView(getTitleView("Search"), false);
-			mergeAdapter.addAdapter(new PagesListAdapter(search));
+		if(search.size()<30){
+			MergeAdapter mergeAdapter = new MergeAdapter();
+			if(search.size()>0){
+				mergeAdapter.addView(getTitleView("Search"), false);
+				mergeAdapter.addAdapter(new PagesListAdapter(search,true));
+				((TextView)findViewById(R.id.errmessage)).setVisibility(View.GONE);
+			}else{
+				((TextView)findViewById(R.id.errmessage)).setText("Sorry, your search yielded no results.");
+				((TextView)findViewById(R.id.errmessage)).setVisibility(View.VISIBLE);
+			}
+			
+			listview.setAdapter(mergeAdapter);
+		}else{
+			
 		}
-		listview.setAdapter(mergeAdapter);
+		
+		
 		listview.setOnItemClickListener(this);
 	}
-	
+
 	public void setupList(){
 		ListView listview = (ListView)findViewById(R.id.ListView01);
-		
+
 		if(games.size()==0){
 			setContent(R.layout.no_favorites);
 			return;
 		}
-		
+
 		if(listview == null){
 			setContent(R.layout.searchlistview);
 			listview = (ListView)findViewById(R.id.ListView01);
 		}
 		listview.setDivider(getResources().getDrawable(R.drawable.pxdividinglinewhite));
 		listview.setItemsCanFocus(false);
-		 ((EditText)findViewById(R.id.search)).setOnEditorActionListener(this);
-		 ((EditText)findViewById(R.id.search)).setSingleLine(true);
+		((EditText)findViewById(R.id.search)).setOnEditorActionListener(this);
+		((EditText)findViewById(R.id.search)).setSingleLine(true);
 		// ((EditText)findViewById(R.id.search)).setFocusable(false);
-		 ((EditText)findViewById(R.id.search)).setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-		 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-	    	imm.hideSoftInputFromWindow(((EditText)findViewById(R.id.search)).getWindowToken(), 0);
+		((EditText)findViewById(R.id.search)).setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(((EditText)findViewById(R.id.search)).getWindowToken(), 0);
 		listview.setSelector(R.drawable.listbutton);
 		//listview.setItemsCanFocus(true);
 		MergeAdapter mergeAdapter = new MergeAdapter();
 		if(games.size()>0){
 			mergeAdapter.addView(getTitleView("Favorites"), false);
-			mergeAdapter.addAdapter(new PagesListAdapter(games));
+			mergeAdapter.addAdapter(new PagesListAdapter(games,false));
 		}
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
-		
+
 		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")!=0){
 			((EditText)findViewById(R.id.search)).setText(((BozukoApplication)getApp()).searchTerm);
 			doQuery(((BozukoApplication)getApp()).searchTerm);
 		}
 	}
-	
+
 	@Override
 	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (event != null && event.getAction() != KeyEvent.ACTION_DOWN) {
-            return false;
-       }
+			return false;
+		}
 		String string = ((EditText)v).getText().toString();
 		if(actionId == EditorInfo.IME_ACTION_SEARCH){
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -116,18 +135,27 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 		}
 		return false;
 	}
-	
+
 	public void doQuery(String query){
 		((BozukoApplication)getApp()).searchTerm = query;
-		
+
 		if(query.trim().compareTo("")==0){
 			setupList();
 		}else{
+			try{
+				ListView listview = (ListView)findViewById(R.id.ListView01);
+				MergeAdapter mergeAdapter = new MergeAdapter();
+				listview.setAdapter(mergeAdapter);
+			}catch(Throwable t){
+
+			}
+			search.clear();
+			searchCurrentPage = 0;
 			progressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-	                entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
-	        		sendSearchRequest(entry);
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					sendSearchRequest(entry);
 				}
 			},"Searching...",NOT_CANCELABLE);
 		}
@@ -143,6 +171,15 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	}
 
 	public void getGames(){
+		try{
+			ListView listview = (ListView)findViewById(R.id.ListView01);
+			MergeAdapter mergeAdapter = new MergeAdapter();
+			listview.setAdapter(mergeAdapter);
+		}catch(Throwable t){
+
+		}
+		games.clear();
+		currentPage = 0;
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
@@ -150,6 +187,28 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				sendRequest(entry);
 			}
 		},"Loading...",CANCELABLE);
+	}
+
+	public void loadMore(){
+		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0){
+			currentPage++;
+			progressRunnable(new Runnable(){
+				public void run(){
+					EntryPointObject entry = new EntryPointObject("1");
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					sendRequest(entry);
+				}
+			},"Loading...",CANCELABLE);
+		}else{
+			searchCurrentPage++;
+			progressRunnable(new Runnable(){
+				public void run(){
+					EntryPointObject entry = new EntryPointObject("1");
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					sendSearchRequest(entry);
+				}
+			},"Loading...",CANCELABLE);
+		}
 	}
 
 	public void onResume(){
@@ -186,30 +245,90 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	public void sendRequest(EntryPointObject entry){
 		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
+			errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
 		try {
-			games.clear();
+			ArrayList<PageObject> pages = new ArrayList<PageObject>();
 			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage,mprefs.getString("token", ""));
 			//Log.v("URL",url);
 			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSONError();
-			try{
-			JSONArray objects = json.getJSONArray("pages");
-			for(int i=0; i<objects.length(); i++){
-				PageObject page = new PageObject(objects.getJSONObject(i));
+			JsonParser jp = req.AutoStreamJSONError();
+			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String fieldname = jp.getCurrentName();
+				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if ("pages".equals(fieldname)) { 
+					//DO parse json
+					while (jp.nextToken() != JsonToken.END_ARRAY) {
+						PageObject page = new PageObject(jp);
+						//Log.v("Page",page.toString());
+						if(page.requestInfo("registered").compareTo("true")==0){
+							pages.add(page);
+						}
+					}
+					
 
-				//Log.v("Page",page.toString());
-				if(page.requestInfo("registered").compareTo("true")==0){
-					games.add(page);
+					mHandler.post(new AddAllRunnable(pages,games));
+
+					RUNNABLE_STATE = RUNNABLE_SUCCESS;
+				}else if ("title".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorTitle = jp.getText();
+				}else if ("message".equals(fieldname)) {
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorMessage = jp.getText();
+				}else if ("name".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorType = jp.getText();
 				}
 			}
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
+		} catch (Throwable e) {
+			mHandler.post(new DisplayThrowable(e));
+			e.printStackTrace();
+			errorMessage = "Failed to get places from server.";
+			errorTitle = "Request Error";
+			RUNNABLE_STATE = RUNNABLE_FAILED;
+		}
+	}
+
+	public void sendSearchRequest(EntryPointObject entry){
+		if(!DataBaseHelper.isOnline(this,0)){
+			errorMessage = "Unable to connect to the internet";
+			errorTitle = "No Connection";
+			RUNNABLE_STATE = RUNNABLE_FAILED;
+			return;
+		}
+		try {
+
+			ArrayList<PageObject> pages = new ArrayList<PageObject>();
+			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage,mprefs.getString("token", ""));
+			//Log.v("URL",url);
+			HttpRequest req = new HttpRequest(new URL(url+ "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			req.setMethodType("GET");
+			JSONObject json = req.AutoJSONError();
+			try{
+				JSONArray objects = json.getJSONArray("pages");
+				for(int i=0; i<objects.length(); i++){
+					PageObject page = new PageObject(objects.getJSONObject(i));
+
+					//Log.v("Page",page.toString());
+					if(page.requestInfo("registered").compareTo("true")==0){
+						pages.add(page);
+					}
+				}
+
+				
+
+				mHandler.post(new AddAllRunnable(pages,search));
+
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}catch(Throwable t){
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
@@ -217,73 +336,51 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		} catch (Throwable e) {
-			mHandler.post(new DisplayThrowable(e));
-			e.printStackTrace();
-			errorMessage = "Failed to get places from server.";
-    		errorTitle = "Request Error";
-			RUNNABLE_STATE = RUNNABLE_FAILED;
-		}
-	}
-	
-	public void sendSearchRequest(EntryPointObject entry){
-		if(!DataBaseHelper.isOnline(this,0)){
-			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
-			RUNNABLE_STATE = RUNNABLE_FAILED;
-			return;
-		}
-		try {
-			search.clear();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage,mprefs.getString("token", ""));
-			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url+ "&query=" + ((BozukoApplication)getApp()).searchTerm+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
-			req.setMethodType("GET");
-			JSONObject json = req.AutoJSONError();
-			try{
-			JSONArray objects = json.getJSONArray("pages");
-			for(int i=0; i<objects.length(); i++){
-				PageObject page = new PageObject(objects.getJSONObject(i));
-
-				//Log.v("Page",page.toString());
-				if(page.requestInfo("registered").compareTo("true")==0){
-					search.add(page);
-				}
-			}
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-		}catch(Throwable t){
-			errorTitle = json.getString("title");
-			errorMessage = json.getString("message");
-			errorType = json.getString("name");
-			RUNNABLE_STATE = RUNNABLE_FAILED;
-		}
-		} catch (Throwable e) {
 			e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
+			errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
 	}
 
 	private class PagesListAdapter extends BaseAdapter{
 		ArrayList<PageObject> pages;
+		boolean type = false;
 
-		public PagesListAdapter(ArrayList<PageObject> inArray){
+		public PagesListAdapter(ArrayList<PageObject> inArray,boolean inType){
 			pages = inArray;
+			type = inType;
 		}
 
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			return pages.size();
+			if(type){
+				if(loadMoreSearch){
+					return pages.size()+1;
+				}else{
+					return pages.size();
+				}
+			}else{
+				if(loadMore){
+					return pages.size()+1;
+				}else{
+					return pages.size();
+				}
+			}
+
+
 		}
 
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			return pages.get(position);
+			if(position < pages.size()){
+				return pages.get(position);
+			}else{
+				return null;
+			}
 		}
 
 		@Override
@@ -313,7 +410,11 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				movieView = (PageView) convertView;
 			}
 			movieView.display((PageObject)getItem(position));
-			groupView.showArrow(true);
+			if(getItem(position)==null){
+				groupView.showArrow(false);
+			}else{
+				groupView.showArrow(true);
+			}
 			return groupView;
 		}
 
@@ -329,13 +430,18 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
-		PageObject page = (PageObject)arg0.getItemAtPosition(arg2);
-		((BozukoApplication)getApp()).currentPageObject = page;
-		Intent intent = new Intent(this,PageBozukoActivity.class);
-		//intent.putExtra("Package", page);
-		startActivity(intent);
+		Object obj = arg0.getItemAtPosition(arg2);
+		if(obj != null){
+			PageObject page = (PageObject)obj;
+			((BozukoApplication)getApp()).currentPageObject = page;
+			Intent intent = new Intent(this,PageBozukoActivity.class);
+			//intent.putExtra("Package", page);
+			startActivity(intent);
+		}else{
+			loadMore();
+		}
 	}
-	
+
 	public void refresh(){
 		getGames();
 	}
@@ -364,6 +470,26 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			}
 		}else{
 			finish();
+		}
+	}
+
+	private class AddAllRunnable implements Runnable{
+		ArrayList<PageObject> srcArray;
+		ArrayList<PageObject> dstArray;
+		public AddAllRunnable(ArrayList<PageObject> tmpArray, ArrayList<PageObject> inArray){
+			dstArray = inArray;
+			srcArray = tmpArray;
+		}
+
+		public void run(){
+			dstArray.addAll(srcArray);
+
+			try{
+				ListView listview = (ListView)findViewById(R.id.ListView01);
+				((BaseAdapter)listview.getAdapter()).notifyDataSetChanged();
+			}catch(Throwable t){
+
+			}
 		}
 	}
 }

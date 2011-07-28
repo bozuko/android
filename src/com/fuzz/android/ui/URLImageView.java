@@ -183,6 +183,11 @@ public class URLImageView extends TouchImageView{
 		}
 	};
 
+	boolean doFit = false;
+	public void setDoFit(boolean inDoFit){
+		doFit = inDoFit;
+	}
+	
 	// Setup the base matrix so that the image is centered and scaled properly.
 	final Runnable setImageLoaded = new Runnable() {
 		public void run() {	
@@ -191,6 +196,16 @@ public class URLImageView extends TouchImageView{
 				progress.setVisibility(View.GONE);
 			}
 
+			if(doFit && ScaleType.FIT_CENTER == getScaleType() && drawable != null){
+				float h = (40*getResources().getDisplayMetrics().density);
+				float dh = drawable.getIntrinsicHeight();
+				float dw = drawable.getIntrinsicWidth();
+				int w = Math.round((dw/dh) * h);
+				setMinimumWidth(w);
+				setMaxWidth(w);
+				invalidate();
+			}
+			
 			if(drawable != null){
 				switch(LOAD_TYPE){
 					case FOREGROUND:
@@ -212,7 +227,11 @@ public class URLImageView extends TouchImageView{
 			}
 
 			if(mListener != null){
-				mListener.imageDidLoad();
+				if(drawable != null){
+					mListener.imageDidLoad();
+				}else{
+					mListener.imageDidFailLoad();
+				}
 			}
 		}
 	};
@@ -222,6 +241,17 @@ public class URLImageView extends TouchImageView{
 			loading = false;
 			if(progress != null){
 				progress.setVisibility(View.GONE);
+			}
+
+
+			if(doFit && ScaleType.FIT_CENTER == getScaleType() && drawable != null){
+				float h = (40*getResources().getDisplayMetrics().density);
+				float dh = drawable.getIntrinsicHeight();
+				float dw = drawable.getIntrinsicWidth();
+				int w = Math.round((dw/dh) * h);
+				setMinimumWidth(w);
+				setMaxWidth(w);
+				invalidate();
 			}
 
 			if(drawable != null){
@@ -243,7 +273,11 @@ public class URLImageView extends TouchImageView{
 				imageweb = null;
 			}
 			if(mListener != null){
-				mListener.imageDidLoad();
+				if(drawable != null){
+					mListener.imageDidLoad();
+				}else{
+					mListener.imageDidFailLoad();
+				}
 			}
 		}
 	};
@@ -328,45 +362,60 @@ public class URLImageView extends TouchImageView{
 			url2 = u;
 		}
 
+		public void downloadNow(int time){
+			try{
+			String tmpURL = url2;
+			URL u;
+			//File cache = imgV.getContext().getCacheDir();
+			URLConnection conn;
+			do{
+				u = new URL(tmpURL);
+				conn = u.openConnection();
+				conn.setRequestProperty("Content-Language", "en-US");
+				conn.setRequestProperty("User-Agent", "Android/SuperGlued");
+				conn.setUseCaches(false);
+				conn.setDoInput(true);
+				conn.connect();
+				tmpURL = conn.getHeaderField("location");
+			} while(conn.getHeaderField("location")!= null);
+			
+			
+			InputStream inputStream = conn.getInputStream();
+			
+			//cache.
+			//cache.
+			FileOutputStream out;
+			if(TYPE == CROSSFADE_IMAGE || TYPE == COVERFLOW_IMAGE || TYPE == THUMBNAIL_IMAGE){
+				out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
+			}else{
+				out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+			}
+			//OutputStream out = imgV.getContext().openFileOutput(DataBaseHelper.localFileForUrl(url2), 0);
+			byte buf[] = new byte[1024];
+			int len;
+			while ((len = inputStream.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			out.close();
+			inputStream.close();
+			}catch(Throwable t){
+				if(time < 20000){
+					try{
+						Thread.sleep(2000);
+						downloadNow(time+2000);
+					}catch(Throwable t2){
+						
+					}
+				}
+			}
+		}
+		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			try {
 				//Log.v("Adding Image to Collection", url2);
-				String tmpURL = url2;
-				URL u;
-				//File cache = imgV.getContext().getCacheDir();
-				URLConnection conn;
-				do{
-					u = new URL(tmpURL);
-					conn = u.openConnection();
-					conn.setRequestProperty("Content-Language", "en-US");
-					conn.setRequestProperty("User-Agent", "Android/SuperGlued");
-					conn.setUseCaches(false);
-					conn.setDoInput(true);
-					conn.connect();
-					tmpURL = conn.getHeaderField("location");
-				} while(conn.getHeaderField("location")!= null);
-				
-				
-				InputStream inputStream = conn.getInputStream();
-				
-				//cache.
-				//cache.
-				FileOutputStream out;
-				if(TYPE == CROSSFADE_IMAGE || TYPE == COVERFLOW_IMAGE || TYPE == THUMBNAIL_IMAGE){
-					out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
-				}else{
-					out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-				}
-				//OutputStream out = imgV.getContext().openFileOutput(DataBaseHelper.localFileForUrl(url2), 0);
-				byte buf[] = new byte[1024];
-				int len;
-				while ((len = inputStream.read(buf)) > 0) {
-					out.write(buf, 0, len);
-				}
-				out.close();
-				inputStream.close();
+				downloadNow(0);
 				if(TYPE==COVERFLOW_IMAGE){
 					BitmapFactory.Options opts = new BitmapFactory.Options();
 					DisplayMetrics metrics = new DisplayMetrics();
@@ -411,7 +460,7 @@ public class URLImageView extends TouchImageView{
 
 				}else{
 					drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-
+					
 				}
 				
 				if(drawable == null){

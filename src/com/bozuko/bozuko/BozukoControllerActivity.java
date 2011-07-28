@@ -248,7 +248,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 		}
 		
 		public void run(){
-			makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
+			//makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
 		}
 	}
 }

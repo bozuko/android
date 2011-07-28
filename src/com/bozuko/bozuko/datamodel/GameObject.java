@@ -2,6 +2,9 @@ package com.bozuko.bozuko.datamodel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,6 +64,14 @@ public class GameObject extends DataObject {
 		}
 	}
 	
+	public GameObject(JsonParser jp) {
+		// TODO Auto-generated constructor stub
+		super(jp);
+		queryid = "id";
+		tablename = "games";
+	}
+	
+
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
 		super.writeToParcel(out, flags);
@@ -139,6 +150,62 @@ public class GameObject extends DataObject {
 		}
 	}
 	
+	public void processJsonParser(JsonParser jp,String masterKey){
+		try {
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String key = jp.getCurrentName();
+				JsonToken token = jp.nextToken();
+				if(token == JsonToken.START_OBJECT){
+					if(key.compareTo("game_state")==0){
+						gameState = new GameState(jp);
+					}else if(key.compareTo("icons")==0){
+						processIcons(jp);
+					}else{
+						processJsonParser(jp,masterKey+key);
+					}
+				}else if(token == JsonToken.START_ARRAY){
+					if(key.compareTo("prizes")==0){
+						prizes = new ArrayList<PrizeObject>();
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+							PrizeObject game = new PrizeObject(jp);
+							prizes.add(game);
+						}
+					}else if(key.compareTo("consolation_prizes")==0){
+						consoldationPrizes = new ArrayList<PrizeObject>();
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+							PrizeObject game = new PrizeObject(jp);
+							consoldationPrizes.add(game);
+						}
+					}else{
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+						}
+					}
+				}else{
+					map.put(masterKey+key, jp.getText());
+				}
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void processIcons(JsonParser jp) {
+		// TODO Auto-generated method stub
+		iconsImages = new ArrayList<String>();
+		icons = new ArrayList<String>();
+		try{
+		while (jp.nextToken() != JsonToken.END_OBJECT) {
+			String key = jp.getCurrentName();
+			jp.nextToken();
+			iconsImages.add(jp.getText());
+			icons.add(key);
+		}
+		}catch(Throwable t){
+			
+		}
+	}
+
 	public String toString(){
 		String ret = super.toString();
 		for(PrizeObject prize : prizes){

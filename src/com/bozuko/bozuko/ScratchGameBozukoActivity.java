@@ -26,8 +26,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
-
-import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.GameResult;
@@ -35,8 +33,8 @@ import com.bozuko.bozuko.datamodel.GameState;
 import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.User;
+import com.bozuko.bozuko.views.AnimationFactory;
 import com.bozuko.bozuko.views.ScratchView;
-import com.bozuko.bozuko.views.SlotBannerAnimator;
 import com.bozuko.bozuko.views.ScratchView.ScratchListener;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
@@ -53,6 +51,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	GameResult result;
 	GameState gameState;
 	PrizeObject prize;
+	
+	boolean requestDONE = false;
+	boolean imageDONE = false;
 
 	ArrayList<Integer> popped = new ArrayList<Integer>();
 	HashMap<String,Integer> scoreCard = new HashMap<String,Integer>();
@@ -60,6 +61,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	@SuppressWarnings("unchecked")
 	@Override
 	public void progressRunnableComplete(){
+		requestDONE = true;
+		closeDialogs();
 		Log.v("GAMESTATE",gameState.toString());
 		if(gameState.requestInfo("user_tokens").compareTo("0") == 0 && result == null){
 			allButtonsHaveBeenScratched();
@@ -67,10 +70,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			if(((TextView)findViewById(R.id.credits)).getText().toString().compareTo("0")==0){
 				if(result.requestInfo("free_play").compareTo("true") != 0){
 					((TextView)findViewById(R.id.credits)).setText((Integer.valueOf(gameState.requestInfo("user_tokens"))+1) + "");
-					findViewById(R.id.credits).setVisibility(View.VISIBLE);
+					//findViewById(R.id.credits).setVisibility(View.VISIBLE);
 				}else{
 					((TextView)findViewById(R.id.credits)).setText((Integer.valueOf(gameState.requestInfo("user_tokens")) + ""));
-					findViewById(R.id.credits).setVisibility(View.VISIBLE);
+					//findViewById(R.id.credits).setVisibility(View.VISIBLE);
 				}
 
 			}
@@ -210,6 +213,12 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}
 
 		if(result != null){
+			if(isWinner){
+				animationDone();
+				isWinner = false;
+				return;
+			}
+			
 			boolean won = false;
 
 			for(String key : scoreCard.keySet()){
@@ -227,7 +236,11 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				}
 			}
 		}
+		
+		
 	}
+	
+	boolean isWinner = false;
 
 	public void onPause(){
 		super.onPause();
@@ -235,6 +248,30 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			timer.cancel();
 			timer.purge();
 			timer = null;
+			
+//			SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
+//			animator.setVisibility(View.GONE);
+//			animator.stop();
+			ImageView cardBackground = (ImageView)findViewById(R.id.cardBackground);
+			ImageView cardText = (ImageView)findViewById(R.id.cardText);
+			ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
+
+			try{
+				cardBackground.clearAnimation();
+				cardBackground.setAnimation(null);
+				cardText.clearAnimation();
+				cardText.setAnimation(null);
+				cardStars.clearAnimation();
+				cardStars.setAnimation(null);
+			}catch(Throwable t){
+
+			}
+			cardText.setVisibility(View.GONE);
+			cardBackground.setVisibility(View.GONE);
+			cardStars.setVisibility(View.GONE);
+			
+			isWinner = true;
+			
 		}catch(Throwable t){
 
 		}
@@ -389,23 +426,25 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			JSONObject json = req.AutoJSONError();
 			Log.v("JSON",json.toString());
 			try{
-				result = new GameResult(json);
-				result.add("gameid", gameState.requestInfo("game_id"));
-				gameState.processJson(json.getJSONObject("game_state"), "");
-				try{
-					prize = new PrizeObject(json.getJSONObject("prize"));
-					prize.add("gameid", gameState.requestInfo("game_id"));
-				}catch(Throwable t){
-
-				}
-				RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			}catch(Throwable t){
 				result = null;
 				prize = null;
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
 				errorType = json.getString("name");
 				RUNNABLE_STATE = RUNNABLE_FAILED;
+				
+			}catch(Throwable t){
+				result = new GameResult(json);
+				result.add("gameid", gameState.requestInfo("game_id"));
+				JSONObject state = json.getJSONObject("game_state");
+				gameState.processJson(state, "");
+				try{
+					prize = new PrizeObject(json.getJSONObject("prize"));
+					prize.add("gameid", gameState.requestInfo("game_id"));
+				}catch(Throwable t1){
+
+				}
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}
 		}catch(Throwable t){
 			mHandler.post(new DisplayThrowable(t));
@@ -507,10 +546,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 		ImageView cardBackground = (ImageView)findViewById(R.id.cardBackground);
 		ImageView cardText = (ImageView)findViewById(R.id.cardText);
-		//ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
-		SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
+		ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
+		//SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
 		
-		animator.setVisibility(View.VISIBLE);
+		//animator.setVisibility(View.VISIBLE);
 		
 		cardText.setEnabled(true);
 		cardText.setClickable(true);
@@ -519,42 +558,42 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 					cardBackground.setImageResource(R.drawable.scratchnomoreplaysbg);
 					cardText.setImageResource(R.drawable.scratchnomoreplaystxt);
-					cardBackground.setVisibility(View.GONE);
+					cardBackground.setVisibility(View.VISIBLE);
 					cardText.setVisibility(View.VISIBLE);
-					//cardStars.setVisibility(View.GONE);
-					animator.playNoMore();
+					cardStars.setVisibility(View.GONE);
+					//animator.playNoMore();
 				}else{
 					cardBackground.setImageResource(R.drawable.scratchyouloseplayagainbg);
 					cardText.setImageResource(R.drawable.scratchyouloseplayagaintxt);
-					cardBackground.setVisibility(View.GONE);
+					cardBackground.setVisibility(View.VISIBLE);
 					cardText.setVisibility(View.VISIBLE);
-					//cardStars.setVisibility(View.GONE);
-					animator.playLose();
+					cardStars.setVisibility(View.GONE);
+					//animator.playLose();
 				}
 			}else{
 				if(result.requestInfo("free_play").compareTo("true") == 0){
 					cardBackground.setImageResource(R.drawable.scratchbonustixbg);
 					cardText.setImageResource(R.drawable.scratchbonustixtxt);
-					cardBackground.setVisibility(View.GONE);
+					cardBackground.setVisibility(View.VISIBLE);
 					cardText.setVisibility(View.VISIBLE);
-					//cardStars.setVisibility(View.GONE);
-					animator.playBonus();
+					cardStars.setVisibility(View.VISIBLE);
+					//animator.playBonus();
 				}else{
 					cardBackground.setImageResource(R.drawable.scratchyouwinbg);
 					cardText.setImageResource(R.drawable.scratchyouwintxt);
-					cardBackground.setVisibility(View.GONE);
+					cardBackground.setVisibility(View.VISIBLE);
 					cardText.setVisibility(View.VISIBLE);
-					//cardStars.setVisibility(View.GONE);
-					animator.playWin();
+					cardStars.setVisibility(View.VISIBLE);
+					//animator.playWin();
 				}
 			}
 		}else{
 			cardBackground.setImageResource(R.drawable.scratchnomoreplaysbg);
 			cardText.setImageResource(R.drawable.scratchnomoreplaystxt);
-			cardBackground.setVisibility(View.GONE);
+			cardBackground.setVisibility(View.VISIBLE);
 			cardText.setVisibility(View.VISIBLE);
-			//cardStars.setVisibility(View.GONE);
-			animator.playNoMore();
+			cardStars.setVisibility(View.GONE);
+			//animator.playNoMore();
 			
 		}
 
@@ -563,15 +602,15 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		//startAnimation
 
 		
-//		try{
-//			if(result.requestInfo("win").compareTo("false")!=0){
-//				//cardStars.startAnimation(getRotateAnimation());
-//			}
-//			//cardBackground.startAnimation(AnimationFactory.getScratchBgAnimation(getResources()));
-//			//cardText.startAnimation(AnimationFactory.getScratchTextAnimation(getResources()));
-//		}catch(Throwable t){
-//			t.printStackTrace();
-//		}
+		try{
+			if(result.requestInfo("win").compareTo("false")!=0){
+				cardStars.startAnimation(AnimationFactory.getScratchRotationAnimation(getResources()));
+			}
+			cardBackground.startAnimation(AnimationFactory.getScaleAnimation(getResources()));
+			cardText.startAnimation(AnimationFactory.getScaleReverseAnimation(getResources()));
+		}catch(Throwable t){
+			t.printStackTrace();
+		}
 	}
 
 	public void animationDone(){
@@ -583,26 +622,26 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}
 		ImageView cardBackground = (ImageView)findViewById(R.id.cardBackground);
 		ImageView cardText = (ImageView)findViewById(R.id.cardText);
-		//ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
+		ImageView cardStars = (ImageView)findViewById(R.id.cardStars);
 
 		try{
 			cardBackground.clearAnimation();
 			cardBackground.setAnimation(null);
 			cardText.clearAnimation();
 			cardText.setAnimation(null);
-			//cardStars.clearAnimation();
-			//cardStars.setAnimation(null);
+			cardStars.clearAnimation();
+			cardStars.setAnimation(null);
 		}catch(Throwable t){
 
 		}
 		
-		SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
-		animator.setVisibility(View.GONE);
-		animator.stop();
+//		SlotBannerAnimator animator = (SlotBannerAnimator)findViewById(R.id.animator);
+//		animator.setVisibility(View.GONE);
+//		animator.stop();
 
 		cardBackground.setVisibility(View.GONE);
 		cardText.setVisibility(View.GONE);
-		//cardStars.setVisibility(View.GONE);
+		cardStars.setVisibility(View.GONE);
 
 		if(result != null){
 			if(result.requestInfo("win").compareTo("false")==0){
@@ -661,6 +700,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	@Override
 	public void imageDidFailLoad() {
 		// TODO Auto-generated method stub
+		imageDONE = true;
+		closeDialogs();
 		makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
 
 			@Override
@@ -674,6 +715,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	@Override
 	public void imageDidLoad() {
 		// TODO Auto-generated method stub
+		imageDONE = true;
+		closeDialogs();
+		
 		((URLImageView)findViewById(R.id.businessimage)).setScaleType(ScaleType.CENTER_CROP);
 		RotateAnimation rotate = new RotateAnimation(0,-15,findViewById(R.id.businessimage).getWidth()/2, findViewById(R.id.businessimage).getHeight()/2);
 		rotate.setFillAfter(true);
@@ -683,10 +727,15 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 		((URLImageView)findViewById(R.id.businessimage)).setPlaceHolder(R.drawable.defaultphoto);
 		((URLImageView)findViewById(R.id.businessimage)).setURL(page.requestInfo("image"));
-		if(((TextView)findViewById(R.id.credits)).getText().toString().compareTo("0")!=0){
-			findViewById(R.id.credits).setVisibility(View.VISIBLE);
-		}
+		
 		//((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
+	}
+	
+	public void closeDialogs(){
+		if(imageDONE && requestDONE){
+			findViewById(R.id.credits).setVisibility(View.VISIBLE);
+			super.closeDialogs();
+		}
 	}
 
 }

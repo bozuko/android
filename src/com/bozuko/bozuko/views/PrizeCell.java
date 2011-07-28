@@ -30,8 +30,8 @@ public class PrizeCell extends RelativeLayout{
 		params.addRule(RelativeLayout.CENTER_VERTICAL,1);
 		params.setMargins(5, 0, 0, 0);
 		_image.setLayoutParams(params);
-	
-		_image.setScaleType(ScaleType.FIT_XY);
+		_image.setDoFit(true);
+		_image.setScaleType(ScaleType.FIT_CENTER);
 		_image.setId(100);
 		addView(_image);
 		

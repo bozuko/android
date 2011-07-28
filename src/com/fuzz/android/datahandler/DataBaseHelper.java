@@ -18,6 +18,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -320,7 +321,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		ConnectivityManager cm = (ConnectivityManager) context
 		.getSystemService(Context.CONNECTIVITY_SERVICE);
 		//Log.v("database", cm.toString());
-		if (cm.getActiveNetworkInfo() == null){
+		NetworkInfo ni = cm.getActiveNetworkInfo();
+		
+		if (ni == null){
 			if(currentTimeout > 20000){
 				return false;
 			}
@@ -334,7 +337,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			}
 			return false;
 		}
-		return cm.getActiveNetworkInfo().isConnected();
+		return ni.isConnected() || ni.isConnectedOrConnecting();
 
 	}
 

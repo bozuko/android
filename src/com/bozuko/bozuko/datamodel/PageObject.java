@@ -2,6 +2,9 @@ package com.bozuko.bozuko.datamodel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +57,34 @@ public class PageObject extends DataObject {
 		}
 	}
 
+	public void processJsonParser(JsonParser jp,String masterKey){
+		try {
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String key = jp.getCurrentName();
+				JsonToken token = jp.nextToken();
+				if(token == JsonToken.START_OBJECT){
+					processJsonParser(jp,masterKey+key);
+				}else if(token == JsonToken.START_ARRAY){
+					if(key.compareTo("games")==0){
+						games = new ArrayList<GameObject>();
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+							GameObject game = new GameObject(jp);
+							games.add(game);
+						}
+					}else{
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+						}
+					}
+				}else{
+					map.put(masterKey+key, jp.getText());
+				}
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
 		public PageObject createFromParcel(Parcel in) {
@@ -76,6 +107,14 @@ public class PageObject extends DataObject {
 			games.add((GameObject) in.readParcelable(GameObject.class.getClassLoader()));
 		}
 	}
+
+	public PageObject(JsonParser jp) {
+		// TODO Auto-generated constructor stub
+		super(jp);
+		queryid = "id";
+		tablename = "pages";
+	}
+	
 
 	@Override
 	public void writeToParcel(Parcel out, int flags) {

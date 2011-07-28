@@ -142,7 +142,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		
 		if(game.prizes.size() > 0 && game.consoldationPrizes.size() > 0){
 			mergeAdapter.addView(getSpacer(), false);
-			mergeAdapter.addView(getGroupTitleView("Prizes"),false);
+			mergeAdapter.addView(getGroupTitleView("Available Prizes"),false);
 			
 			ArrayList<PrizeObject> prizes = new ArrayList<PrizeObject>();
 			prizes.addAll(game.prizes);
@@ -152,12 +152,12 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 			
 		}else if(game.prizes.size() > 0){
 			mergeAdapter.addView(getSpacer(), false);
-			mergeAdapter.addView(getGroupTitleView("Prizes"),false);
+			mergeAdapter.addView(getGroupTitleView("Available Prizes"),false);
 			
 			mergeAdapter.addAdapter(new PrizeListAdapter(game.prizes));
 		}else if(game.consoldationPrizes.size() > 0){
 			mergeAdapter.addView(getSpacer(), false);
-			mergeAdapter.addView(getGroupTitleView("Prizes"),false);
+			mergeAdapter.addView(getGroupTitleView("Available Prizes"),false);
 			
 			mergeAdapter.addAdapter(new PrizeListAdapter(game.consoldationPrizes));
 		}

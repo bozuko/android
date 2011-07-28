@@ -15,32 +15,88 @@ public class AnimationFactory {
 	
 	public static int ANIMATION_SPEED = 500;
 	
-	public static Animation getScratchBgAnimation(Resources resources){
+	public static Animation getScratchRotationAnimation(Resources resources){
 		AnimationSet setAnimation = new AnimationSet(true);
 		
-		RotateAnimation rotateAnimation = new RotateAnimation(0,360,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-		rotateAnimation.setDuration(ANIMATION_SPEED*4);
+		RotateAnimation rotateAnimation = new RotateAnimation(0,360*3,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+		rotateAnimation.setDuration(ANIMATION_SPEED*12);
 		rotateAnimation.setInterpolator(new LinearInterpolator());
 		setAnimation.addAnimation(rotateAnimation);
 		
-		ScaleAnimation scaleAnimation2 = new ScaleAnimation(0.0f,1.0f,0.0f,1.0f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-		scaleAnimation2.setDuration(ANIMATION_SPEED*4);
-		setAnimation.addAnimation(scaleAnimation2);
-		scaleAnimation2.setInterpolator(new BounceInterpolator());
-		
-		ScaleAnimation scaleAnimation1 = new ScaleAnimation(1.0f,0.0f,1.0f,0.0f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-		scaleAnimation1.setDuration(ANIMATION_SPEED*4);
-		scaleAnimation1.setStartOffset(ANIMATION_SPEED*4);
-		setAnimation.addAnimation(scaleAnimation1);
-		scaleAnimation1.setInterpolator(new BounceInterpolator());
-		
-		RotateAnimation rotateAnimation1 = new RotateAnimation(0,360,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-		rotateAnimation1.setDuration(ANIMATION_SPEED*4);
-		rotateAnimation1.setStartOffset(ANIMATION_SPEED*4);
-		rotateAnimation1.setInterpolator(new LinearInterpolator());
-		setAnimation.addAnimation(rotateAnimation1);
+		return setAnimation;
+	}
+	
+	public static Animation getScaleAnimation(Resources resources){
+		AnimationSet setAnimation = new AnimationSet(true);
+	
+		buildAnimation(0,setAnimation);
 		
 		return setAnimation;
+	}
+	
+	public static Animation getScaleReverseAnimation(Resources resources){
+		AnimationSet setAnimation = new AnimationSet(true);
+	
+		buildReverseAnimation(0,setAnimation);
+		
+		return setAnimation;
+	}
+	
+	
+	public static Animation getScratchBgAnimation(Resources resources){
+		AnimationSet setAnimation = new AnimationSet(true);
+		
+		
+		
+		RotateAnimation rotateAnimation = new RotateAnimation(0,360*3,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+		rotateAnimation.setDuration(ANIMATION_SPEED*12);
+		rotateAnimation.setInterpolator(new LinearInterpolator());
+		setAnimation.addAnimation(rotateAnimation);
+		
+		buildAnimation(0,setAnimation);
+		
+		return setAnimation;
+	}
+	
+
+	public static void buildReverseAnimation(int current,AnimationSet animation){
+		if(current == 6){
+			return;
+		}
+		if(current%2 == 0){
+			ScaleAnimation scaleAnimation2 = new ScaleAnimation(1.1f,0.90f,1.1f,0.90f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+			scaleAnimation2.setDuration(ANIMATION_SPEED*2);
+			scaleAnimation2.setStartOffset((ANIMATION_SPEED*2)*current);
+			animation.addAnimation(scaleAnimation2);
+			scaleAnimation2.setInterpolator(new BounceInterpolator());
+		}else{
+			ScaleAnimation scaleAnimation2 = new ScaleAnimation(0.90f,1.1f,0.90f,1.1f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+			scaleAnimation2.setDuration(ANIMATION_SPEED*2);
+			scaleAnimation2.setStartOffset((ANIMATION_SPEED*2)*current);
+			animation.addAnimation(scaleAnimation2);
+			scaleAnimation2.setInterpolator(new BounceInterpolator());
+		}
+		buildReverseAnimation(current+1,animation);
+	}
+	
+	public static void buildAnimation(int current,AnimationSet animation){
+		if(current == 6){
+			return;
+		}
+		if(current%2 == 0){
+			ScaleAnimation scaleAnimation2 = new ScaleAnimation(0.90f,1.1f,0.90f,1.1f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+			scaleAnimation2.setDuration(ANIMATION_SPEED*2);
+			scaleAnimation2.setStartOffset((ANIMATION_SPEED*2)*current);
+			animation.addAnimation(scaleAnimation2);
+			scaleAnimation2.setInterpolator(new BounceInterpolator());
+		}else{
+			ScaleAnimation scaleAnimation2 = new ScaleAnimation(1.1f,0.90f,1.1f,0.90f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+			scaleAnimation2.setDuration(ANIMATION_SPEED*2);
+			scaleAnimation2.setStartOffset((ANIMATION_SPEED*2)*current);
+			animation.addAnimation(scaleAnimation2);
+			scaleAnimation2.setInterpolator(new BounceInterpolator());
+		}
+		buildAnimation(current+1,animation);
 	}
 	
 	public static Animation getScratchTextAnimation(Resources resources){

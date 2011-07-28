@@ -2,8 +2,6 @@ package com.bozuko.bozuko;
 
 import java.net.URL;
 import org.json.JSONObject;
-
-import com.bozuko.bozuko.BozukoControllerActivity.DisplayThrowable;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.RedemptionObject;
@@ -162,15 +160,15 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 			
 			JSONObject json = req.AutoJSONError();
 			try{
-				Log.v("JSON",json.toString());
-				redemption = new RedemptionObject(json);
-				prize.processJson(json.getJSONObject("prize"), "");
-				RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			}catch(Throwable t){
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
 				errorType = json.getString("name");
 				RUNNABLE_STATE = RUNNABLE_FAILED;
+			}catch(Throwable t){
+				Log.v("JSON",json.toString());
+				redemption = new RedemptionObject(json);
+				prize.processJson(json.getJSONObject("prize"), "");
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();

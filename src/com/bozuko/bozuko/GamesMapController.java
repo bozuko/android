@@ -4,9 +4,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -56,8 +56,6 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		
 	}
 	
-	
-
 	@Override
 	public void progressRunnableError(){
 		if(itemizedoverlay.shouldAdd()){
@@ -66,24 +64,26 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		mapView.postInvalidate();
 		if(games.size()==0){
 			//makeDialog("No games near location.","",null);
+			if(errorType.compareTo("facebook/auth")==0){
+				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						facebookSignOut();
+						finish();
+					}
+				});
+			}else{
+				makeDialog(errorMessage,errorTitle,null);
+			}
+			
 			findViewById(R.id.errormsg).setVisibility(View.VISIBLE);
 		}else{
 			findViewById(R.id.errormsg).setVisibility(View.GONE);
 		}
 		SENDING = false;
-		if(errorType.compareTo("facebook/auth")==0){
-			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					facebookSignOut();
-					finish();
-				}
-			});
-		}else{
-			makeDialog(errorMessage,errorTitle,null);
-		}
+		
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -179,14 +179,16 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	}
 
 	public void loadGames(){
+		if(!SENDING){
 		SENDING = true;
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
 				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
-				sendRequest(entry);
+				sendRequest(entry,0);
 			}
 		},"Loading. Please wait...",CANCELABLE);
+		}
 	}
 	
 	public void loadGamesBG(){
@@ -196,7 +198,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
 				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
-				sendRequest(entry);
+				sendRequest(entry,0);
 			}
 		});
 		}
@@ -216,7 +218,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		return bounds;
 	}
 
-	public void sendRequest(EntryPointObject entry){
+	public void sendRequest(EntryPointObject entry,int time){
 		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
@@ -232,30 +234,49 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			url += String.format("?ll=%f,%f&limit=25&offset=%d",((float)center.getLatitudeE6())/1000000,((float)center.getLongitudeE6())/1000000,0);
 			url += String.format("&bounds=%f,%f,%f,%f", bounds[1][0],bounds[1][1],bounds[0][0],bounds[0][1]);
 			Log.v("MAPURL",url);
-			HttpRequest req = new HttpRequest(new URL(url + "&token=" + mprefs.getString("token", "") + "&mobileversion="+GlobalConstants.MOBILE_VERSION));
-			req.setMethodType("GET");
-			JSONObject json = req.AutoJSONError();
-			try{
-			JSONArray objects = json.getJSONArray("pages");
-			for(int i=0; i<objects.length(); i++){
-				PageObject page = new PageObject(objects.getJSONObject(i));
-				if(page.requestInfo("registered").compareTo("true")==0){
-					if(!gamesLoaded.containsKey(page.requestInfo("id"))){
-						tempGames.add(page);
-						gamesLoaded.put(page.requestInfo("id"), "1");
-					}
+			if(url.toLowerCase().contains("null")){
+				if(time<20000){
+					Thread.sleep(2000);
+					sendRequest(entry,time+2000);
 				}
 			}
-			mHandler.post(new LoadMapRunnable(tempGames));
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			}catch(Throwable t){
-				errorTitle = json.getString("title");
-				errorMessage = json.getString("message");
-				errorType = json.getString("name");
-				RUNNABLE_STATE = RUNNABLE_FAILED;
+			
+			HttpRequest req = new HttpRequest(new URL(url + "&token=" + mprefs.getString("token", "") + "&mobileversion="+GlobalConstants.MOBILE_VERSION));
+			req.setMethodType("GET");
+			JsonParser jp = req.AutoStreamJSONError();
+			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String fieldname = jp.getCurrentName();
+				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if ("pages".equals(fieldname)) { 
+					//DO parse json
+					while (jp.nextToken() != JsonToken.END_ARRAY) {
+						PageObject page = new PageObject(jp);
+						//Log.v("Page",page.toString());
+						if(page.requestInfo("registered").compareTo("true")==0){
+							if(!gamesLoaded.containsKey(page.requestInfo("id"))){
+								tempGames.add(page);
+								gamesLoaded.put(page.requestInfo("id"), "1");
+							}
+						}
+					}
+					mHandler.post(new LoadMapRunnable(tempGames));
+					RUNNABLE_STATE = RUNNABLE_SUCCESS;
+				}else if ("title".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorTitle = jp.getText();
+				}else if ("message".equals(fieldname)) {
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorMessage = jp.getText();
+				}else if ("name".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorType = jp.getText();
+				}
 			}
+			
 		} catch (Throwable e) {
 			e.printStackTrace();
+			//mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -305,8 +326,6 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	public void refresh(){
 		loadGames();
 	}
-
-
 
 	@Override
 	public void onClick(View arg0) {
@@ -370,6 +389,19 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			cookieManager.removeAllCookie();
 		}catch(Throwable t){
 			
+		}
+	}
+
+	protected class DisplayThrowable implements Runnable{
+		
+		Throwable inThrowable;
+		
+		public DisplayThrowable(Throwable e){
+			inThrowable = e;
+		}
+		
+		public void run(){
+			makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
 		}
 	}
 }
