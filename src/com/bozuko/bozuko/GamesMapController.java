@@ -77,6 +77,14 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 						finish();
 					}
 				});
+			}else if(errorType.compareTo("auth/mobile")==0){
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				
+				if(mprefs.getBoolean("facebook_login", false)){
+					((BozukoApplication)getApp()).getUser();
+				}
+				
+				makeDialog(errorMessage,errorTitle,null);
 			}else{
 				makeDialog(errorMessage,errorTitle,null);
 			}
@@ -276,7 +284,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 					errorType = jp.getText();
 				}
 			}
-			
+			jp.close();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			//mHandler.post(new DisplayThrowable(e));

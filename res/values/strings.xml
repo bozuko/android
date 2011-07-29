@@ -3,6 +3,10 @@
 	<string name="search_hint">Search for games</string>
     <string name="search_descrip">Games Search</string>
 	
+	<string name="eula_title">License</string>
+	<string name="eula_accept">Accept</string>
+	<string name="eula_refuse">Refuse</string>
+	
     <string name="hello">Hello World, Main!</string>
     <string name="Cancel">Cancel</string>
     <string name="Ok">Ok</string>

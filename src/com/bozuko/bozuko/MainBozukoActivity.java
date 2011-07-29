@@ -135,15 +135,20 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 				String url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
 				HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 				req.setMethodType("GET");
-				JSONObject json = req.AutoJSON();
-				User user = new User(json);
+				JSONObject json = req.AutoJSONError();
+				try{
+					json.getString("title");
+					
+				}catch(Throwable t){
+					User user = new User(json);
 				
-				user.add("userid", "1");
-				user.add("bozukoid", user.requestInfo("id"));
-				user.remove("id");
-				Log.v("UserObject",user.toString());
-				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
-				user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+					user.add("userid", "1");
+					user.add("bozukoid", user.requestInfo("id"));
+					user.remove("id");
+					Log.v("UserObject",user.toString());
+					BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
+					user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				}
 			}
 		}catch(Throwable t){
 				

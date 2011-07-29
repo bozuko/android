@@ -167,6 +167,14 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 					finish();
 				}
 			});
+		}else if(errorType.compareTo("auth/mobile")==0){
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			
+			if(mprefs.getBoolean("facebook_login", false)){
+				((BozukoApplication)getApp()).getUser();
+			}
+			
+			makeDialog(errorMessage,errorTitle,null);
 		}else{
 			makeDialog(errorMessage,errorTitle,null);
 		}

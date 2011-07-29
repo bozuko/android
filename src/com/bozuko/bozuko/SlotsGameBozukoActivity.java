@@ -217,6 +217,21 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 						finish();
 					}
 				});
+			}else if(errorType.compareTo("auth/mobile")==0){
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				
+				if(mprefs.getBoolean("facebook_login", false)){
+					((BozukoApplication)getApp()).getUser();
+				}
+				
+				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
 			}else{
 				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
@@ -249,6 +264,21 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
 						facebookSignOut();
+						finish();
+					}
+				});
+			}else if(errorType.compareTo("auth/mobile")==0){
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				
+				if(mprefs.getBoolean("facebook_login", false)){
+					((BozukoApplication)getApp()).getUser();
+				}
+				
+				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
 						finish();
 					}
 				});

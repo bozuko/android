@@ -11,15 +11,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TabHost;
+import com.google.android.divideandconquer.Eula;
 
-public class GamesTabController extends TabActivity implements OnClickListener {
+public class GamesTabController extends TabActivity implements OnClickListener,Eula.OnEulaAgreedTo {
 
 	
 	public void onCreate(Bundle savedInstanceState) {
 		 getWindow().setFormat(PixelFormat.RGBA_8888);
 	    super.onCreate(savedInstanceState);
 	    showtabs();
-	    
+	    Eula.show(this);
 	    findViewById(R.id.nearby).setOnClickListener(this);
 	    findViewById(R.id.favorites).setOnClickListener(this);
 	    findViewById(R.id.map).setOnClickListener(this);
@@ -111,6 +112,13 @@ public class GamesTabController extends TabActivity implements OnClickListener {
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onEulaAgreedTo() {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(this,AboutBozukoActivity.class);
+		startActivity(intent);
 	}
 	
 }

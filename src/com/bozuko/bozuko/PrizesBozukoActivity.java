@@ -159,6 +159,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 					errorType = jp.getText();
 				}
 			}
+			jp.close();
 //			JSONObject json = req.AutoJSONError();
 //			try{
 //			JSONArray objects = json.getJSONArray("prizes");

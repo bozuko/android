@@ -290,6 +290,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 					errorType = jp.getText();
 				}
 			}
+			jp.close();
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
 			e.printStackTrace();

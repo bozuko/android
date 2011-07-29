@@ -8,13 +8,12 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.ImageView.ScaleType;
 
-public class SlotWheelView extends FrameLayout {
+public class SlotWheelView extends NoTouchScrollView {
 
 	private static final float FAST_SPEED = 10;
 	private float CURRENT_SPEED = FAST_SPEED;
@@ -59,18 +58,19 @@ public class SlotWheelView extends FrameLayout {
 
 
 	private void createUI(Context mContext){
+		listView = this;
 		RESETPOSITION = (int)(160*getResources().getDisplayMetrics().density);
-		listView = new NoTouchScrollView(mContext);
-		listView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
-		addView(listView);
-		listView.setHorizontalScrollBarEnabled(false);
-		listView.setVerticalScrollBarEnabled(false);
-		listView.setEnabled(false);
+		//listView = new NoTouchScrollView(mContext);
+		//listView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+		//addView(listView);
+		setHorizontalScrollBarEnabled(false);
+		setVerticalScrollBarEnabled(false);
+		setEnabled(false);
 
 		layout = new LinearLayout(mContext);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		layout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-		listView.addView(layout);
+		addView(layout);
 		_animateTimer = new Timer();
 	}
 
@@ -110,7 +110,7 @@ public class SlotWheelView extends FrameLayout {
 	}
 
 	public void randomizeScrollPosition(){
-		listView.post(new Runnable(){
+		post(new Runnable(){
 			public void run(){
 				Random seedRandom = new Random();
 				

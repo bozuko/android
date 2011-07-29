@@ -3,7 +3,6 @@ package com.bozuko.bozuko;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
@@ -143,6 +142,8 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContent(R.layout.searchlistview);
+		
+		
 		//setHeader(R.layout.detailheader);
 		((EditText)findViewById(R.id.search)).setSingleLine(true);
 		((EditText)findViewById(R.id.search)).setOnEditorActionListener(this);
@@ -249,7 +250,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 					errorType = jp.getText();
 				}
 			}
-
+			jp.close();
 			//			try{
 			//			JSONArray objects = json.getJSONArray("pages");
 			//			for(int i=0; i<objects.length(); i++){

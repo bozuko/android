@@ -108,6 +108,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 					expired.setText("EMAILED\n" + dateFormat.format(date));
 				}else{
 					Date date = dateParser.parse(prize.requestInfo("redeemed_timestamp"));
+					//date = dateParser.parse("Fri Jul 29 2011 16:13:06 GMT-0400 (EDT)");
 					expired.setText("REDEEMED\n" + dateFormat.format(date));
 				}
 			}catch(Throwable t){

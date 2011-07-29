@@ -144,34 +144,50 @@ public class BozukoApplication extends CustomApplication {
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSON();
-			EntryPointObject entry = new EntryPointObject(json);
-			entry.add("entryid", "1");
-			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
-			entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+			JSONObject json = req.AutoJSONError();
+			try{
+				json.getString("title");
 			
-			url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
-			req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
-			req.setMethodType("GET");
-			json = req.AutoJSON();
-			Bozuko bozuko = new Bozuko(json);
-			bozuko.add("bozukoid", "1");
-			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("bozuko");
-			bozuko.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
-			
-			if(entry.checkInfo("linksuser")){
-				url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
+			}catch(Throwable t1){
+				EntryPointObject entry = new EntryPointObject(json);
+				entry.add("entryid", "1");
+				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
+				entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				
+				url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
 				req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 				req.setMethodType("GET");
-				json = req.AutoJSON();
-				User user = new User(json);
+				json = req.AutoJSONError();
+				try{
+					json.getString("title");
+					
+				}catch(Throwable t){
+					Bozuko bozuko = new Bozuko(json);
+					bozuko.add("bozukoid", "1");
+					BozukoDataBaseHelper.getSharedInstance(this).eraseTable("bozuko");
+					bozuko.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				}
 				
-				user.add("userid", "1");
-				user.add("bozukoid", user.requestInfo("id"));
-				user.remove("id");
-				Log.v("UserObject",user.toString());
-				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
-				user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				if(entry.checkInfo("linksuser")){
+					url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
+					req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
+					req.setMethodType("GET");
+					json = req.AutoJSONError();
+					try{
+						json.getString("title");
+						
+					}catch(Throwable t){
+						User user = new User(json);
+						
+						user.add("userid", "1");
+						user.add("bozukoid", user.requestInfo("id"));
+						user.remove("id");
+						Log.v("UserObject",user.toString());
+						BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
+						user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+					}
+					
+				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -182,4 +198,43 @@ public class BozukoApplication extends CustomApplication {
 	public void onTerminate(){
 		super.onTerminate();
 	}
+
+	public void getUser(){
+		Thread th = new Thread(){
+			public void run(){
+				sendUserRequest();
+				
+			}
+		};
+		th.start();
+	}
+	
+	public void sendUserRequest(){
+		EntryPointObject entry = new EntryPointObject("1");
+		entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		try{
+		String url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
+		HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
+		req.setMethodType("GET");
+		JSONObject json = req.AutoJSONError();
+		try{
+			json.getString("title");
+			
+		}catch(Throwable t){
+			User user = new User(json);
+			
+			user.add("userid", "1");
+			user.add("bozukoid", user.requestInfo("id"));
+			user.remove("id");
+			Log.v("UserObject",user.toString());
+			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
+			user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+		}
+		}catch(Throwable t){
+			
+		}
+	}
 }
+
