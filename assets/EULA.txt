@@ -1,0 +1,89 @@
+BOZUKO MOBILE APPLICATION
+TERMS OF END USER LICENSE AGREEMENT
+
+Effective July 27, 2011
+Last Revised July 27, 2011
+
+This End User License Agreement (this “License”) is an agreement between you and Bozuko Inc. (“Bozuko”) that sets forth the terms of your license to access and use the location-based social games and related services available through Bozuko’s mobile application, as well as updates and upgrades that replace or supplement it in any respect and which are not distributed with a separate license, and any documentation (collectively, the “Bozuko App”).
+
+PLEASE READ THIS LICENSE CAREFULLY. BY ACCESSING THE BOZUKO APP, YOU ACCEPT AND AGREE TO THE TERMS OF THIS LICENSE. IF YOU DO NOT AGREE TO THESE TERMS, PLEASE DO NOT ACCESS, INSTALL OR USE THE BOZUKO APP.
+
+SECTION 4 OF THIS LICENSE DESCRIBES OUR PRIVACY PRACTICES APPLICABLE TO THE BOZUKO APP. YOUR PRIVACY IS IMPORTANT TO US AND WE ENCOURAGE YOU TO READ SECTION 4 CAREFULLY.
+
+1. License Grant.
+
+The Bozuko App and its content, including its "look and feel" (e.g., text, graphics, images, logos), content and other material, (“App Content”) are protected under copyright, trademark and other laws. The Bozuko App and the App Content are owned by Bozuko and its licensors and are licensed to you.
+
+Bozuko hereby grants to you, subject to the terms and conditions of this License, a personal, nonexclusive, nontransferable, limited license (without the right to sublicense) to access and use the Bozuko App for your non- commercial use on a mobile device that you own or control. This License does not allow you to use the Bozuko App on any mobile device that you do not own or control. This License is limited to the intellectual property rights of Bozuko and its licensors and does not include any rights to other patents or intellectual property. All rights not expressly granted herein are reserved by Bozuko.
+
+2.License Limitations.
+
+You agree to protect the Bozuko App from unauthorized access or use. Except as specifically permitted in this License or expressly authorized in writing by Bozuko, you agree that you will not directly or indirectly: (a) encumber, transfer, rent, lease, sublicense, modify, time-share or use the Bozuko App in any service bureau arrangement; or (b) distribute, copy, adapt, create derivative works of, translate, localize, port or otherwise modify the Bozuko App; or (c) permit any third party to engage in any of the acts described in clauses (a) and (b).
+
+You understand and agree that you are not permitted to: (w) remove or alter any copyright or other proprietary rights’ notice or restrictive rights legend contained or included in the Bozuko App; (x) decompile, disassemble, reverse compile, reverse assemble, reverse translate or otherwise reverse engineer the Bozuko App; (y) use any means to discover the source code of the Bozuko App or to discover the trade secrets in the Bozuko App; or (z) otherwise circumvent any technological measure that controls access to the Bozuko App.
+
+3. Use of Bozuko App.
+
+You must provide at your own expense the mobile device, wireless service plan, software, Internet connections and/or other equipment or services that you need to access and use the Bozuko App. Bozuko does not guarantee that the Bozuko App can be accessed and used on all devices or with all service plans or is available in all geographic locations. You acknowledge that when you use the Bozuko App your wireless service provider may charge you fees for data, messaging and/or other wireless access. Please check with your wireless service provider to determine what fees apply to your access and use of the Bozuko App. YOU ARE SOLELY RESPONSIBLE FOR ANY FEE, COST OR EXPENSE THAT YOU INCUR TO ACCESS, INSTALL AND USE THE BOZUKO APP FROM YOUR MOBILE DEVICE.
+
+A Facebook Account may be required to access and use certain functionality of the Bozuko App. (Please visit www.facebook.com for more information.) The Bozuko App also may allow you to access services of other third parties which may require Internet access and/or that you accept additional terms and conditions.
+
+You agree that you:
+
+* You will not access or use the Bozuko App if you are under age 18 or otherwise not fully able and competent to agree to the terms of this License;
+* You not access or use the Bozuko App if you have previously been banned by Bozuko;
+* You will use the Bozuko App for personal and non-commercial purposes only and not to advertise, solicit or transmit commercial advertisements, including “spam”;
+* You will not use the Bozuko App for offensive, indecent or objectionable conduct; and
+* You will use the Bozuko App for lawful purposes only and not use it to engage in any illegal conduct.
+
+4. Your Data.
+You understand and agree that Bozuko may collect, use and disclose information from you in various ways when you use the Bozuko App, as follows:
+
+(a) Information that Bozuko Collects: We collect personal information that you provide to us directly or though your use of the Bozuko App. This personal information may include but is not limited to name, e-mail address, mailing address, Facebook account information (e.g., profile picture, gender, list of friends and information that you “share with everyone” on Facebook), geographic information regarding the location (e.g., city and state) of you/your mobile device and information provided by winners of sweepstakes. When you use the Bozuko App, we may use cookies, web beacons and other analytic technologies to collect non-personally identifiable information, such as information about your mobile device (including unique device id (UDID), make and model), IP address, usage data, operating system, applications and software. This information will not be stored in a manner that is personally identifiable with you, although it may be unique or consist of or contain information that you consider to be personal information.
+
+(b) Use of Information: Bozuko may store and use the Personal Information that you provide through your use of the Bozuko App. We may use your personal information to process your requests, facilitate communication between Bozuko and you and to customize, analyze, adjust and improve the Bozuko App. Bozuko also may use the information to enforce Bozuko’s agreements with you, to prevent fraud and other prohibited or illegal activities and for other purposes authorized or required by law. We do not rent or sell your personal information.
+
+(c) Disclosure of Information: We will not disclose, share, sell or trade your personal information to or with any third party other than (i) we deem necessary, in our sole discretion and without your prior permission, to comply with any applicable law, regulation, legal process or governmental request; (ii) to protect or defend Bozuko’s rights or property, even without a subpoena, warrant or other court order; (iii) to a party acquiring all or substantially all of the equity and/or assets of Bozuko or the Bozuko App in order to permit the party to continue the operation of the Bozuko App; and (iv) in the event of a merger, liquidation, dissolution or other transfer of substantially all of the assets of Bozuko or the Bozuko App. Except as described above, we will not disclose your Personal Information to other third parties unless you have provided consent.
+
+All personal and non-personal information provided through the Bozuko App is sent through your mobile service provider. Personal information collected by your mobile service provider and other third parties is used, stored, transferred and disclosed pursuant to the third party’s privacy policies and practices.
+
+The Bozuko App also may allow you to interact and share your information with others. We encourage you to carefully consider disclosure of your personal information that might be accessible to others.
+
+If you would like to “opt-out” of certain information gathering and sharing or to opt-out of certain features of the Bozuko App, then please uninstall the Bozuko App.
+
+
+5. Modifications.
+
+We may modify this License at any time. Modifications become effective immediately upon your first access to or use of the Bozuko App after the “Last Revised” date at the top of this page. Your continued access or use of the Bozuko App after the modifications have become effective shall be deemed your conclusive acceptance of the modified License.
+
+6. Disclaimer of Warranties & Limitation of Liability.
+
+YOU ACKNOWLEDGE THAT THE BOZUKO APP (INCLUDING, WITHOUT LIMITATION, ANY THIRD PARTY SOFTWARE OR SERVICES) IS SUPPLIED TO YOU ON AN "AS IS" BASIS AND THAT USE OF THE BOZUKO APP IS AT YOUR SOLE RISK. BOZUKO HEREBY EXPRESSLY DISCLAIMS ALL WARRANTIES REGARDING THE BOZUKO APP AND THE USE, PERFORMANCE, OPERATION AND SUPPORT THEREOF, EITHER EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR ANY PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, INTERFERENCE WITH ENJOYMENT, ACCURACY, COMPLETENESS, INTEGRATION, FREEDOM FROM DEFECTS OR DISABLING DEVICES, UNINTERRUPTED USE AND ALL WARRANTIES IMPLIED FROM ANY COURSE OF DEALING OR USAGE OF TRADE. BOZUKO DOES NOT WARRANT THAT (A) THE BOZUKO APP WILL MEET YOUR REQUIREMENTS, (B) OPERATION OF THE BOZUKO APP WILL BE UNINTERRUPTED OR VIRUS- OR ERROR-FREE, (C) THAT THE BOZUKO APP WILL OPERATE OR BE COMPATIBLE WITH ANY OTHER APPLICATION, (D) DEFECTS IN THE BOZUKO APP WILL BE CORRECTED OR (E) THAT THE BOZUKO APP WILL BE AVAILABLE FOR REINSTALLS ON THE SAME OR MULTIPLE DEVICES. ANY ORAL OR WRITTEN ADVICE PROVIDED BY BOZUKO OT ITS AUTHORIZED AGENTS WILL NOT BE DEEMED TO CREATE ANY WARRANTY. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF IMPLIED WARRANTIES SO SOME OR ALL OF THE ABOVE EXCLUSIONS MAY NOT APPLY TO YOU.
+
+YOU AGREE THAT IN NO EVENT WILL BOZUKO BE LIABLE (Y) FOR DIRECT, INDIRECT, SPECIAL, EXEMPLARY, INCIDENTAL, CONSEQUENTIAL OR PUNITIVE DAMAGES OF ANY KIND (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, LOSS OF USE, DATA OR PROFITS OR BUSINESS INTERRUPTION), HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY, WHETHER UNDER THIS LICENSE OR OTHERWISE ARISING IN ANY WAY IN CONNECTION WITH THE BOZUKO APP OR THIS LICENSE AND WHETHER IN CONTRACT, STRICT LIABILITY OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) EVEN IF BOZUKO HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE, OR (Z) FOR ANY OTHER CLAIM, DEMAND OR DAMAGES WHATSOEVER RESULTING FROM OR ARISING OUT OF OR IN CONNECTION WITH THIS LICENSE OR THE DELIVERY, USE OR PERFORMANCE OF THE BOZUKO APP. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE ABOVE EXCLUSION OR LIMITATION MAY NOT APPLY TO YOU.
+
+You agree that the above limitation of liability together with the other provisions in this License that limit liability are essential terms of this License.
+
+7. Termination.
+
+This License is effective until the earlier of the date that you uninstall the Bozuko App, you fail to comply with any term of this License or Bozuko terminates this License. Upon termination, you will cease all use of the Bozuko App and will destroy all copies (full or partial) of the Bozuko App in your possession or control. Termination will not limit any of Bozuko’s other rights or remedies at law or in equity. This Section 7 along with Sections 1, 2, 6, 10, 11 and 12 shall survive termination or expiration of this License for any reason.
+
+8. Export Laws.
+
+You agree that you will not export or re-export, directly or indirectly the Bozuko App and/or other information or materials provided by Bozuko hereunder, to any country for which the United States or any other relevant jurisdiction requires any export license or other governmental approval at the time of export without first obtaining such license or approval. You are responsible for and hereby agree to comply at your sole expense with all applicable United States export laws and regulations.
+
+9. U.S. Government Restricted Rights.
+
+The Bozuko App is “commercial computer software” and “commercial computer software documentation,” respectively, as such terms are used in United States Federal Acquisition Regulations Section 12.212. Any use, modification, reproduction, release, performance, display, disclosure or distribution of the Bozuko App by or on behalf of the U.S. Government is subject to restrictions as set forth in this License.
+
+10. Taxes.
+
+You are solely responsible for any and all duties, taxes, levies or fees (including any sales, use or withholding taxes) imposed on or in connection with this License by any authority.
+
+11. Injunctive Relief.
+
+You agree that a breach of this License will cause irreparable injury to Bozuko for which monetary damages would not be an adequate remedy and Bozuko shall be entitled to seek equitable relief in addition to any remedies it may have hereunder or at law without a bond, other security or proof of damages.
+
+12. Miscellaneous.
+
+This License may not be modified except by a writing executed by the duly-authorized representatives of Bozuko. No other act, document, usage or custom will be deemed to modify or amend this License. This License will inure to the benefit of and will be binding upon each party’s successors and assigns. This License and the licenses granted hereunder may be assigned by Bozuko but may not be assigned by you without the prior express written consent of Bozuko. If any provision hereof is or becomes, at any time or for any reason, unenforceable or invalid, no other provision hereof will be affected thereby and the remaining provisions will continue with the same effect as if such unenforceable or invalid provisions will not have been inserted herein; provided that the ability of either party to obtain substantially the bargained-for performance of the other will not have thereby been impaired. It is expressly understood that in the event either party on any occasion fails to perform any term hereof and the other party does not enforce that term, the failure to enforce on any occasion will not constitute a waiver of any term and will not prevent enforcement on any other occasion. Nothing contained in this License will be deemed to constitute either party as the agent or representative of the other party or both parties as joint venturers or partners for any purpose. In the event that either party is prevented from performing, or is unable to perform, any of its obligations under this License due to any cause beyond the reasonable control of the party invoking this provision, the affected party's performance will be extended for the period of delay or inability to perform due to such occurrence. The headings and captions contained herein will not be considered to be part of the License but are for convenience only. This License will be governed by and construed and enforced in accordance with the internal laws of the Commonwealth of Massachusetts, without giving effect to the principles of conflicts of laws of such state, and will be binding upon the parties hereto in the United States and worldwide. You and Bozuko agree that the United Nations Convention on Contracts for the International Sale of Goods will not apply to the interpretation or construction of this License. Any claims or legal actions by one party against the other arising under this License or concerning any rights under this License will be commenced and maintained in any state or federal court located in the Commonwealth of Massachusetts and both parties hereby submit to the jurisdiction and venue of any such court. This License sets forth the entire understanding of the parties with respect to the matters contained herein and there are no promises, covenants or undertakings other than those expressly set forth herein.
