@@ -58,6 +58,9 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	
 	@Override
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(itemizedoverlay.shouldAdd()){
 			mapOverlays.add(itemizedoverlay);
 		}

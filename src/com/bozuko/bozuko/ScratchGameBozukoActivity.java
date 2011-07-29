@@ -61,6 +61,26 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	@SuppressWarnings("unchecked")
 	@Override
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			if(result != null){
+				result.add("scratchBitmap", popped.toString());
+				Log.v("SCRATCH",popped.toString());
+				result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				try{
+					Log.v("Prize",prize.toString());
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+				
+				if(prize != null){
+					prize.add("gameid", gameState.requestInfo("game_id"));
+					Log.v("Prize",prize.toString());
+					prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				}
+			}
+			return;
+		}
+		
 		requestDONE = true;
 		closeDialogs();
 		Log.v("GAMESTATE",gameState.toString());
@@ -118,6 +138,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 	@Override
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(errorType.compareTo("facebook/auth")==0){
 			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
@@ -281,7 +304,15 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			result.add("scratchBitmap", popped.toString());
 			Log.v("SCRATCH",popped.toString());
 			result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+			try{
+				Log.v("Prize",prize.toString());
+			}catch(Throwable t){
+				t.printStackTrace();
+			}
+			
 			if(prize != null){
+				prize.add("gameid", gameState.requestInfo("game_id"));
+				Log.v("Prize",prize.toString());
 				prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 			}
 		}
@@ -295,13 +326,15 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			Log.v("SCRATCH",result.toString());
 			result.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 			Log.v("SCRATCH",result.toString());
-			if(result.checkInfo("scratchBitmap") && !result.checkInfo("isFinished")){
-				try{
-					prize = new PrizeObject(gameState.requestInfo("game_id"));
-					prize.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-				}catch(Throwable t){
+			try{
+				prize = new PrizeObject(gameState.requestInfo("game_id"));
+				prize.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				Log.v("PRIZE",prize.toString());
+			}catch(Throwable t){
 
-				}
+			}
+			if(result.checkInfo("scratchBitmap") && !result.checkInfo("isFinished")){
+				
 
 				if(result.requestInfo("scratchBitmap").compareTo("[]")!=0){
 					String poppedresults = result.requestInfo("scratchBitmap");
@@ -319,7 +352,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}else{
 				result.delete(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-
+				prize.delete(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 				getGameState();
 			}
 		}catch(Throwable t){
@@ -355,6 +388,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			
+			
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_entry");
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("POST");
@@ -415,6 +450,13 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			if(!gameState.checkInfo("linksgame_result")){
+				errorTitle = "No more plays";
+				errorMessage = "No more plays";
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+				return;
+			}
+			
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_result");
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("POST");
@@ -440,6 +482,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				gameState.processJson(state, "");
 				try{
 					prize = new PrizeObject(json.getJSONObject("prize"));
+					prize.add("prizeid", prize.requestInfo("id"));
+					prize.remove("id");
 					prize.add("gameid", gameState.requestInfo("game_id"));
 				}catch(Throwable t1){
 

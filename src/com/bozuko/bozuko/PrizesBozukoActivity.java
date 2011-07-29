@@ -36,6 +36,9 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	ArrayList<PrizeObject> tmpPastPrizes = new ArrayList<PrizeObject>();
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		
 		pastPrizes.clear();

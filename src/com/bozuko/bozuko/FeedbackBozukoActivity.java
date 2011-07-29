@@ -147,10 +147,16 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		finish();
 	}
 	
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(errorType.compareTo("facebook/auth")==0){
 			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 				

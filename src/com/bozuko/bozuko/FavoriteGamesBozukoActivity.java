@@ -47,6 +47,9 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	boolean loadMoreSearch = false;
 
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0){
 			setupList();
 		}else{

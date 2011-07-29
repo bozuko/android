@@ -119,7 +119,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		mergeAdapter.addView(getGroupTitleView("Bozuko"),false);
 		mergeAdapter.addView(getCellView("Privacy Policy",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
-		mergeAdapter.addView(getCellView("How to Play?",R.drawable.cellbutton),true);
+		mergeAdapter.addView(getCellView("How to Play",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("About Bozuko",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
@@ -142,6 +142,9 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor edit = mprefs.edit();
 		edit.putBoolean("facebook_login", false);
@@ -185,7 +188,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 				Intent intent = new Intent(this,PageBozukoActivity.class);
 				intent.putExtra("PageLink",bozuko.requestInfo("linksbozuko_page"));
 				startActivity(intent);
-			}else if(title.compareTo("How to Play?")==0){
+			}else if(title.compareTo("How to Play")==0){
 				//TODO
 				//openURL(bozuko.requestInfo("linkshow_to_play"));
 				Intent intent = new Intent(this,AboutBozukoActivity.class);

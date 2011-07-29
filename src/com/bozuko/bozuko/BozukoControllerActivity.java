@@ -35,6 +35,9 @@ public class BozukoControllerActivity extends ControllerActivity {
 	public String errorType = "";
 	
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(errorType.compareTo("facebook/auth")==0){
 			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 				

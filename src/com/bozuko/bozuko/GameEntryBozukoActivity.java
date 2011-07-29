@@ -28,7 +28,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.GameObject;
+import com.bozuko.bozuko.datamodel.GameResult;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.views.GameHeaderView;
 import com.bozuko.bozuko.views.PrizeCell;
@@ -43,6 +45,9 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	GameObject game;
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		setupView();
 		setupButton();
 	}
@@ -79,6 +84,9 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	}
 
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(errorType.compareTo("facebook/auth")==0){
 			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 				
@@ -184,7 +192,39 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		((Button)findViewById(R.id.entergame)).setText(game.gameState.requestInfo("button_text"));
 		((Button)findViewById(R.id.entergame)).setOnClickListener(this);
 		
-		if(game.gameState.requestInfo("button_enabled").compareTo("true")!=0){
+		if(game.requestInfo("type").compareTo("scratch")==0){
+			try{
+				GameResult result = new GameResult(game.gameState.requestInfo("game_id"));
+				result.getObject(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				PrizeObject prize = null;
+				try{
+					prize = new PrizeObject(game.gameState.requestInfo("game_id"));
+					prize.getObject(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					Log.v("PRIZE",prize.toString());
+				}catch(Throwable t){
+
+				}
+				if(result.checkInfo("scratchBitmap") && !result.checkInfo("isFinished")){
+					findViewById(R.id.entergame).setVisibility(View.VISIBLE);
+					findViewById(R.id.agree).setVisibility(View.VISIBLE);
+					findViewById(R.id.nextgame).setVisibility(View.INVISIBLE);
+					((Button)findViewById(R.id.entergame)).setText("Play");
+					
+				}else{
+					result.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					prize.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					loadButton();
+				}
+			}catch(Throwable t){
+				loadButton();
+			}
+		}else{
+			loadButton();
+		}
+	}
+		
+    public void loadButton(){
+    	if(game.gameState.requestInfo("button_enabled").compareTo("true")!=0){
 			findViewById(R.id.entergame).setVisibility(View.INVISIBLE);
 			findViewById(R.id.agree).setVisibility(View.INVISIBLE);
 			findViewById(R.id.nextgame).setVisibility(View.VISIBLE);
@@ -194,7 +234,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 			findViewById(R.id.agree).setVisibility(View.VISIBLE);
 			findViewById(R.id.nextgame).setVisibility(View.INVISIBLE);
 		}
-	}
+    }
 
 	UpdateReceiver mReceiver = new UpdateReceiver();
 	public void onPause(){

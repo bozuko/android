@@ -63,6 +63,9 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 	}
 
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		super.progressRunnableError();
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setSelector(R.drawable.listbutton);

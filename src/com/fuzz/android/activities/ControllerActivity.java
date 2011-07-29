@@ -9,11 +9,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +53,7 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 	protected String progressMessage = "";
 	
 	public String FLURRY_EVENT = "";
-	public final static String FLURRY_KEY = "VMLSWLVEXVCM1AYV4GYG";
+	public final static String FLURRY_KEY = "";
 	
 	protected Handler mHandler = new Handler();
 	protected Thread runnable;
@@ -132,9 +134,9 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 		makeDialog(errorMessage,errorTitle,null);
 	}
 	
-	public void makeDialog(String message, String title, DialogInterface.OnClickListener listener){
+	public AlertDialog makeDialog(String message, String title, DialogInterface.OnClickListener listener){
 		if(isFinishing())
-			return;
+			return null;
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getParent()!=null ? getParent() : this);
 		builder.setMessage(message)
@@ -147,6 +149,8 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 		       } : listener));
 		AlertDialog alert = builder.create();
 		alert.show();
+		
+		return alert;
 	}
 
 	public void setTitle(String title){
@@ -328,22 +332,36 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 		}
 		}
 		
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(mprefs.getBoolean("LocationActive", true)){
+        	getApp().lHandler.start(getApp());
+        }
+		
 		super.onResume();
 	}
 	
 	public void onStart(){ 
-		FlurryAgent.onStartSession(this, FLURRY_KEY);
+		if(FLURRY_KEY.compareTo("")!=0){
+			FlurryAgent.onStartSession(this, FLURRY_KEY);
+		}
 		STATE = STATE_ACTIVE;
 		super.onStart();
 	}
 	
 	public void onPause(){
 		STATE = STATE_PAUSED;
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(mprefs.getBoolean("LocationActive", true)){
+        	getApp().lHandler.cancel();
+        }
+		
 		super.onPause();
 	}
 	
 	public void onStop(){
-		FlurryAgent.onEndSession(this);
+		if(FLURRY_KEY.compareTo("")!=0){
+			FlurryAgent.onEndSession(this);
+		}
 		STATE = STATE_PAUSED;
 		super.onStop();
 	}

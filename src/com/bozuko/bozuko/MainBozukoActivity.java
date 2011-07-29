@@ -33,12 +33,12 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 	}
 	
 	public void progressRunnableError(){
+
 		if(isFinishing()){
-			
-			
 			return;
 		}
-		makeDialog("Please check your connection. Could not initialize Bozuko.","Connection Error",new DialogInterface.OnClickListener() {
+		
+		makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -55,35 +55,19 @@ public class MainBozukoActivity extends BozukoControllerActivity {
         setContent(R.layout.main);
         getCacheDir();
         ((BozukoApplication)getApp()).searchTerm = "";
-        //((BozukoApplication)getApp()).getEntry();
-        
-//        Timer n = new Timer();
-//		TimerTask task = new TimerTask(){
-//
-//			@Override
-//			public void run() {
-//				mHandler.post(mUpdateResults);
-//			}
-//			
-//		};
-//		n.schedule(task, 3000);
         
         unProgressRunnable(new Runnable(){
         	public void run(){
         		sendRequest();
         	}
         });
-//        timer.schedule(new TimerTask(){
-//        	public void run(){
-//        		timer.cancel();
-//        		timer.purge();
-//        		timer = null;
-//        	}
-//        }, 15000);
+
     }
     
     public void sendRequest(){
     	if(!DataBaseHelper.isOnline(this,0)){
+    		errorMessage = "Please check your connection. Could not initialize Bozuko.";
+    		errorTitle = "Connection Error";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
@@ -93,27 +77,65 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSON();
-			EntryPointObject entry = new EntryPointObject(json);
-			entry.add("entryid", "1");
-			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
-			entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
-			
-			url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
-			req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
-			req.setMethodType("GET");
-			json = req.AutoJSON();
-			Bozuko bozuko = new Bozuko(json);
-			bozuko.add("bozukoid", "1");
-			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("bozuko");
-			bozuko.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
-			
+			JSONObject json = req.AutoJSONError();
 			try{
+				errorTitle = json.getString("title");
+				errorMessage = json.getString("message");
+				errorType = json.getString("name");
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+			}catch(Throwable t){
+				EntryPointObject entry = new EntryPointObject(json);
+				entry.add("entryid", "1");
+				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
+				entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				getBozukoLinks(entry);
+				getUserInfo(entry);
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
+			}
+		} catch (Throwable e) {
+			RUNNABLE_STATE = RUNNABLE_FAILED;
+			errorMessage = "Could not initialize Bozuko.";
+    		errorTitle = "Request Error";
+			e.printStackTrace();
+		}
+	}
+    
+    public void getBozukoLinks(EntryPointObject entry){
+    	try{
+    		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			
+    		String url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
+    		HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
+			req.setMethodType("GET");
+			JSONObject json = req.AutoJSONError();
+			try{
+				errorTitle = json.getString("title");
+				errorMessage = json.getString("message");
+				errorType = json.getString("name");
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+			}catch(Throwable t){
+				Bozuko bozuko = new Bozuko(json);
+				bozuko.add("bozukoid", "1");
+				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("bozuko");
+				bozuko.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
+			}
+    	}catch(Throwable t){
+    		RUNNABLE_STATE = RUNNABLE_FAILED;
+			errorMessage = "Could not initialize Bozuko.";
+    		errorTitle = "Request Error";
+    	}
+    }
+    
+    public void getUserInfo(EntryPointObject entry){
+    	try{
 			if(entry.checkInfo("linksuser")){
-				url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
-				req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				
+				String url = GlobalConstants.BASE_URL + entry.requestInfo("linksuser");
+				HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version=" + GlobalConstants.MOBILE_VERSION));
 				req.setMethodType("GET");
-				json = req.AutoJSON();
+				JSONObject json = req.AutoJSON();
 				User user = new User(json);
 				
 				user.add("userid", "1");
@@ -123,14 +145,8 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
 				user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 			}
-			}catch(Throwable t){
+		}catch(Throwable t){
 				
-			}
-			
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-		} catch (Throwable e) {
-			RUNNABLE_STATE = RUNNABLE_FAILED;
-			e.printStackTrace();
 		}
-	}
+    }
 }

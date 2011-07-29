@@ -88,13 +88,13 @@ public class LocationHandler{
 				
 				int failcount = 0;
 				try{
-					lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000*15, 500, agps,l.getMainLooper());
+					lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000*15, 1000, agps,l.getMainLooper());
 				}catch(Exception e1){
 					failcount++;
 				}
 				
 				try{
-					lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000*15, 500, gps,l.getMainLooper());
+					lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000*15, 1000, gps,l.getMainLooper());
 				}catch(Exception e){
 					failcount++;
 				}

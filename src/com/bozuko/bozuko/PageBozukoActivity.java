@@ -42,6 +42,9 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	String pageLink;
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		setupView();
 	}
 

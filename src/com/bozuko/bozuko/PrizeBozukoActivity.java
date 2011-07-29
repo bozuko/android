@@ -210,6 +210,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 				if(now == -1){
 					try{
 						timer.cancel();
+						timer.purge();
 						timer = new Timer();
 					}catch(Throwable t){
 						t.printStackTrace();

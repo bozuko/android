@@ -12,12 +12,7 @@ import android.webkit.WebView;
 public class SocialMediaWebViewActivity extends InAppWebViewControllerActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
-		Thread th = new Thread(){
-			public void run(){
-				removeCookies();
-			}
-		};
-		th.start();
+		removeCookies();
 		
 		super.onCreate(savedInstanceState);
 		

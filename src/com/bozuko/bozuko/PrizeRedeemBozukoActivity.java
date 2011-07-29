@@ -102,6 +102,9 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 	}
 	
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		Intent intent = new Intent(this,PrizeBozukoActivity.class);
 		intent.putExtra("Package", redemption);
 		intent.putExtra("Prize", prize);
@@ -111,6 +114,9 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 	}
 	
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(errorType.compareTo("facebook/auth")==0){
 			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 				

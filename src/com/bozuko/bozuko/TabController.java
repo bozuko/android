@@ -2,10 +2,12 @@ package com.bozuko.bozuko;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import android.widget.TextView;
 
 public class TabController extends TabActivity {
 	
@@ -54,6 +56,9 @@ public class TabController extends TabActivity {
         for(int i=0;i<tabhost.getTabWidget().getChildCount();i++)
         {
         	tabhost.getTabWidget().getChildAt(i).setBackgroundResource(r[i]);
+        	
+        	TextView t = (TextView) getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+	    	t.setTextColor(Color.WHITE);
         }
     }
 

@@ -141,6 +141,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	}
 
 	public void progressRunnableComplete(){
+		if(isFinishing()){
+			return;
+		}
 		if(METHOD_TYPE == GAME_ENTER){
 			if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 				findViewById(R.id.spin).setEnabled(false);
@@ -199,6 +202,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	@Override
 	public void progressRunnableError(){
+		if(isFinishing()){
+			return;
+		}
 		if(METHOD_TYPE == GAME_ENTER){
 			findViewById(R.id.spin).setEnabled(false);
 			if(errorType.compareTo("facebook/auth")==0){
@@ -328,6 +334,12 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			if(!gameState.checkInfo("linksgame_result")){
+				errorTitle = "No more plays";
+				errorMessage = "No more plays";
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+				return;
+			}
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_result");
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("POST");
