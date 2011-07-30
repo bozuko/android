@@ -369,21 +369,7 @@ public class URLBitmapDrawable extends Drawable {
 			}catch(Exception e1){
 				//e1.printStackTrace();
 				try {
-					URL u = new URL(url2);
-					URLConnection conn = u.openConnection();
-					conn.setRequestProperty("Content-Language", "en-US");
-					conn.setRequestProperty("User-Agent", "Mobile/Safari");
-					conn.setUseCaches(false);
-					conn.setDoInput(true);
-					InputStream inputStream = conn.getInputStream();
-					FileOutputStream out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-					byte buf[] = new byte[1024];
-					int len;
-					while ((len = inputStream.read(buf)) > 0) {
-						out.write(buf, 0, len);
-					}
-					out.close();
-					inputStream.close();
+					downloadImage(url2);
 					Bitmap copy = mBitmap;
 					BitmapFactory.Options opts = new BitmapFactory.Options();
 					opts.inPurgeable=true;
@@ -410,6 +396,29 @@ public class URLBitmapDrawable extends Drawable {
 			}
 		}
 
+	}
+	
+	public static boolean downloadImage(String url2){
+		try{
+		URL u = new URL(url2);
+		URLConnection conn = u.openConnection();
+		conn.setRequestProperty("Content-Language", "en-US");
+		conn.setRequestProperty("User-Agent", "Mobile/Safari");
+		conn.setUseCaches(false);
+		conn.setDoInput(true);
+		InputStream inputStream = conn.getInputStream();
+		FileOutputStream out = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+		byte buf[] = new byte[1024];
+		int len;
+		while ((len = inputStream.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		out.close();
+		inputStream.close();
+		return true;
+		}catch(Throwable t){
+			return false;
+		}
 	}
 
 	private static final int DEFAULT_PAINT_FLAGS =

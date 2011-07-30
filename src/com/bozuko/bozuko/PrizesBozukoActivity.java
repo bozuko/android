@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		if(isFinishing()){
 			return;
 		}
+		RUNNING = false;
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		
 		pastPrizes.clear();
@@ -73,6 +75,10 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		listview.setOnItemClickListener(this);
 	}
 	
+	public void progressRunnableError(){
+		super.progressRunnableError();
+		RUNNING = false;
+	}
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,14 +89,20 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		
 	}
 	
+	boolean RUNNING = false;
+	
 	public void getPrizes(){
+		if(!RUNNING){
+			RUNNING = true;
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
 				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+				
 				sendRequest(entry);
 			}
 		},"Loading...",NOT_CANCELABLE);
+		}
 	}
 	
 	public void onResume(){
@@ -126,11 +138,16 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			String url = GlobalConstants.BASE_URL + entry.requestInfo("linksprizes");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			url += String.format("?token=%s",mprefs.getString("token", ""));
+			//Log.v("ENTRY",entry.toString());
 			//Log.v("URL",url);
 			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
+			//Log.v("PRIZESLISTSTRING",req.AutoPlain());
+			
 			JsonParser jp = req.AutoStreamJSONError();
-			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			
+			JsonToken token = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			if(token == JsonToken.START_OBJECT){
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
 				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
@@ -157,6 +174,22 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				}else if ("name".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
 					errorType = jp.getText();
+				}
+			}
+			}else{
+				if(token == JsonToken.START_ARRAY){
+					while (jp.nextToken() != JsonToken.END_ARRAY) {
+						PrizeObject page = new PrizeObject(jp);
+						//Log.v("Page",page.toString());
+						//prizes.add(page);
+						if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
+							tmpPastPrizes.add(page);
+						}else{
+							tmpActivePrizes.add(page);
+						}
+					}
+					
+					RUNNABLE_STATE = RUNNABLE_SUCCESS;
 				}
 			}
 			jp.close();

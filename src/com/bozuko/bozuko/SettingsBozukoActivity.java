@@ -127,12 +127,12 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("Terms of Use",R.drawable.cellbutton),true);
 		
-		Bozuko bozuko = new Bozuko("1");
-		bozuko.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
-		if(bozuko.checkInfo("linksbozuko_demo_page")){
+		//Bozuko bozuko = new Bozuko("1");
+		//bozuko.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+		//if(bozuko.checkInfo("linksbozuko_demo_page")){
 			mergeAdapter.addView(getSpacer(),false);
 			mergeAdapter.addView(getCellView("Demo Games",R.drawable.cellbutton),true);
-		}
+		//}
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getGreenCellView("Play Our Game!"),true);
 		mergeAdapter.addView(getSpacer(),false);

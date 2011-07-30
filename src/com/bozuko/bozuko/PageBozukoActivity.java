@@ -170,6 +170,19 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
 		if(page != null){
 			//setupView();
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			if(mprefs.getBoolean("ReloadPage",false)){
+				SharedPreferences.Editor edit = mprefs.edit();
+				edit.putBoolean("ReloadPage", false);
+				edit.commit();
+				if(page.checkInfo("linkspage")){
+				progressRunnable(new Runnable(){
+					public void run(){
+						sendRequest();
+					}
+				},"Loading...",CANCELABLE);
+				}
+			}
 		}else{
 			//LOAD DATA
 			progressRunnable(new Runnable(){
@@ -178,19 +191,7 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 				}
 			},"Loading...",CANCELABLE);
 		}
-		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if(mprefs.getBoolean("ReloadPage",false)){
-			SharedPreferences.Editor edit = mprefs.edit();
-			edit.putBoolean("ReloadPage", false);
-			edit.commit();
-			if(page.checkInfo("linkspage")){
-			progressRunnable(new Runnable(){
-				public void run(){
-					sendRequest();
-				}
-			},"Loading...",CANCELABLE);
-			}
-		}
+		
 
 		super.onResume();
 	}

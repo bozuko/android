@@ -17,6 +17,7 @@ import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.User;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
+import com.fuzz.android.globals.GlobalFunctions;
 import com.fuzz.android.http.HttpRequest;
 import com.fuzz.android.ui.URLImageView;
 import com.bozuko.bozuko.views.AnimationSequence;
@@ -49,9 +50,11 @@ import com.fuzz.android.ui.URLBitmapDrawable;
 
 public class SlotsGameBozukoActivity extends BozukoControllerActivity implements OnClickListener, SpinnerListener, SequencerListener {
 	ArrayList<Drawable> bitmaps;
+	public static final int LOAD_IMAGES = 2;
 	public static final int GAME_ENTER = 0;
 	public static final int GAME_RESULTS = 1;
 	public int METHOD_TYPE = GAME_ENTER;
+	public boolean imagesFailed = false;
 
 	boolean sequencing = false;
 
@@ -113,7 +116,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		((URLImageView)findViewById(R.id.gameimage)).setPlaceHolder(R.drawable.defaultphotolarge);
 		((URLImageView)findViewById(R.id.gameimage)).setURL(page.requestInfo("image"));
 
-		setupImages();
+		//setupImages();
 
 		((SlotWheelView)findViewById(R.id.slotwheel1)).setEnabled(false);
 		((SlotWheelView)findViewById(R.id.slotwheel2)).setEnabled(false);
@@ -133,20 +136,124 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				public void run(){
 					enterGame();
 				}
+			},"Entering...",NOT_CANCELABLE);
+		}else{
+			progressRunnable(new Runnable(){
+				public void run(){
+					loadImages();
+				}
 			},"Loading...",NOT_CANCELABLE);
 		}
 
 		findViewById(R.id.prizestext).setOnClickListener(this);
 		findViewById(R.id.officialrules).setOnClickListener(this);
 	}
+	
+	public void loadImages(){
+		METHOD_TYPE = LOAD_IMAGES;
+		RUNNABLE_STATE = RUNNABLE_SUCCESS;
+		
+		bitmaps = new ArrayList<Drawable>();
+		for(int i=0; i<game.icons.size(); i++){
+			String url = game.iconsImages.get(i);
+			String image = game.icons.get(i);
+			//Log.v("image",image);
+			if(url.startsWith("http")){
+				Drawable bitmap;
+				if(DataBaseHelper.isImageCached(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),128),this)){
+					BitmapFactory.Options opts = new BitmapFactory.Options();
+					opts.outHeight = (int)(80*getResources().getDisplayMetrics().density);
+					opts.outWidth = (int)(80*getResources().getDisplayMetrics().density);
+					opts.inPurgeable = true;
+					Bitmap bit = BitmapFactory.decodeFile(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),128), opts);
+					bitmap = new BitmapDrawable(getResources(),bit);
+					bitmaps.add(bitmap);
+				}else{
+					if(URLBitmapDrawable.downloadImage(url)){
+						BitmapFactory.Options opts = new BitmapFactory.Options();
+						opts.outHeight = (int)(80*getResources().getDisplayMetrics().density);
+						opts.outWidth = (int)(80*getResources().getDisplayMetrics().density);
+						opts.inPurgeable = true;
+						Bitmap bit = BitmapFactory.decodeFile(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),128), opts);
+						bitmap = new BitmapDrawable(getResources(),bit);
+						bitmaps.add(bitmap);
+					}else{
+						imagesFailed = true;
+					}
+				}
+			}else{
+				Drawable bitmap;
+				try{
+					BitmapFactory.Options opts = new BitmapFactory.Options();
+					opts.outHeight = (int)(80*getResources().getDisplayMetrics().density);
+					opts.outWidth = (int)(80*getResources().getDisplayMetrics().density);
+					opts.inPurgeable = true;
+					int resource = getResources().getIdentifier("slotitem"+image, "drawable", "com.bozuko.bozuko");
+					if(resource == 0){
+						throw new Exception("");
+					}
+					Bitmap bit = BitmapFactory.decodeResource(getResources(), resource,opts);
+					bitmap = new BitmapDrawable(getResources(),bit);
+
+					bitmaps.add(bitmap);
+				}catch(Throwable t){
+					if(DataBaseHelper.isImageCached(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(game.requestInfo("configthemebase")+"/"+url),128),this)){
+						BitmapFactory.Options opts = new BitmapFactory.Options();
+						opts.outHeight = (int)(80*getResources().getDisplayMetrics().density);
+						opts.outWidth = (int)(80*getResources().getDisplayMetrics().density);
+						opts.inPurgeable = true;
+						Bitmap bit = BitmapFactory.decodeFile(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(game.requestInfo("configthemebase")+"/"+url),128), opts);
+						bitmap = new BitmapDrawable(getResources(),bit);
+						//bitmap = new URLBitmapDrawable(R.drawable.blank,game.requestInfo("configthemebase")+"/"+url,this);
+						bitmaps.add(bitmap);
+					}else{
+						if(URLBitmapDrawable.downloadImage(game.requestInfo("configthemebase")+"/"+url)){
+							BitmapFactory.Options opts = new BitmapFactory.Options();
+							opts.outHeight = (int)(80*getResources().getDisplayMetrics().density);
+							opts.outWidth = (int)(80*getResources().getDisplayMetrics().density);
+							opts.inPurgeable = true;
+							Bitmap bit = BitmapFactory.decodeFile(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(game.requestInfo("configthemebase")+"/"+url),128), opts);
+							bitmap = new BitmapDrawable(getResources(),bit);
+							//bitmap = new URLBitmapDrawable(R.drawable.blank,game.requestInfo("configthemebase")+"/"+url,this);
+							bitmaps.add(bitmap);
+						}else{
+							imagesFailed = true;
+						}	
+					}
+					
+				}
+			}
+		}
+	}
 
 	public void progressRunnableComplete(){
 		if(isFinishing()){
 			return;
 		}
-		if(METHOD_TYPE == GAME_ENTER){
+		if(imagesFailed){
+			
+			makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					finish();
+				}
+			});
+		}
+		if(!imagesFailed){
+			if(METHOD_TYPE == LOAD_IMAGES){
+				((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps);
+				((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps);
+				((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps);
+			}else if(METHOD_TYPE == GAME_ENTER){
+			((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps);
+			((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps);
+			((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps);
+			
 			if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 				findViewById(R.id.spin).setEnabled(false);
+				
 				AlertDialog alert = makeDialog("Please come back later.","No More Plays",new DialogInterface.OnClickListener() {
 
 					@Override
@@ -194,9 +301,17 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				((SlotWheelView)findViewById(R.id.slotwheel1)).stop();
 				((SlotWheelView)findViewById(R.id.slotwheel2)).stop();
 				((SlotWheelView)findViewById(R.id.slotwheel3)).stop();
-				makeDialog("Couldn't load game try again later.","Request Error",null);
+				makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
 				findViewById(R.id.spin).setEnabled(true);
 			}
+		}
 		}
 	}
 
@@ -205,6 +320,19 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		if(isFinishing()){
 			return;
 		}
+		if(imagesFailed){
+			
+			makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					finish();
+				}
+			});
+		}
+		
+		if(!imagesFailed){
 		if(METHOD_TYPE == GAME_ENTER){
 			findViewById(R.id.spin).setEnabled(false);
 			if(errorType.compareTo("facebook/auth")==0){
@@ -296,9 +424,15 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 			findViewById(R.id.spin).setEnabled(true);
 		}
+		}
 	}
 
 	public void enterGame(){
+		try{
+		loadImages();
+		}catch(Throwable t){
+			//t.printStackTrace();
+		}
 		METHOD_TYPE = GAME_ENTER;
 		if(!DataBaseHelper.isOnline(this,0)){
 			errorTitle = "Connection Error";
@@ -343,6 +477,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		}catch(Throwable t){
+			t.printStackTrace();
 			mHandler.post(new DisplayThrowable(t));
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
@@ -581,6 +716,15 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		if(((SlotWheelView)findViewById(R.id.slotwheel3)).isSpinning()){
 			return;
 		}else{
+			try{
+				if(timer != null){
+					timer.cancel();
+					timer.purge();
+					timer = null;
+				}
+			}catch(Throwable t){
+				
+			}
 			finish();
 		}
 	}

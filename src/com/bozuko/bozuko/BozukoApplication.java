@@ -150,7 +150,12 @@ public class BozukoApplication extends CustomApplication {
 			
 			}catch(Throwable t1){
 				EntryPointObject entry = new EntryPointObject(json);
+				if(!entry.checkInfo("linksprizes")){
+					entry.add("linksprizes", "");
+					entry.add("linksuser", "");
+				}
 				entry.add("entryid", "1");
+				//Log.v("ENTRY",entry.toString());
 				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
 				entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 				

@@ -86,6 +86,10 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 			}catch(Throwable t){
 				EntryPointObject entry = new EntryPointObject(json);
 				entry.add("entryid", "1");
+				if(!entry.checkInfo("linksprizes")){
+				entry.add("linksprizes", "");
+				entry.add("linksuser", "");
+				}
 				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
 				entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 				getBozukoLinks(entry);
