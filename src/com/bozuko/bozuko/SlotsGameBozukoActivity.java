@@ -66,7 +66,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		for(int i=0; i<game.icons.size(); i++){
 			String url = game.iconsImages.get(i);
 			String image = game.icons.get(i);
-			Log.v("image",image);
+			//Log.v("image",image);
 			if(url.startsWith("http")){
 				Drawable bitmap;
 				try{
@@ -379,7 +379,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			JSONObject json = req.AutoJSONError();
-			Log.v("JSON",json.toString());
+			//Log.v("JSON",json.toString());
 			try{
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");

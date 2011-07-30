@@ -201,7 +201,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 				try{
 					prize = new PrizeObject(game.gameState.requestInfo("game_id"));
 					prize.getObject(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-					Log.v("PRIZE",prize.toString());
+					//Log.v("PRIZE",prize.toString());
 				}catch(Throwable t){
 
 				}
@@ -275,7 +275,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 		}catch(Throwable t){
 			
-			Log.v("JSONSTATE",json.toString());
+			//Log.v("JSONSTATE",json.toString());
 			game.gameState.processJson(json, "");
 			RUNNABLE_STATE = RUNNABLE_SUCCESS;
 		}

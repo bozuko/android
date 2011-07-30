@@ -96,7 +96,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			errorMessage = "Could not initialize Bozuko.";
     		errorTitle = "Request Error";
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
     
@@ -145,7 +145,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 					user.add("userid", "1");
 					user.add("bozukoid", user.requestInfo("id"));
 					user.remove("id");
-					Log.v("UserObject",user.toString());
+					//Log.v("UserObject",user.toString());
 					BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
 					user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 				}

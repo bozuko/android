@@ -55,7 +55,7 @@ public class HttpRequest {
 			u= new URL(url);
 			conn = (HttpURLConnection) u.openConnection();
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -212,11 +212,11 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return db.parse(conn.getInputStream());
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return null;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -233,13 +233,13 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return db.parse(conn.getInputStream());
 			}else{
-				Log.v("HTTP REQUEST ERROR",getResponse());
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return null;
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -318,12 +318,12 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return db.parse(conn.getInputStream());
 			}else{
-				Log.v("HTTP REQUEST ERROR",getResponse());
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return null;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -336,7 +336,7 @@ public class HttpRequest {
             	Xml.parse(conn.getInputStream(), Xml.Encoding.UTF_8, handler);
             	 //parser.parse(conn.getInputStream(), handler);
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 			}
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -353,7 +353,7 @@ public class HttpRequest {
             	Xml.parse(conn.getInputStream(), Xml.Encoding.UTF_8, handler);
             	 //parser.parse(conn.getInputStream(), handler);
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 			}
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -412,7 +412,7 @@ public class HttpRequest {
 				return new JSONArray(getResponse());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -429,11 +429,11 @@ public class HttpRequest {
 				return new JSONArray(getResponse());
 			}else{
 				DEBUGCONNECTION();
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return new JSONArray(getResponse());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();	
+			//e.printStackTrace();	
 		}
 		return null;
 	}
@@ -446,11 +446,11 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return new JSONArray(getResponse());
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return new JSONArray(getResponse());
 			}	
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -465,7 +465,7 @@ public class HttpRequest {
 				return new JSONObject(getResponse());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -482,11 +482,11 @@ public class HttpRequest {
 				return new JSONObject(getResponse());
 			}else{
 				DEBUGCONNECTION();
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return new JSONObject(getResponse());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();	
+			//e.printStackTrace();	
 		}
 		return null;
 	}
@@ -506,7 +506,7 @@ public class HttpRequest {
 				return new JSONObject(getErrorResponse());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();	
+			//e.printStackTrace();	
 		}
 		return null;
 	}
@@ -528,7 +528,7 @@ public class HttpRequest {
 				return f.createJsonParser(conn.getErrorStream());
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();	
+			//e.printStackTrace();	
 		}
 		return null;
 	}
@@ -541,11 +541,11 @@ public class HttpRequest {
 			if(conn.getResponseCode() == 200){
 				return new JSONObject(getResponse());
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 				return new JSONObject(getResponse());
 			}	
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -649,7 +649,7 @@ public class HttpRequest {
             if(conn.getResponseCode() == 200){
             	Xml.parse(conn.getInputStream(), Xml.Encoding.UTF_8, handler);
 			}else{
-				Log.v("HTTP REQUEST ERROR",getErrorResponse());
+				//Log.v("HTTP REQUEST ERROR",getErrorResponse());
 			}
         } catch (Throwable e) {
             throw new RuntimeException(e);

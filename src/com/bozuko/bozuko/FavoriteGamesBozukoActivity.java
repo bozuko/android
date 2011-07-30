@@ -293,7 +293,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			jp.close();
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
-			e.printStackTrace();
+			//e.printStackTrace();
 			errorMessage = "Failed to get places from server.";
 			errorTitle = "Request Error";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -340,7 +340,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
 			errorTitle = "No Connection";

@@ -86,7 +86,7 @@ public class DataObject implements Parcelable{
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class DataObject implements Parcelable{
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}
@@ -212,7 +212,7 @@ public class DataObject implements Parcelable{
 			String selection[] = {id};
 			db.delete(tablename, queryid+"=?", selection);
 		}catch(Throwable t){
-			t.printStackTrace();
+			//t.printStackTrace();
 		}
 		closeDataBase(dbh,ret);
 	}

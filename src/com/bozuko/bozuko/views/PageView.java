@@ -234,7 +234,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 			((BozukoControllerActivity)getContext()).progressRunnableError();
 		}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			post(new Runnable(){
 				public void run(){
 					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();

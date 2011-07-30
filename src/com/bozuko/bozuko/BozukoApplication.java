@@ -94,7 +94,7 @@ public class BozukoApplication extends CustomApplication {
 							Intent broad = new Intent("LOCATIONSUPDATED");
 							broad.putExtra("FAIL", false);
 							sendBroadcast(broad);
-							e.printStackTrace();
+							//e.printStackTrace();
 						}
 					}catch(Throwable t){
 						SharedPreferences.Editor edit = mprefs.edit();
@@ -182,7 +182,7 @@ public class BozukoApplication extends CustomApplication {
 						user.add("userid", "1");
 						user.add("bozukoid", user.requestInfo("id"));
 						user.remove("id");
-						Log.v("UserObject",user.toString());
+						//Log.v("UserObject",user.toString());
 						BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
 						user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 					}
@@ -190,7 +190,7 @@ public class BozukoApplication extends CustomApplication {
 				}
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
@@ -228,7 +228,7 @@ public class BozukoApplication extends CustomApplication {
 			user.add("userid", "1");
 			user.add("bozukoid", user.requestInfo("id"));
 			user.remove("id");
-			Log.v("UserObject",user.toString());
+			//Log.v("UserObject",user.toString());
 			BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
 			user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 		}

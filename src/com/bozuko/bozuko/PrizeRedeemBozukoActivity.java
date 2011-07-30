@@ -153,8 +153,8 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 			User user = new User("1");
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
 			String url = GlobalConstants.BASE_URL + prize.requestInfo("linksredeem");
-			Log.v("URL",url);
-			Log.v("Prize",prize.toString());
+			//Log.v("URL",url);
+			//Log.v("Prize",prize.toString());
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("POST");
@@ -179,13 +179,13 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 				errorType = json.getString("name");
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}catch(Throwable t){
-				Log.v("JSON",json.toString());
+				//Log.v("JSON",json.toString());
 				redemption = new RedemptionObject(json);
 				prize.processJson(json.getJSONObject("prize"), "");
 				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Sorry, unable to redeem prize at this time.";
     		errorTitle = "Request Error";

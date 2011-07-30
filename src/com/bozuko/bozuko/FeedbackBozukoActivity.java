@@ -88,7 +88,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 			String request = GlobalConstants.BASE_URL + url;
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
-			Log.v("url",request);
+			//Log.v("url",request);
 			User user = new User("1");
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -104,7 +104,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 				req.setMethodType("PUT");
 				
 				JSONObject json = req.AutoJSONError();
-				Log.v("JSON",json.toString());
+				//Log.v("JSON",json.toString());
 				try{
 					if(json.getBoolean("success")){
 						RUNNABLE_STATE = RUNNABLE_SUCCESS;
@@ -139,7 +139,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 			
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
-			e.printStackTrace();
+			//e.printStackTrace();
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

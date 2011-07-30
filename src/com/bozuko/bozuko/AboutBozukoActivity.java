@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 
-public class AboutBozukoActivity extends BozukoControllerActivity {
+public class AboutBozukoActivity extends BozukoControllerActivity implements OnClickListener {
 
 	ArrayList<Integer> about = new ArrayList<Integer>();
 	
@@ -20,11 +22,14 @@ public class AboutBozukoActivity extends BozukoControllerActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContent(R.layout.about);
-		setHeader(R.layout.detailheader);
+		setHeader(R.layout.detailsubmitheader);
 		about.add(Integer.valueOf(R.drawable.helpscreen1));
 		about.add(Integer.valueOf(R.drawable.helpscreen2));
 		about.add(Integer.valueOf(R.drawable.helpscreen3));
 		about.add(Integer.valueOf(R.drawable.helpscreen4));
+		
+		((Button)findViewById(R.id.submit)).setText("Close");
+		findViewById(R.id.submit).setOnClickListener(this);
 		
 		PagingScrollView view = (PagingScrollView)findViewById(R.id.page_view);
 		view.setAdapter(new CustomPaging()); 
@@ -70,14 +75,14 @@ public class AboutBozukoActivity extends BozukoControllerActivity {
 			// TODO Auto-generated method stub
 			ImageView view = null;
 			if(ConvertView == null){
-				Log.v("MAKING VIEW", "VIEW WAS NULL SAD");
+				//Log.v("MAKING VIEW", "VIEW WAS NULL SAD");
 				view = new ImageView(getBaseContext());
 				DisplayMetrics metrics = new DisplayMetrics();
 		        getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		        LayoutParams params = new LayoutParams(metrics.widthPixels,LayoutParams.WRAP_CONTENT);
 		        view.setLayoutParams(params);
 			}else{
-				Log.v("GETTING VIEW", "VIEW BEING REUSED HAPPY");
+				//Log.v("GETTING VIEW", "VIEW BEING REUSED HAPPY");
 				view = (ImageView)ConvertView;
 			}
 			view.setImageResource(about.get(position));
@@ -120,4 +125,10 @@ public class AboutBozukoActivity extends BozukoControllerActivity {
 			scrollclouds.scrollBy(diff/4, 0);
 		}
     }
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		finish();
+	}
 }

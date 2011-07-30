@@ -51,8 +51,8 @@ public class GameResult extends DataObject {
 							HashMap<String,String> temp = new HashMap<String,String>();
 							temp.put("number", json.getString("number"));
 							temp.put("text", json.getString("text"));
-							Log.v("TEXT",json.getString("text"));
-							Log.v("NUMBER",json.getString("number"));
+							//Log.v("TEXT",json.getString("text"));
+							//Log.v("NUMBER",json.getString("number"));
 							results.add(temp);
 						}
 					}
@@ -61,7 +61,7 @@ public class GameResult extends DataObject {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

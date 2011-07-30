@@ -150,7 +150,7 @@ public class URLImageView extends TouchImageView{
 				}
 				
 			}catch(java.lang.OutOfMemoryError e){
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}

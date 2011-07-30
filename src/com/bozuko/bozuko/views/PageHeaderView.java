@@ -272,7 +272,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 				((BozukoControllerActivity)getContext()).progressRunnableError();
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			post(new Runnable(){
 				public void run(){
 					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();
@@ -285,7 +285,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 
 		public boolean shouldOverrideUrlLoading (WebView view, String url){
 			//TODO do like commands
-			Log.v("URL",url);
+			//Log.v("URL",url);
 			if(url.startsWith("bozuko://facebook/liked")){
 				Intent intent = new Intent("LIKECHANGED");
 				getContext().sendBroadcast(intent);

@@ -351,7 +351,7 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 				
 				url = GlobalConstants.BASE_URL + page.requestInfo("linkspage");
 			}
-			Log.v("URL", url);
+			//Log.v("URL", url);
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
@@ -371,7 +371,7 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";

@@ -145,7 +145,7 @@ public class GameObject extends DataObject {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public class GameObject extends DataObject {
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	

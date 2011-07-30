@@ -28,7 +28,7 @@ public class CustomApplication extends Application implements SocialMediaApplica
 			try {
 				helper.createDataBase();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				helper.getWritableDatabase();
 			}
 			helper.openDataBase();

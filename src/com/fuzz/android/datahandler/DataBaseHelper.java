@@ -63,7 +63,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				copyDataBase();
 				//Log.v("DBHelper", "Copied");
 			} catch (Throwable e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				throw new Error("Error copying database");
 
 			}
@@ -188,7 +188,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void setAppStateForDevice() {
-		Log.v("DB Helper", "Insert into appstate");
+		//Log.v("DB Helper", "Insert into appstate");
 		//		myDB.beginTransaction();
 		TelephonyManager mTelephonyMgr = (TelephonyManager) myContext
 		.getSystemService(Context.TELEPHONY_SERVICE);
@@ -263,7 +263,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			return hexString.toString();
 
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "";
 	}
@@ -294,7 +294,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			return hexString.toString();
 
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "";
 	}
@@ -333,7 +333,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				return isOnline(context,currentTimeout+2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			return false;
 		}

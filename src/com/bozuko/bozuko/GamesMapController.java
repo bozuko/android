@@ -244,7 +244,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			GeoPoint center = this.mapView.getMapCenter();
 			url += String.format("?ll=%f,%f&limit=25&offset=%d",((float)center.getLatitudeE6())/1000000,((float)center.getLongitudeE6())/1000000,0);
 			url += String.format("&bounds=%f,%f,%f,%f", bounds[1][0],bounds[1][1],bounds[0][0],bounds[0][1]);
-			Log.v("MAPURL",url);
+			//Log.v("MAPURL",url);
 			if(url.toLowerCase().contains("null")){
 				if(time<20000){
 					Thread.sleep(2000);
@@ -286,7 +286,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			}
 			jp.close();
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			//mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
     		errorTitle = "No Connection";
@@ -412,7 +412,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		}
 		
 		public void run(){
-			makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
+			//makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
 		}
 	}
 }

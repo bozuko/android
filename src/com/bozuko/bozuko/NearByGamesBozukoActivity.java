@@ -229,7 +229,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
-						Log.v("Page",page.toString());
+						//Log.v("Page",page.toString());
 						if(page.requestInfo("featured").compareTo("true")==0){
 							featured.add(page);
 						}else if(page.requestInfo("registered").compareTo("true")==0){
@@ -273,7 +273,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			//			}
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
-			e.printStackTrace();
+			//e.printStackTrace();
 			errorMessage = "Failed to get places from server.";
 			errorTitle = "Request Error";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -314,7 +314,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			}
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
-			e.printStackTrace();
+			//e.printStackTrace();
 			errorMessage = "Unable to connect to the internet";
 			errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

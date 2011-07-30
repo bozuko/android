@@ -181,7 +181,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 //				RUNNABLE_STATE = RUNNABLE_FAILED;
 //			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Please try again in a moment.";
     		errorTitle = "Request Error";

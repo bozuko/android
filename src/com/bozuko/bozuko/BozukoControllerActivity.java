@@ -137,13 +137,13 @@ public class BozukoControllerActivity extends ControllerActivity {
 			option.method.invoke(this,(Object[]) null);
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
 	public String challengeResponse(String url,String challenge){
 		url = url.replace(GlobalConstants.BASE_URL, "");
-		Log.v("challengeResponse",url+challenge);
+		//Log.v("challengeResponse",url+challenge);
 		return BozukoDataBaseHelper.sha1(url+challenge);
 	}
 
