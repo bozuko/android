@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Bozuko" default="help">
+    <property file="local.properties" />
+    <property file="Bozuko.properties" />
+    <property file="default.properties" />
+
+    <path id="android.antlibs">
+        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar" />
+        <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />
+    </path>
+
+    <target name="-post-compile">
+        <antcall target="optimize"/>
+    </target>
+    
+    <property name="proguard-dir" value="/Developer/android/proguard4.5.1/lib"/>
+ <property name="unoptimized" value="${proguard-dir}/unoptimized.jar"/>
+ <property name="optimized" value="${proguard-dir}/optimized.jar"/>
+ <property name="external.libs.dir" value="libs"/>
+ 
+ <target name="optimize" unless="nooptimize">
+  <jar basedir="${out.classes.dir}" destfile="${unoptimized}"/>
+ 
+  <java jar="${proguard-dir}/proguard.jar" fork="true" failonerror="true">
+   <jvmarg value="-Dmaximum.inlined.code.length=16"/>
+   <arg value="@proguard.cfg"/>      
+   <arg value="-injars ${unoptimized}"/>
+   <arg value="-outjars ${optimized}"/>
+   <arg value="-libraryjars ${external.libs.dir}:${android.jar}"/>
+   <arg value="-libraryjars ${sdk.dir}/add-ons/addon_google_apis_google_inc_11/libs/maps.jar"/>
+  </java>     
+ 
+  <delete dir="${out.classes.dir}"/>
+  <mkdir dir="${out.classes.dir}"/>
+  <unzip src="${proguard-dir}/optimized.jar" dest="${out.classes.dir}"/>
+ 
+  <delete file="optimized.jar"/>
+ 
+   </target>
+
+    <!--<import file="${sdk.dir}/tools/ant/pre_setup.xml" />-->
+ <taskdef name="setup"
+        classname="com.android.ant.SetupTask"
+        classpathref="android.antlibs" />
+    <setup />
+
+</project>
