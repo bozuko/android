@@ -3,6 +3,7 @@ package com.bozuko.bozuko;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -37,7 +38,7 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 	    rel.setLayoutParams(params);
 	    setContent(rel);
 	    
-	    webview = new WebView(this);
+	    webview = new WebView(getApplicationContext());
 		RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
 		webview.setLayoutParams(params2);
 		webview.getSettings().setBuiltInZoomControls(true);
@@ -46,6 +47,7 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 		webview.getSettings().setUserAgentString("Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7 android");
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.loadUrl(url);
+		webview.getSettings().setSavePassword(false);
 		webview.setBackgroundColor(Color.WHITE);
 		rel.addView(webview);
 	    
@@ -64,6 +66,32 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 	
 	public void onPause(){
 		super.onPause();
+		webview.pauseTimers();
+		//CookieSyncManager.getInstance().stopSync();
+		try{
+			Class.forName("android.webkit.WebView").getMethod("onPause", (Class[]) null).invoke(webview, (Object[]) null);
+		}catch(Throwable t){
+			
+		}
+	}
+	
+
+	public void onResume(){
+		super.onResume();
+		webview.resumeTimers();
+		//CookieSyncManager.getInstance().startSync();
+		try{
+			Class.forName("android.webkit.WebView").getMethod("onResume", (Class[]) null).invoke(webview, (Object[]) null);
+		}catch(Throwable t){
+			
+		}
+	}
+	
+	public void onDestroy(){
+		webview.stopLoading();
+		webview.destroy();
+		super.onDestroy();
+		
 	}
 
 	@Override
@@ -92,6 +120,27 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 	protected class CustomWebClient extends WebViewClient{
 		@Override
 		public boolean shouldOverrideUrlLoading (WebView view, String url){
+			if(url.startsWith("mailto")){
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);
+				
+				return true;
+			}
+			if(url.startsWith("market")){
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);
+				
+				return true;
+			}
+			if(url.startsWith("tel")){
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);
+				
+				return true;
+			}
 			return false;
 		}
 		

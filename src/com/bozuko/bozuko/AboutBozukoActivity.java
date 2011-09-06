@@ -6,7 +6,6 @@ import com.fuzz.android.ui.PagingScrollView;
 import com.fuzz.android.ui.PagingLayout.PagingAdapter;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -18,6 +17,10 @@ public class AboutBozukoActivity extends BozukoControllerActivity implements OnC
 
 	ArrayList<Integer> about = new ArrayList<Integer>();
 	
+	public void onDestroy(){
+		super.onDestroy();
+		about.clear();
+	}
 	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -76,7 +79,7 @@ public class AboutBozukoActivity extends BozukoControllerActivity implements OnC
 			ImageView view = null;
 			if(ConvertView == null){
 				//Log.v("MAKING VIEW", "VIEW WAS NULL SAD");
-				view = new ImageView(getBaseContext());
+				view = new ImageView(AboutBozukoActivity.this);
 				DisplayMetrics metrics = new DisplayMetrics();
 		        getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		        LayoutParams params = new LayoutParams(metrics.widthPixels,LayoutParams.WRAP_CONTENT);

@@ -117,8 +117,13 @@ public class GamesTabController extends TabActivity implements OnClickListener,E
 	@Override
 	public void onEulaAgreedTo() {
 		// TODO Auto-generated method stub
-		Intent intent = new Intent(this,AboutBozukoActivity.class);
-		startActivity(intent);
+		//Intent intent = new Intent(this,AboutBozukoActivity.class);
+		//startActivity(intent);
 	}
 	
+	public void onResume(){
+		super.onResume();
+		((BozukoApplication)getApplication()).currentGameObject=null;
+		((BozukoApplication)getApplication()).currentPageObject=null;
+	}
 }

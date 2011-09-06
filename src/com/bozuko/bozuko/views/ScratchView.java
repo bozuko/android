@@ -100,7 +100,7 @@ public class ScratchView extends Button {
 	Runnable runnable = new Runnable(){
 		public void run(){
 			//setBackgroundResource(resources[current++]);
-			BitmapDrawable bitmap = new BitmapDrawable(ScratchCache.getSharedInstance().getBitmap(resources[current++], getResources()));
+			BitmapDrawable bitmap= new BitmapDrawable(ScratchCache.getSharedInstance().getBitmap(resources[current++], getResources()));
 			setBackgroundDrawable(bitmap);
 //			
 //			current++;

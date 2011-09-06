@@ -16,11 +16,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 
@@ -42,6 +42,8 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 			if(prize.requestInfo("is_barcode").compareTo("true") == 0){
 				setContent(R.layout.prizebarcode);
 				setupBasic();
+				((URLImageView)findViewById(R.id.barcode)).setProgressBar((ProgressBar)findViewById(R.id.progressBar1));
+				((URLImageView)findViewById(R.id.barcode)).setOnLoadListener(this);
 				((URLImageView)findViewById(R.id.barcode)).setURL(prize.requestInfo("barcode_image"));
 			}else{
 				setContent(R.layout.prize);
@@ -55,6 +57,8 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 			if(prize.requestInfo("is_barcode").compareTo("true") == 0){
 				setContent(R.layout.prizebarcode);
 				setupBasic();
+				((URLImageView)findViewById(R.id.barcode)).setProgressBar((ProgressBar)findViewById(R.id.progressBar1));
+				((URLImageView)findViewById(R.id.barcode)).setOnLoadListener(this);
 				((URLImageView)findViewById(R.id.barcode)).setURL(prize.requestInfo("barcode_image"));
 			}else if(prize.requestInfo("is_email").compareTo("true") == 0){
 				setContent(R.layout.prize);
@@ -120,7 +124,7 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 					User user = new User("1");
 					
 					try{
-						user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+						user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 					}catch(Throwable t){
 						//t.printStackTrace();
 					}
@@ -206,12 +210,37 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 		public void run(){
 			SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
 			Date date = new Date();
+			Date newDate = null;
+			try{
+				newDate = dateFormat.parse(((TextView)findViewById(R.id.clock)).getText().toString());
+			}catch(Throwable t){
+				
+			}
+			
 			((TextView)findViewById(R.id.clock)).setText(dateFormat.format(date));
+			
+			try{
+				date = dateFormat.parse(((TextView)findViewById(R.id.clock)).getText().toString());
+			}catch(Throwable t){
+				
+			}
 			
 			if(countDown){
 				int now = Integer.parseInt(((TextView)findViewById(R.id.countdown)).getText().toString());
-				now--;
-				if(now == -1){
+				//now--;
+				if(newDate != null){
+					if(date.getTime() > newDate.getTime()-(5*1000)){
+						long diff = date.getTime() - newDate.getTime();
+						int seconds = (int) (diff/1000);
+						now -= seconds;
+					}else{
+						now--;
+					}
+				}else{
+					now--;
+				}
+				
+				if(now < 0){
 					try{
 						timer.cancel();
 						timer.purge();
@@ -237,6 +266,11 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 	@Override
 	public void imageDidFailLoad() {
 		// TODO Auto-generated method stub
+		if(findViewById(R.id.barcode) != null){
+			makeDialog("Your barcode cannot be retrieved. Please check your prize screen later.","Uh-oh!",null);
+		}else{
+			makeDialog("Failed to retreive image.","Uh-oh!",null);
+		}
 		
 	}
 

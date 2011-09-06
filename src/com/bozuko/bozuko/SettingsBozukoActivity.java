@@ -8,6 +8,7 @@ import com.bozuko.bozuko.datamodel.User;
 import com.bozuko.bozuko.views.UserView;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
+import com.fuzz.android.globals.GlobalFunctions;
 import com.fuzz.android.http.HttpRequest;
 import com.fuzz.android.ui.GroupView;
 import com.fuzz.android.ui.MenuOption;
@@ -42,7 +43,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		User user = new User("1");
 		
 		try{
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 		}catch(Throwable t){
 			
 		}
@@ -59,7 +60,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	public View getGreenCellView(String inString){
 		GroupView groupView = new GroupView(this);
 		
-		TextView textView = new TextView(getBaseContext());
+		TextView textView = new TextView(this);
 		textView.setLayoutParams(new ListView.LayoutParams(LayoutParams.FILL_PARENT,(int)(44*getResources().getDisplayMetrics().density)));
 		textView.setTextColor(Color.BLACK);
 		textView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -117,13 +118,13 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		}
 		
 		mergeAdapter.addView(getGroupTitleView("Bozuko"),false);
-		mergeAdapter.addView(getCellView("Privacy Policy",R.drawable.cellbutton),true);
-		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("How to Play",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("About Bozuko",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("Bozuko for Business",R.drawable.cellbutton),true);
+		mergeAdapter.addView(getSpacer(),false);
+		mergeAdapter.addView(getCellView("Privacy Policy",R.drawable.cellbutton),true);
 		mergeAdapter.addView(getSpacer(),false);
 		mergeAdapter.addView(getCellView("Terms of Use",R.drawable.cellbutton),true);
 		
@@ -137,10 +138,26 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		mergeAdapter.addView(getGreenCellView("Play Our Game!"),true);
 		mergeAdapter.addView(getSpacer(),false);
 		
+		
+		mergeAdapter.addView(getSubtitle(GlobalFunctions.getVersionName(this, this.getClass())),false);
+		
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
 	}
 	
+	private View getSubtitle(String inString) {
+		// TODO Auto-generated method stub
+		
+		TextView textView = new TextView(this);
+		textView.setLayoutParams(new ListView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+		textView.setTextColor(Color.BLACK);
+		textView.setTypeface(Typeface.DEFAULT_BOLD);
+		textView.setTextSize(7);
+		textView.setGravity(Gravity.CENTER);
+		textView.setText(inString);
+		return textView;
+	}
+
 	public void progressRunnableComplete(){
 		if(isFinishing()){
 			return;
@@ -230,7 +247,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	public void facebook(){
 		//TODO
 		EntryPointObject entry = new EntryPointObject("1");
-        entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+        entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 		
         SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mprefs.getBoolean("facebook_login", false)){
@@ -258,7 +275,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		
 		try{
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			
 			String url = GlobalConstants.BASE_URL + user.requestInfo("linkslogout");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);

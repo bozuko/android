@@ -3,9 +3,24 @@ package com.fuzz.android.globals;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Node;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+
 public class GlobalFunctions {
 
-
+	@SuppressWarnings("unchecked")
+	public static String getVersionName(Context context, Class cls) 
+	{
+	  try {
+	    ComponentName comp = new ComponentName(context, cls);
+	    PackageInfo pinfo = context.getPackageManager().getPackageInfo(comp.getPackageName(), 0);
+	    return pinfo.versionName;
+	  } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+	    return null;
+	  }
+	}
+	
 	private static String prettyPrint(String xml,int indent){
 		//Log.v("XML", xml);
 		StringBuilder string = new StringBuilder();

@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class MainBozukoActivity extends BozukoControllerActivity {
 	
@@ -37,7 +36,23 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 		if(isFinishing()){
 			return;
 		}
-		
+		if(errorType.compareTo("")==0){
+		try{
+		Bozuko bozuko = new Bozuko("1");
+		bozuko.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+		EntryPointObject entry = new EntryPointObject("1");
+		entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+		if(entry.checkInfo("linkspages")&&bozuko.checkInfo("linksprivacy_policy")){
+			Intent myIntent = new Intent();
+			myIntent.setClassName("com.bozuko.bozuko","com.bozuko.bozuko.TabController");
+			startActivity(myIntent);
+			finish();
+			return;
+		}
+		}catch (Throwable t) {
+			
+		}
+		}
 		makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 			
 			@Override
@@ -68,6 +83,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
     	if(!DataBaseHelper.isOnline(this,0)){
     		errorMessage = "Please check your connection. Could not initialize Bozuko.";
     		errorTitle = "Connection Error";
+    		errorType = "";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
@@ -100,6 +116,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			errorMessage = "Could not initialize Bozuko.";
     		errorTitle = "Request Error";
+    		errorType = "";
 			//e.printStackTrace();
 		}
 	}
@@ -128,6 +145,7 @@ public class MainBozukoActivity extends BozukoControllerActivity {
     		RUNNABLE_STATE = RUNNABLE_FAILED;
 			errorMessage = "Could not initialize Bozuko.";
     		errorTitle = "Request Error";
+    		errorType = "";
     	}
     }
     

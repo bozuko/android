@@ -13,12 +13,10 @@ import com.fuzz.android.globals.GlobalConstants;
 import com.fuzz.android.http.HttpRequest;
 import com.fuzz.android.ui.CheckView;
 import com.fuzz.android.ui.MergeAdapter;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,15 +34,40 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	ArrayList<PrizeObject> tmpActivePrizes = new ArrayList<PrizeObject>();
 	ArrayList<PrizeObject> tmpPastPrizes = new ArrayList<PrizeObject>();
 	
+	String nextURL;
+	
+	public void onDestroy(){
+		super.onDestroy();
+		ListView listview = (ListView)findViewById(R.id.ListView01);
+		listview.setAdapter(new SimpleAdapter());
+		activePrizes.clear();
+		pastPrizes.clear();
+		tmpActivePrizes.clear();
+		tmpPastPrizes.clear();
+	}
+	
 	public void progressRunnableComplete(){
 		if(isFinishing()){
 			return;
 		}
 		RUNNING = false;
+		if(pastPrizes.size()==0 || activePrizes.size()==0){
+			setupList();
+		}else{
+			pastPrizes.addAll(tmpPastPrizes);
+			activePrizes.addAll(tmpActivePrizes);
+			try{
+				ListView listview = (ListView)findViewById(R.id.ListView01);
+				((BaseAdapter)listview.getAdapter()).notifyDataSetChanged();
+			}catch(Throwable t){
+
+			}
+		}
+	}
+	
+	public void setupList(){
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		
-		pastPrizes.clear();
-		activePrizes.clear();
 		pastPrizes.addAll(tmpPastPrizes);
 		activePrizes.addAll(tmpActivePrizes);
 		
@@ -65,11 +88,15 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		MergeAdapter mergeAdapter = new MergeAdapter();
 		if(activePrizes.size()>0){
 			mergeAdapter.addView(getTitleView("Active Prizes"), false);
-			mergeAdapter.addAdapter(new PrizeListAdapter(activePrizes));
+			if(pastPrizes.size()>0){
+				mergeAdapter.addAdapter(new PrizeListAdapter(activePrizes,false));
+			}else{
+				mergeAdapter.addAdapter(new PrizeListAdapter(activePrizes,true));
+			}
 		}
 		if(pastPrizes.size()>0){
 			mergeAdapter.addView(getTitleView("Past Prizes"), false);
-			mergeAdapter.addAdapter(new PrizeListAdapter(pastPrizes));
+			mergeAdapter.addAdapter(new PrizeListAdapter(pastPrizes,true));
 		}
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
@@ -92,12 +119,22 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	boolean RUNNING = false;
 	
 	public void getPrizes(){
+		
 		if(!RUNNING){
 			RUNNING = true;
+			pastPrizes.clear();
+			activePrizes.clear();
+			try{
+			ListView listview = (ListView)findViewById(R.id.ListView01);
+			MergeAdapter mergeAdapter = new MergeAdapter();
+			listview.setAdapter(mergeAdapter);
+			}catch(Throwable t){
+				
+			}
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
-				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(PrizesBozukoActivity.this));
 				
 				sendRequest(entry);
 			}
@@ -108,6 +145,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	public void onResume(){
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mprefs.getBoolean("facebook_login", false)){
+			nextURL = "";
+			
 			getPrizes();
 		}else{
 			activePrizes.clear();
@@ -133,14 +172,23 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			return;
 		}
 		try {
-			tmpActivePrizes.clear();
-			tmpPastPrizes.clear();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linksprizes");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			url += String.format("?token=%s",mprefs.getString("token", ""));
+			tmpActivePrizes = new ArrayList<PrizeObject>();
+			tmpPastPrizes = new ArrayList<PrizeObject>();
+			String url = GlobalConstants.BASE_URL;
+			if(nextURL.compareTo("")==0){
+				url += entry.requestInfo("linksprizes");
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				url += String.format("?token=%s",mprefs.getString("token", ""));
+				url += "&mobile_version="+GlobalConstants.MOBILE_VERSION;
+			}else{
+				url += nextURL;
+				nextURL = "";
+			}
+			
+			
 			//Log.v("ENTRY",entry.toString());
 			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
 			//Log.v("PRIZESLISTSTRING",req.AutoPlain());
 			
@@ -150,7 +198,11 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			if(token == JsonToken.START_OBJECT){
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
-				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				token = jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
+				}
+				
 				if ("prizes".equals(fieldname)) { 
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
@@ -164,6 +216,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 						}
 					}
 					
+					//mHandler.post(new AddAllRunnable(tmpActivePrizes,activePrizes));
+					//mHandler.post(new AddAllRunnable(tmpPastPrizes,pastPrizes));
 					RUNNABLE_STATE = RUNNABLE_SUCCESS;
 				}else if ("title".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -174,23 +228,10 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				}else if ("name".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
 					errorType = jp.getText();
+				}else if ("next".equals(fieldname)) { 
+					nextURL = jp.getText();
 				}
 			}
-			}else{
-				if(token == JsonToken.START_ARRAY){
-					while (jp.nextToken() != JsonToken.END_ARRAY) {
-						PrizeObject page = new PrizeObject(jp);
-						//Log.v("Page",page.toString());
-						//prizes.add(page);
-						if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
-							tmpPastPrizes.add(page);
-						}else{
-							tmpActivePrizes.add(page);
-						}
-					}
-					
-					RUNNABLE_STATE = RUNNABLE_SUCCESS;
-				}
 			}
 			jp.close();
 //			JSONObject json = req.AutoJSONError();
@@ -225,20 +266,38 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	
 	private class PrizeListAdapter extends BaseAdapter{
 		ArrayList<PrizeObject> pages;
+		boolean searchable;
 
-		public PrizeListAdapter(ArrayList<PrizeObject> inArray){
+		public PrizeListAdapter(ArrayList<PrizeObject> inArray, boolean inSearchable){
 			pages = inArray;
+			searchable = inSearchable;
+			//Log.v("NEXTURL",nextURL);
 		}
 
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
+			if(searchable){
+				if(nextURL.compareTo("")!=0){
+					return pages.size()+1;
+				}
+			}
+			
 			return pages.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
+			if(searchable){
+				if(nextURL.compareTo("")!=0){
+					if(position<pages.size()){
+						return pages.get(position);
+					}else{
+						return null;
+					}
+				}
+			}
 			return pages.get(position);
 		}
 
@@ -257,7 +316,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				groupView = (CheckView)masterConvertView;
 				convertView = groupView.getContentView();
 			}else{
-				groupView = new CheckView(getBaseContext());
+				groupView = new CheckView(PrizesBozukoActivity.this);
 			}
 
 			PrizeView movieView = null;
@@ -269,7 +328,12 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				movieView = (PrizeView) convertView;
 			}
 			movieView.display((PrizeObject)getItem(position));
-			groupView.showArrow(true);
+			if(getItem(position)!=null){
+				groupView.showArrow(true);
+			}else{
+				groupView.showArrow(false);
+			}
+			
 			return groupView;
 		}
 
@@ -301,6 +365,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
 		Object object = arg0.getItemAtPosition(arg2);
+		if(object != null){
 		if(object.getClass() == PrizeObject.class){
 			PrizeObject prize = (PrizeObject)object;
 			if(prize.requestInfo("state").compareTo("redeemed") == 0 || prize.requestInfo("state").compareTo("expired") == 0){
@@ -313,6 +378,19 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 				startActivityForResult(intent,666);
 			}
 		}
+		}else{
+			loadMore();
+		}
+	}
+	
+	public void loadMore(){
+		progressRunnable(new Runnable(){
+			public void run(){
+				EntryPointObject entry = new EntryPointObject("1");
+				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(PrizesBozukoActivity.this));
+				sendRequest(entry);
+			}
+		},"Loading...",CANCELABLE);
 	}
 	
 	 protected void onActivityResult(int requestCode, int resultCode,

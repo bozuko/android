@@ -80,6 +80,8 @@ public class DataObject implements Parcelable{
 				JsonToken token = jp.nextToken();
 				if(token == JsonToken.START_OBJECT){
 					processJsonParser(jp,masterKey+key);
+				}else if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
 				}else{
 					map.put(masterKey+key, jp.getText());
 				}

@@ -9,14 +9,16 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
@@ -94,7 +96,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 	public View getCellView(String inString,int resource){
 		GroupView groupView = new GroupView(this);
 		
-		TextView textView = new TextView(getBaseContext());
+		TextView textView = new TextView(BozukoControllerActivity.this);
 		textView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,(int)(44*getResources().getDisplayMetrics().density)));
 		textView.setTextColor(Color.BLACK);
 		textView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -111,7 +113,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 	public View getLongCellView(String inString,int resource){
 		GroupView groupView = new GroupView(this);
 		
-		TextView textView = new TextView(getBaseContext());
+		TextView textView = new TextView(BozukoControllerActivity.this);
 		textView.setPadding(0, 10, 0, 10);
 		textView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 		textView.setTextColor(Color.GRAY);
@@ -127,7 +129,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 	}
 
 	public View getOptionView(MenuOption option,int resource){
-		OptionCell optionView = new OptionCell(getBaseContext());
+		OptionCell optionView = new OptionCell(BozukoControllerActivity.this);
 		optionView.display(option,resource);
 		return optionView;
 	}
@@ -173,7 +175,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 	public void facebook(){
 		//TODO
 		EntryPointObject entry = new EntryPointObject("1");
-        entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+        entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(BozukoControllerActivity.this));
 		
         SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		if(mprefs.getBoolean("facebook_login", false)){
@@ -203,7 +205,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 		
 		try{
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(BozukoControllerActivity.this));
 			
 			String url = GlobalConstants.BASE_URL + user.requestInfo("linkslogout");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -214,7 +216,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 			
 			mHandler.post(new Runnable(){
 				public void run(){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(BozukoControllerActivity.this);
 					SharedPreferences.Editor edit = mprefs.edit();
 					edit.putBoolean("facebook_login", false);
 					edit.putString("token", "");
@@ -225,7 +227,7 @@ public class BozukoControllerActivity extends ControllerActivity {
 					edit.commit();
 					((BozukoApplication)getApp()).getEntry();
 					
-					Intent bozuko = new Intent(getBaseContext(),SettingsBozukoActivity.class);
+					Intent bozuko = new Intent(BozukoControllerActivity.this,SettingsBozukoActivity.class);
 					bozuko.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 					startActivity(bozuko);
 				}
@@ -261,5 +263,43 @@ public class BozukoControllerActivity extends ControllerActivity {
 		public void run(){
 			//makeDialog(inThrowable.getLocalizedMessage() + "\n" + inThrowable.getMessage() + "\n" + inThrowable.toString(),"StackTrace",null);
 		}
+	}
+
+	public class SimpleAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
+
+	public void onPause(){
+		super.onPause();
+		((BozukoApplication)getApp()).saveData();
+	}
+	
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		((BozukoApplication)getApp()).loadData();
 	}
 }

@@ -14,7 +14,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,10 +54,10 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	public View getRulesCellView(String inString,int resource){
 		GroupView groupView = new GroupView(this);
 		
-		LinearLayout layout = new LinearLayout(getBaseContext());
+		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		
-		TextView textView = new TextView(getBaseContext());
+		TextView textView = new TextView(this);
 		textView.setPadding(0, 10, 0, 10);
 		textView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 		textView.setTextColor(Color.BLACK);
@@ -68,7 +67,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		textView.setText("Official Rules");
 		layout.addView(textView);
 		
-		textView = new TextView(getBaseContext());
+		textView = new TextView(this);
 		textView.setPadding(0, 10, 0, 10);
 		textView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 		textView.setTextColor(Color.GRAY);
@@ -107,7 +106,6 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 			makeDialog(errorMessage,errorTitle,null);
 		}else{
 			makeDialog(errorMessage,errorTitle,null);
-			setupView();
 		}
 	}
 	
@@ -128,6 +126,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 
 		GameHeaderView pageView = new GameHeaderView(this);
 		pageView.display(game,((BozukoApplication)getApp()).currentPageObject);
+		pageView.setId(999);
 		groupView.setContentView(pageView);
 
 		groupView.setImage(R.drawable.cellbutton);
@@ -142,6 +141,13 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		listview.setCacheColorHint(Color.argb(255, 205, 205, 205));
 		listview.setSelector(R.drawable.blank);
 		listview.setDividerHeight(0);
+		
+		if(findViewById(999)!=null){
+			((GameHeaderView)findViewById(999)).pauseTimers();
+		}
+		if(findViewById(999)!=null){
+			((GameHeaderView)findViewById(999)).destroy();
+		}
 		
 		MergeAdapter mergeAdapter = new MergeAdapter();
 
@@ -210,7 +216,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 					findViewById(R.id.agree).setVisibility(View.VISIBLE);
 					findViewById(R.id.nextgame).setVisibility(View.INVISIBLE);
 					((Button)findViewById(R.id.entergame)).setText("Play");
-					
+					findViewById(R.id.entergame).setEnabled(true);
 				}else{
 					result.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 					prize.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
@@ -232,6 +238,7 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 			((TextView)findViewById(R.id.nextgame)).setText(game.gameState.requestInfo("button_text"));
 		}else{
 			findViewById(R.id.entergame).setVisibility(View.VISIBLE);
+			findViewById(R.id.entergame).setEnabled(true);
 			findViewById(R.id.agree).setVisibility(View.VISIBLE);
 			findViewById(R.id.nextgame).setVisibility(View.INVISIBLE);
 		}
@@ -241,17 +248,37 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	public void onPause(){
 		super.onPause();
 		unregisterReceiver(mReceiver);
+		if(findViewById(999)!=null){
+			((GameHeaderView)findViewById(999)).pauseTimers();
+		}
+		game = null;
+		//CookieSyncManager.getInstance().stopSync();
 	}
 
 	public void onResume(){
+		game = ((BozukoApplication)getApp()).currentGameObject;
+		
 		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
 		super.onResume();
 		setupView();
+		
 		unProgressRunnable(new Runnable(){
 			public void run(){
 				getGameState();
 			}
 		});
+		if(findViewById(999)!=null){
+			((GameHeaderView)findViewById(999)).resumeTimers();
+		}
+		//CookieSyncManager.getInstance().startSync();
+	}
+	
+	public void onDestroy(){
+		if(findViewById(999)!=null){
+			((GameHeaderView)findViewById(999)).destroy();
+		}
+		super.onDestroy();
+		
 	}
 	
 	public void getGameState(){
@@ -333,12 +360,12 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 				groupView = (GroupView)masterConvertView;
 				convertView = groupView.getContentView();
 			}else{
-				groupView = new GroupView(getBaseContext());
+				groupView = new GroupView(GameEntryBozukoActivity.this);
 			}
 
 			PrizeCell movieView = null;
 			if (convertView == null) {
-				movieView = new PrizeCell(getBaseContext());
+				movieView = new PrizeCell(GameEntryBozukoActivity.this);
 				groupView.setContentView(movieView);
 			}
 			else {
@@ -363,38 +390,15 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	}
 
 	@Override
-	public void onClick(View v) {
+	public synchronized void onClick(View v) {
 		// TODO Auto-generated method stub
-		//Log.v("Game",game.toString());
+		if(!v.isEnabled()){
+			return;
+		}
+		v.setEnabled(false);
 		System.gc();
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-		//Log.v("GAME",game.toString());
-		//Log.v("GAMESTATE",game.gameState.toString());
 		if(mprefs.getBoolean("facebook_login", false)){
-//			if(game.gameState.requestInfo("button_action").compareTo("enter") == 0){
-//				if(game.requestInfo("entry_methodtype").compareTo("facebook/like")==0 && ((BozukoApplication)getApp()).currentPageObject.requestInfo("liked").compareTo("true")!=0){
-//					//Intent intent = new Intent(this,SocialMediaWebViewActivity.class);
-//					//intent.setData(Uri.parse(((BozukoApplication)getApp()).currentGameObject.requestInfo("like_url")));
-//					//startActivity(intent);
-//					makeDialog("Facebook like required.","Game Error",null);
-//				}else{
-//					if(game.requestInfo("type").compareTo("scratch")==0){
-//						Intent intent = new Intent(this,ScratchGameBozukoActivity.class);
-//						startActivity(intent);
-//					}else if(game.requestInfo("type").compareTo("slots") == 0){
-//						Intent intent = new Intent(this,SlotsGameBozukoActivity.class);
-//						startActivity(intent);
-//					}
-//				}
-//			}else{
-//				if(game.requestInfo("type").compareTo("scratch")==0){
-//					Intent intent = new Intent(this,ScratchGameBozukoActivity.class);
-//					startActivity(intent);
-//				}else if(game.requestInfo("type").compareTo("slots") == 0){
-//					Intent intent = new Intent(this,SlotsGameBozukoActivity.class);
-//					startActivity(intent);
-//				}
-//			}
 			if(game.requestInfo("type").compareTo("scratch")==0){
 				Intent intent = new Intent(this,ScratchGameBozukoActivity.class);
 				startActivity(intent);
@@ -405,8 +409,6 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		}else{
 			notLoggedIn();
 		}
-		
-		
 	}
 	
 	protected class UpdateReceiver extends BroadcastReceiver{

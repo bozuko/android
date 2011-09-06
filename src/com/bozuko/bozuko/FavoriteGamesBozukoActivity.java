@@ -45,12 +45,22 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 
 	boolean loadMore = false;
 	boolean loadMoreSearch = false;
+	String nextURL = "";
+	String nextSearchURL = "";
 
+	public void onDestroy(){
+		ListView listview = (ListView)findViewById(R.id.ListView01);
+		listview.setAdapter(new SimpleAdapter());
+		games.clear();
+		search.clear();
+		super.onDestroy();
+	}
+	
 	public void progressRunnableComplete(){
 		if(isFinishing()){
 			return;
 		}
-		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0){
+		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0 && games.size()>0){
 			setupList();
 		}else{
 			setupSearch();
@@ -59,6 +69,14 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 
 	public void setupSearch(){
 		ListView listview = (ListView)findViewById(R.id.ListView01);
+		if(games.size()==0){
+			setContent(R.layout.no_favorites);
+			return;
+		}
+		if(listview == null){
+			setContent(R.layout.searchlistview);
+			listview = (ListView)findViewById(R.id.ListView01);
+		}
 		listview.setSelector(R.drawable.listbutton);
 		listview.setItemsCanFocus(false);
 		if(search.size()<30){
@@ -152,12 +170,13 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			}catch(Throwable t){
 
 			}
+			nextSearchURL = "";
 			search.clear();
 			searchCurrentPage = 0;
 			progressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(FavoriteGamesBozukoActivity.this));
 					sendSearchRequest(entry);
 				}
 			},"Searching...",NOT_CANCELABLE);
@@ -183,10 +202,11 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 		}
 		games.clear();
 		currentPage = 0;
+		nextURL = "";
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
-				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(FavoriteGamesBozukoActivity.this));
 				sendRequest(entry);
 			}
 		},"Loading...",CANCELABLE);
@@ -198,7 +218,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			progressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(FavoriteGamesBozukoActivity.this));
 					sendRequest(entry);
 				}
 			},"Loading...",CANCELABLE);
@@ -207,7 +227,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 			progressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(FavoriteGamesBozukoActivity.this));
 					sendSearchRequest(entry);
 				}
 			},"Loading...",CANCELABLE);
@@ -254,23 +274,35 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 		}
 		try {
 			ArrayList<PageObject> pages = new ArrayList<PageObject>();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage,mprefs.getString("token", ""));
-			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url+"&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			String url = GlobalConstants.BASE_URL;
+			if(nextURL.compareTo("")==0){
+				url += entry.requestInfo("linkspages");
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage,mprefs.getString("token", ""));
+				url += "&mobile_version="+GlobalConstants.MOBILE_VERSION;
+			}else{
+				url += nextURL;
+				nextURL = "";
+			}
+			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
 			JsonParser jp = req.AutoStreamJSONError();
-			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			JsonToken start = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			if(start == JsonToken.START_OBJECT){
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
-				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				JsonToken token = jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
+				}
 				if ("pages".equals(fieldname)) { 
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
 						//Log.v("Page",page.toString());
-						if(page.requestInfo("registered").compareTo("true")==0){
+						if(page.requestInfo("featured").compareTo("true")==0){
+							pages.add(page);
+						}else if(page.requestInfo("registered").compareTo("true")==0){
 							pages.add(page);
 						}
 					}
@@ -288,7 +320,14 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				}else if ("name".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
 					errorType = jp.getText();
+				}else if ("next".equals(fieldname)) { 
+					nextURL = jp.getText();
 				}
+			}
+			}else{
+			errorMessage = "Failed to get places from server.";
+			errorTitle = "Request Error";
+			RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 			jp.close();
 		} catch (Throwable e) {
@@ -310,11 +349,19 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 		try {
 
 			ArrayList<PageObject> pages = new ArrayList<PageObject>();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage,mprefs.getString("token", ""));
-			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url+ "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			String url = GlobalConstants.BASE_URL;
+			if(nextSearchURL.compareTo("")==0){
+				url += entry.requestInfo("linkspages");
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage,mprefs.getString("token", ""));
+				//Log.v("URL",url);
+				url += "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION;
+			}else{
+				url += nextSearchURL;
+				nextSearchURL = "";
+			}
+			
+			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
 			JSONObject json = req.AutoJSONError();
 			try{
@@ -328,7 +375,11 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 					}
 				}
 
-				
+				try{
+					nextSearchURL = json.getString("next");
+				}catch(Throwable t){
+					
+				}
 
 				mHandler.post(new AddAllRunnable(pages,search));
 
@@ -402,7 +453,7 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				groupView = (CheckView)masterConvertView;
 				convertView = groupView.getContentView();
 			}else{
-				groupView = new CheckView(getBaseContext());
+				groupView = new CheckView(FavoriteGamesBozukoActivity.this);
 			}
 
 			PageView movieView = null;

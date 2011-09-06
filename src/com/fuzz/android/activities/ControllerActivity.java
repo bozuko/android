@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
@@ -113,6 +114,8 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		 getWindow().setFormat(PixelFormat.RGBA_8888);
+		 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         STATE = STATE_ACTIVE;
         setContentView(Res.layout.toplayer);
@@ -220,6 +223,7 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 		 switch(id) {
 		    case CANCELABLE:
 		    	((ProgressDialog)dialog).setMessage(progressMessage);
+		    	
 		    	break;
 		    case NOT_CANCELABLE:
 		    	((ProgressDialog)dialog).setMessage(progressMessage);
@@ -228,6 +232,11 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 		    	((ProgressDialog)dialog).setMessage(progressMessage);
 		    	break;
 		 }
+		ProgressBar p = (ProgressBar) dialog.findViewById(android.R.id.progress);
+		if(p!=null){
+			p.setVisibility(View.GONE);
+			p.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	protected void onPrepareDialog (int id, Dialog dialog, Bundle args){

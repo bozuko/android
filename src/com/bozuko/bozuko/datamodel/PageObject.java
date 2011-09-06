@@ -8,9 +8,14 @@ import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.datahandler.DataObject;
 
 public class PageObject extends DataObject {
@@ -75,6 +80,8 @@ public class PageObject extends DataObject {
 						while (jp.nextToken() != JsonToken.END_ARRAY) {
 						}
 					}
+				}else if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
 				}else{
 					map.put(masterKey+key, jp.getText());
 				}
@@ -127,5 +134,49 @@ public class PageObject extends DataObject {
 				out.writeParcelable(game, Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
 			}
 		}
+	}
+
+	public void saveToDb(String id,DataBaseHelper dbh){
+		
+		dbh.eraseTable("pages");
+		dbh.eraseTable("games");
+		dbh.eraseTable("gameiconimages");
+		dbh.eraseTable("gameicons");
+		dbh.eraseTable("gameState");
+		dbh.eraseTable("listprizes");
+		super.saveToDb(id, dbh);
+		
+		
+		for(int i=0; i<games.size(); i++){
+			games.get(i).add("pageid", requestInfo("id"));
+			games.get(i).saveToDb(games.get(i).requestInfo("id"), dbh);
+		}
+	}
+	
+	public void getObject(String id,DataBaseHelper dbh){
+		super.getObject(id, dbh);
+
+		try{
+		String selection[] = {requestInfo("id")};
+		Cursor r = dbh.getDB().query("games", null, "pageid=?", selection, null, null, null);
+		games = new ArrayList<GameObject>();
+		while(r.moveToNext()){
+			GameObject object = new GameObject(r);
+			object.getObject(object.requestInfo("id"), dbh);
+			games.add(object);
+		}
+		r.close();
+		}catch(Throwable t){
+		}
+	}
+	
+	public void createTable(SQLiteDatabase db) throws SQLException{
+		String sql = "create table " + tablename + " (_id integer primary key autoincrement, ";
+		for (String s: map.keySet()) {
+				sql = sql + s + " text, ";
+		}
+		sql = sql.substring(0, sql.length()-2);
+		sql = sql + ")";
+		db.execSQL(sql);
 	}
 }

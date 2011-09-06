@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
@@ -16,11 +18,9 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
@@ -49,7 +49,19 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	MapOverlay itemizedoverlay;
 	String zip;
 	boolean SENDING = false;
+	String lat = "0.0";
+	String lon = "0.0";
 	public String errorType = "";
+
+	public void onDestroy(){
+		super.onDestroy();
+		mc = null;
+		mapView = null;
+		locationoverlay = null;
+		mapOverlays.clear();
+		itemizedoverlay.empty();
+		
+	}
 
 	@Override
 	public void progressRunnableComplete(){
@@ -61,7 +73,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		if(isFinishing()){
 			return;
 		}
-		if(itemizedoverlay.shouldAdd()){
+		if(itemizedoverlay.shouldAdd() && !mapOverlays.contains(itemizedoverlay)){
 			mapOverlays.add(itemizedoverlay);
 		}
 		mapView.postInvalidate();
@@ -122,15 +134,21 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	}
 
 	UpdateReceiver mReceiver = new UpdateReceiver();
+	LocationReceiver mLocationReceiver = new LocationReceiver();
 	public void onPause(){
 		super.onPause();
 		unregisterReceiver(mReceiver);
+		unregisterReceiver(mLocationReceiver);
 	}
 	
 	public void onResume(){
 		super.onResume();
 		registerReceiver(mReceiver, new IntentFilter("MapPan"));
+		registerReceiver(mLocationReceiver, new IntentFilter("LOCATIONSUPDATED"));
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String tempLat = mprefs.getString("clat", "0.00");
+		String tempLon = mprefs.getString("clon", "0.00");
+		
 		if(mprefs.getBoolean("ReloadMap", false)){
 			games.clear();
 			gamesLoaded.clear();
@@ -142,9 +160,13 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			centerStuff();
 			loadLocation();
 			loadGames();
-		}
-		if(games.size()==0){
+		}else if(games.size()==0){
 			loadGames();
+		}else if(lat.compareTo(tempLat)!=0 && lon.compareTo(tempLon)!=0){
+			Double distance = BozukoDataBaseHelper.distanceAsDouble(Double.valueOf(lat), Double.valueOf(tempLat), Double.valueOf(lon), Double.valueOf(tempLon));
+			if(distance > 0.5){
+				loadGames();
+			}
 		}
 	}
 
@@ -192,13 +214,28 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	public void loadGames(){
 		if(!SENDING){
 		SENDING = true;
-		progressRunnable(new Runnable(){
-			public void run(){
-				EntryPointObject entry = new EntryPointObject("1");
-				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
-				sendRequest(entry,0);
-			}
-		},"Loading. Please wait...",CANCELABLE);
+			showDialog(NOT_CANCELABLE);
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask(){
+				public void run(){
+					mHandler.post(new Runnable(){
+						public void run(){
+							SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(GamesMapController.this);
+							String tempLat = mprefs.getString("clat", "0.00");
+							String tempLon = mprefs.getString("clon", "0.00");
+							lat = tempLat;
+							lon = tempLon;
+							progressRunnable(new Runnable(){
+								public void run(){
+									EntryPointObject entry = new EntryPointObject("1");
+									entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(GamesMapController.this));
+									sendRequest(entry,0);
+								}
+							},"Loading. Please wait...",NOT_CANCELABLE);
+						}
+					});
+				}
+			}, 2000);
 		}
 	}
 	
@@ -208,7 +245,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		unProgressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
-				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(GamesMapController.this));
 				sendRequest(entry,0);
 			}
 		});
@@ -255,10 +292,15 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			HttpRequest req = new HttpRequest(new URL(url + "&token=" + mprefs.getString("token", "") + "&mobileversion="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
 			JsonParser jp = req.AutoStreamJSONError();
-			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			JsonToken start = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			
+			if(start == JsonToken.START_OBJECT){
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
-				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				JsonToken token = jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
+				}
 				if ("pages".equals(fieldname)) { 
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
@@ -284,6 +326,11 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 					errorType = jp.getText();
 				}
 			}
+		}else{
+			errorMessage = "Failed to get places from server.";
+			errorTitle = "Request Error";
+			RUNNABLE_STATE = RUNNABLE_FAILED;
+			}
 			jp.close();
 		} catch (Throwable e) {
 			//e.printStackTrace();
@@ -299,6 +346,22 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		public void onReceive(Context arg0, Intent arg1) {
 			// TODO Auto-generated method stub
 			loadGamesBG();
+		}
+
+	}
+	
+	protected class LocationReceiver extends BroadcastReceiver{
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			// TODO Auto-generated method stub
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(arg0);
+			String tempLat = mprefs.getString("clat", "0.00");
+			String tempLon = mprefs.getString("clon", "0.00");
+			Double distance = BozukoDataBaseHelper.distanceAsDouble(Double.valueOf(lat), Double.valueOf(tempLat), Double.valueOf(lon), Double.valueOf(tempLon));
+			if(distance > 0.5){
+				loadGames();
+			}
+			loadLocation();
 		}
 
 	}
@@ -360,7 +423,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 		
 		try{
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(GamesMapController.this));
 			
 			String url = GlobalConstants.BASE_URL + user.requestInfo("linkslogout");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -371,7 +434,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			
 			mHandler.post(new Runnable(){
 				public void run(){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(GamesMapController.this);
 					SharedPreferences.Editor edit = mprefs.edit();
 					edit.putBoolean("facebook_login", false);
 					edit.putString("token", "");
@@ -382,7 +445,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 					edit.commit();
 					((BozukoApplication)getApp()).getEntry();
 					
-					Intent bozuko = new Intent(getBaseContext(),SettingsBozukoActivity.class);
+					Intent bozuko = new Intent(GamesMapController.this,SettingsBozukoActivity.class);
 					bozuko.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 					startActivity(bozuko);
 				}
@@ -395,7 +458,7 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 	
 	public void removeCookies(){
 		try{
-			CookieSyncManager.createInstance(this);
+			//CookieSyncManager.createInstance(this);
 			CookieManager cookieManager = CookieManager.getInstance();
 			cookieManager.removeAllCookie();
 		}catch(Throwable t){

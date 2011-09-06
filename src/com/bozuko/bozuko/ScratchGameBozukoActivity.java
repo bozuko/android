@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +20,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.RotateAnimation;
@@ -34,6 +35,7 @@ import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.datamodel.PrizeObject;
 import com.bozuko.bozuko.datamodel.User;
 import com.bozuko.bozuko.views.AnimationFactory;
+import com.bozuko.bozuko.views.ScratchCache;
 import com.bozuko.bozuko.views.ScratchView;
 import com.bozuko.bozuko.views.ScratchView.ScratchListener;
 import com.fuzz.android.datahandler.DataBaseHelper;
@@ -70,7 +72,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				
 				if(prize != null){
 					prize.add("gameid", gameState.requestInfo("game_id"));
-					Log.v("Prize",prize.toString());
+					//Log.v("Prize",prize.toString());
 					prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 				}
 			}
@@ -83,6 +85,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		if(gameState.requestInfo("user_tokens").compareTo("0") == 0 && result == null){
 			allButtonsHaveBeenScratched();
 		}else{
+			
+			
 			if(((TextView)findViewById(R.id.credits)).getText().toString().compareTo("0")==0){
 				if(result.requestInfo("free_play").compareTo("true") != 0){
 					((TextView)findViewById(R.id.credits)).setText((Integer.valueOf(gameState.requestInfo("user_tokens"))+1) + "");
@@ -94,6 +98,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 			}
 			boolean won = false;
+			try{
+			
 			for(int i=0; i<result.results.size(); i++){
 				HashMap<String,String> temp = (HashMap<String,String>)result.results.get(i);
 				ScratchView view = (ScratchView)findViewById(i+1);
@@ -129,6 +135,27 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			}else if(popped.size() == NUMBER_OF_SCRATCH_AREAS){
 				allButtonsHaveBeenScratched();
 			}
+			}catch(Throwable t){
+				AlertDialog alert = null;
+				alert = makeDialog("Could not load game try again later.","Request Failed",new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+				if(alert != null){
+					alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						
+						@Override
+						public void onDismiss(DialogInterface dialog) {
+							// TODO Auto-generated method stub
+							finish();
+						}
+					});
+					}
+			}
 		}
 	}
 
@@ -137,8 +164,12 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		if(isFinishing()){
 			return;
 		}
+		//requestDONE = true;
+		super.closeDialogs();
+		
+		AlertDialog alert = null;
 		if(errorType.compareTo("facebook/auth")==0){
-			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+			alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -154,7 +185,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				((BozukoApplication)getApp()).getUser();
 			}
 			
-			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+			alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -163,7 +194,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				}
 			});
 		}else{
-			makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+			alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -172,7 +203,16 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				}
 			});
 		}
-
+		if(alert != null){
+		alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+		});
+		}
 	}
 
 	public void setupTickets(int left,int top,int width,int height, int startX, int startY, int textSize){
@@ -232,7 +272,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			public void run(){
 				loadGameState();
 			}
-		},"Loading...",NOT_CANCELABLE);
+		},"Loading...",CLOSEABLE);
 
 		findViewById(R.id.prizestext).setOnClickListener(this);
 		findViewById(R.id.officialrules).setOnClickListener(this);
@@ -241,7 +281,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	public void onResume(){
 		super.onResume();
 		if(gameState.requestInfo("button_action").compareTo("enter")!=0){
-			if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
+			if(gameState.requestInfo("user_tokens").compareTo("0") == 0 && result == null){
 				allButtonsHaveBeenScratched();
 			}
 		}
@@ -394,7 +434,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			
 			
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_entry");
@@ -456,7 +496,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			if(!gameState.checkInfo("linksgame_result")){
 				errorTitle = "No more plays";
 				errorMessage = "No more plays";
@@ -508,12 +548,14 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	}
 
 	@Override
-	public void onClick(View v) {
+	public synchronized void onClick(View v) {
 		// TODO Auto-generated method stub
 		if(v.getId() == R.id.cardText){
-			v.setEnabled(false);
-			v.setClickable(false);
-			animationDone();
+			if(v.isEnabled()){
+				v.setEnabled(false);
+				v.setClickable(false);
+				animationDone();
+			}
 			return;
 		}
 
@@ -572,6 +614,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			if(result != null){
 				result.add("isFinished", "1");
 			}
+			thisMethodIsDone=false;
 			playEndingSequence();
 			((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
 			timer = new Timer();
@@ -664,7 +707,14 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}
 	}
 
-	public void animationDone(){
+	
+	boolean thisMethodIsDone = false;
+	public synchronized void animationDone(){
+		if(thisMethodIsDone){
+			return;
+		}
+		thisMethodIsDone = true;
+		
 		try{
 			timer.cancel();
 			try{timer.purge();}catch(Throwable t){}
@@ -715,8 +765,16 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 						}
 					});
 				}else{
+					if(result.requestInfo("free_play").compareTo("true") != 0){
 					if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 						finish();
+					}else{
+						progressRunnable(new Runnable(){
+							public void run(){
+								getGameResults();
+							}
+						},"Loading...",NOT_CANCELABLE);
+					}
 					}else{
 						progressRunnable(new Runnable(){
 							public void run(){
@@ -787,6 +845,19 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			findViewById(R.id.credits).setVisibility(View.VISIBLE);
 			super.closeDialogs();
 		}
+	}
+		
+	public void onDestroy(){
+//		Intent backToIntent = new Intent("destroyURLImage");
+//		backToIntent.putExtra("parentClass",this.getClass().toString());
+//		sendBroadcast(backToIntent);
+		
+		//Log.v("Bozuko","Scratch destroyed");
+		((URLImageView)findViewById(R.id.ticket)).setURL(null);
+		((URLImageView)findViewById(R.id.businessimage)).setURL(null);
+		
+		ScratchCache.getSharedInstance().clearResources();
+		super.onDestroy();	
 	}
 
 }

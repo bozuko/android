@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -28,7 +27,7 @@ public class PhotoAdapter extends ArrayAdapter<PhotoInterface>{
 
 		if (convertView == null) {
 			// create the cell renderer
-			Log.i(getClass().getSimpleName(), "creating a MovieView object");
+			//Log.i(getClass().getSimpleName(), "creating a MovieView object");
 			movieView = new MediaView(parent.getContext());
 		}
 		else {

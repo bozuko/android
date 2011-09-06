@@ -18,13 +18,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils.TruncateAt;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.CookieManager;
@@ -49,6 +49,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 	PageObject page;
 	ImageView check;
 	WebView _likeView;
+	int count = 0;
 
 	public PageHeaderView(Context context) {
 		super(context);
@@ -109,7 +110,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 		CookieSyncManager.createInstance(mContext);
 		CookieManager cookieManager = CookieManager.getInstance();
 		cookieManager.setAcceptCookie(true);
-		_likeView = new WebView(mContext);
+		_likeView = new WebView(mContext.getApplicationContext());
 		params = new RelativeLayout.LayoutParams((int)(50*getResources().getDisplayMetrics().density),(int)(20*getResources().getDisplayMetrics().density));
 		_likeView.setId(99);
 		params.setMargins(0, 10, 0, 0);
@@ -120,9 +121,11 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 		_likeView.getSettings().setJavaScriptEnabled(true);
 		_likeView.setWebViewClient(new SocialWebClient());
 		_likeView.setFocusable(false);
-		//_likeView.setVerticalScrollBarEnabled(false);
-		//_likeView.setHorizontalScrollBarEnabled(false);
+		_likeView.setVerticalScrollBarEnabled(false);
+		_likeView.setHorizontalScrollBarEnabled(false);
 		addView(_likeView);
+		_likeView.resumeTimers();
+		count++;
 		
 		
 		_category = new TextView(mContext);
@@ -184,7 +187,16 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 
 	public void display(PageObject inPage){
 		page = inPage;
-		_likeView.loadUrl(inPage.requestInfo("like_button_url"));
+		//Log.v("PAGE",page.toString());
+		//_likeView.loadUrl(inPage.requestInfo("like_button_url"));
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		if(!mprefs.getBoolean("facebook_login", false)){
+			_likeView.loadUrl("file:///android_asset/login.html");
+		}else{
+			_likeView.loadUrl(page.requestInfo("like_button_url"));
+		}
+		
+		
 		_image.setURL(page.requestInfo("image"));
 		_category.setText(page.requestInfo("category"));
 		_title.setText(page.requestInfo("name"));
@@ -300,7 +312,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 				getContext().sendBroadcast(intent);
 				return true;
 			}
-			if(url.startsWith("https://www.facebook.com/connect")){
+			if(url.startsWith("bozuko://facebook/no_session")){
 				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 				if(mprefs.getBoolean("facebook_login", false)){
 					((BozukoControllerActivity)getContext()).makeDialog("Looks like you changed your Facebook password. Please log out of Bozuko and log back in. Thanks!","Password Changed",new DialogInterface.OnClickListener() {
@@ -324,8 +336,63 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 				}
 				return true;
 			}
-			
+			if(url.startsWith("bozuko://facebook/reload")){
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+				if(!mprefs.getBoolean("facebook_login", false)){
+					_likeView.loadUrl("file:///android_asset/login.html");
+				}else{
+					_likeView.loadUrl(page.requestInfo("like_button_url"));
+				}
+				return true;
+			}
+			if(url.startsWith("bozuko://")){
+				
+				return true;
+			}
 			return false;
 		}
+		
+		public void onReceivedError (WebView view, int errorCode, String description, String failingUrl){
+			//view.setVisibility(View.INVISIBLE);
+			view.loadUrl("file:///android_asset/loading.html");
+		}
+		
+		public void onPageStarted (WebView view, String url, Bitmap favicon){
+			view.setVisibility(View.VISIBLE);
+		}
 	}
+
+	
+	public void pauseTimers() {
+		// TODO Auto-generated method stub
+		while(count!=0){
+			count--;
+			_likeView.pauseTimers();
+			try{
+				Class.forName("android.webkit.WebView").getMethod("onPause", (Class[]) null).invoke(_likeView, (Object[]) null);
+			}catch(Throwable t){
+				
+			}
+		}
+	}
+
+	public void resumeTimers() {
+		// TODO Auto-generated method stub
+		_likeView.resumeTimers();
+		count++;
+		try{
+			Class.forName("android.webkit.WebView").getMethod("onResume", (Class[]) null).invoke(_likeView, (Object[]) null);
+		}catch(Throwable t){
+			
+		}
+	}
+
+	public void destroy() {
+		// TODO Auto-generated method stub
+		_likeView.stopLoading();
+		_likeView.destroy();
+		
+	}
+	
+	
 }

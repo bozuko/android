@@ -2,7 +2,6 @@ package com.bozuko.bozuko;
 
 import java.net.URL;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.User;
@@ -15,7 +14,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -90,7 +88,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			//Log.v("url",request);
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(request));
 			req.add("token", mprefs.getString("token", ""));
@@ -128,8 +126,8 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 					errorType = json.getString("name");
 					RUNNABLE_STATE = RUNNABLE_FAILED;
 				}else{
-					@SuppressWarnings("unused")
-					JSONArray array = new JSONArray(string);
+					//@SuppressWarnings("unused")
+					//JSONArray array = new JSONArray(string);
 					RUNNABLE_STATE = RUNNABLE_SUCCESS;
 				}
 				

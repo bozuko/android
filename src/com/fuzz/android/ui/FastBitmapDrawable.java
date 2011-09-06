@@ -21,7 +21,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.ColorFilter;
-import android.util.Log;
 
 public class FastBitmapDrawable extends Drawable {
     private final Bitmap mBitmap;
@@ -73,6 +72,6 @@ public class FastBitmapDrawable extends Drawable {
     }
     
     public void finalize(){
-    	Log.v("FastBitmapDrawable","finalize");
+    	//Log.v("FastBitmapDrawable","finalize");
     }
 }

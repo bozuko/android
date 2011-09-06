@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -109,7 +108,7 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 		intent.putExtra("Package", redemption);
 		intent.putExtra("Prize", prize);
 		startActivity(intent);
-		setResult(RESULT_OK);
+		//setResult(RESULT_OK);
 		finish();
 	}
 	
@@ -151,7 +150,7 @@ public class PrizeRedeemBozukoActivity extends BozukoControllerActivity implemen
 			TelephonyManager mTelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);  
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			String url = GlobalConstants.BASE_URL + prize.requestInfo("linksredeem");
 			//Log.v("URL",url);
 			//Log.v("Prize",prize.toString());

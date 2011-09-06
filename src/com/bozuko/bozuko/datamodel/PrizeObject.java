@@ -2,6 +2,8 @@ package com.bozuko.bozuko.datamodel;
 
 import org.codehaus.jackson.JsonParser;
 import org.json.JSONObject;
+
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -46,5 +48,12 @@ public class PrizeObject extends DataObject {
 		super(jp);
 		queryid = "gameid";
 		tablename = "prizes";
+	}
+
+	public PrizeObject(Cursor r) {
+		super(r);
+		queryid = "gameid";
+		tablename = "prizes";
+		// TODO Auto-generated constructor stub
 	}
 }

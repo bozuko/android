@@ -139,4 +139,13 @@ public class MapItMapActivity extends MapControllerActivity implements OnClickLi
 			startActivity(map);
 		}
 	}
+
+	public void onDestroy(){
+		super.onDestroy();
+		mc = null;
+		mapView = null;
+		locationoverlay = null;
+		mapOverlays.clear();
+		itemizedoverlay.empty();
+	}
 }

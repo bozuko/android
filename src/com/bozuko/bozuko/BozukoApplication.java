@@ -3,6 +3,9 @@ package com.bozuko.bozuko;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.json.JSONObject;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +13,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 import com.bozuko.bozuko.datamodel.Bozuko;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
@@ -25,8 +27,8 @@ import com.fuzz.android.http.HttpRequest;
 
 public class BozukoApplication extends CustomApplication {
 
-	public PageObject currentPageObject;
-	public GameObject currentGameObject;
+	public PageObject currentPageObject=null;
+	public GameObject currentGameObject=null;
 	
 	public String searchTerm = "";
 	
@@ -35,14 +37,20 @@ public class BozukoApplication extends CustomApplication {
 		// TODO Auto-generated method stub
 		
 		if(!lHandler.isLocationEnabled()){
-			endLocation();
+			//endLocation();
+			if(lHandler != null){
+				lHandler.cancel();
+			}
 			try{
 				Toast.makeText(this, "Check you gps and network connections.", Toast.LENGTH_LONG).show();
 			}catch(Throwable t){
 				
 			}
 		}else if(lHandler.loc == null){
-			endLocation();
+			//endLocation();
+			if(lHandler != null){
+				lHandler.cancel();
+			}
 			try{
 				Toast.makeText(this, "Your current location is temporarily unavailable", Toast.LENGTH_LONG).show();
 			}catch(Throwable t){
@@ -68,9 +76,9 @@ public class BozukoApplication extends CustomApplication {
 			//edit.putString("zipcode", "");
 			Thread th = new Thread(){
 				public void run(){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(BozukoApplication.this);
 					try{
-						Geocoder geoCoder = new Geocoder(getBaseContext());
+						Geocoder geoCoder = new Geocoder(BozukoApplication.this);
 						Location cur = getCurrentLocation();
 						List<Address> addresses;
 						//String zipcode = mprefs.getString("zipcode", "");
@@ -118,9 +126,43 @@ public class BozukoApplication extends CustomApplication {
 	@Override
 	public void onCreate (){
 		super.onCreate();
-
+		
+		//CookieSyncManager.createInstance(this);
 		//getEntry();
 		startLocation();
+	}
+	
+	public void loadData(){
+
+		if(timer!=null){
+			try{
+				timer.cancel();
+				timer.purge();
+				timer = null;
+			}catch(Throwable t){
+				
+			}
+		}
+		
+		 if(currentPageObject==null){
+		
+		SharedPreferences mprefs = PreferenceManager
+		.getDefaultSharedPreferences(this);
+		if(mprefs.getBoolean("LoadGameObject", false)){
+			//currentPageObject.
+			
+			currentGameObject = new GameObject(mprefs.getString("GameObjectToLoad", ""));
+			currentGameObject.getObject(mprefs.getString("GameObjectToLoad", ""), BozukoDataBaseHelper.getSharedInstance(this));
+		
+			//Log.v("Page", currentGameObject.toString());
+		}
+		if(mprefs.getBoolean("LoadPageObject", false)){
+			currentPageObject = new PageObject(mprefs.getString("PageObjectToLoad", ""));
+			currentPageObject.getObject(mprefs.getString("PageObjectToLoad", ""), BozukoDataBaseHelper.getSharedInstance(this));
+
+			//Log.v("Page", currentPageObject.toString());
+		}
+		}
 	}
 	
 	public void getEntry(){
@@ -156,7 +198,7 @@ public class BozukoApplication extends CustomApplication {
 				}
 				entry.add("entryid", "1");
 				//Log.v("ENTRY",entry.toString());
-				BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
+				//BozukoDataBaseHelper.getSharedInstance(this).eraseTable("entrypoint");
 				entry.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 				
 				url = GlobalConstants.BASE_URL + entry.requestInfo("linksbozuko");
@@ -200,8 +242,65 @@ public class BozukoApplication extends CustomApplication {
 	}
 
 	@Override
-	public void onTerminate(){
-		super.onTerminate();
+	public void onLowMemory(){
+		
+		//Toast.makeText(this, "Application Context Lost", Toast.LENGTH_LONG).show();
+		
+		super.onLowMemory();
+	}
+	
+	Timer timer;
+	
+	public void saveData(){
+		if(timer!=null){
+			try{
+				timer.cancel();
+				timer.purge();
+				timer = null;
+			}catch(Throwable t){
+				
+			}
+		}
+		
+		timer = new Timer();
+		timer.schedule(new TimerTask(){
+			public void run(){
+				performSaveData();
+			}
+		}, 10000);
+		
+//		performSaveData();
+	}
+	
+	public void performSaveData(){
+		SharedPreferences mprefs = PreferenceManager
+		.getDefaultSharedPreferences(this);
+		if(currentGameObject!=null){
+			//currentGameObject.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+			
+			SharedPreferences.Editor editor = mprefs.edit();
+			editor.putString("GameObjectToLoad", currentGameObject.requestInfo("id"));
+			editor.putBoolean("LoadGameObject", true);
+			editor.commit();
+		}else{
+			SharedPreferences.Editor editor = mprefs.edit();
+			editor.putBoolean("LoadGameObject", false);
+			editor.commit();
+		}
+		if(currentPageObject!=null){
+			//Log.v("Page", currentPageObject.toString());
+			
+			currentPageObject.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
+			
+			SharedPreferences.Editor editor = mprefs.edit();
+			editor.putString("PageObjectToLoad", currentPageObject.requestInfo("id"));
+			editor.putBoolean("LoadPageObject", true);
+			editor.commit();
+		}else{
+			SharedPreferences.Editor editor = mprefs.edit();
+			editor.putBoolean("LoadPageObject", false);
+			editor.commit();
+		}
 	}
 
 	public void getUser(){
@@ -216,7 +315,7 @@ public class BozukoApplication extends CustomApplication {
 	
 	public void sendUserRequest(){
 		EntryPointObject entry = new EntryPointObject("1");
-		entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+		entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(BozukoApplication.this));
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		try{

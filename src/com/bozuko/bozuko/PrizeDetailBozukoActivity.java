@@ -1,9 +1,7 @@
 package com.bozuko.bozuko;
 
 import com.bozuko.bozuko.datamodel.PrizeObject;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 public class PrizeDetailBozukoActivity extends BozukoControllerActivity {

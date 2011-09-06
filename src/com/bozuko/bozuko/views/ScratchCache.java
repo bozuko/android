@@ -37,4 +37,8 @@ public class ScratchCache {
 		
 		return reference.get();
 	}
+	public void clearResources() {
+		// TODO Auto-generated method stub
+		resourcesLoaded.clear();
+	}
 }

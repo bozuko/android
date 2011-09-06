@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ViewSwitcher;
 
@@ -126,8 +125,8 @@ public class CustomViewSwitcher extends ViewSwitcher {
             mRunning = running;
         }
         if (LOGD) {
-            Log.d(TAG, "updateRunning() mVisible=" + mVisible + ", mStarted=" + mStarted
-                    + ", mUserPresent=" + mUserPresent + ", mRunning=" + mRunning);
+           // Log.d(TAG, "updateRunning() mVisible=" + mVisible + ", mStarted=" + mStarted
+           //         + ", mUserPresent=" + mUserPresent + ", mRunning=" + mRunning);
         }
     }
 

@@ -5,12 +5,18 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+
 import com.fuzz.android.concurrent.WorkQueue;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalEnum;
 import com.fuzz.android.globals.GlobalFunctions;
 import com.fuzz.android.globals.Res;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,7 +32,8 @@ import android.widget.ProgressBar;
 
 @SuppressWarnings("static-access")
 public class URLImageView extends TouchImageView{
-
+	protected Context cont;
+	protected BroadcastReceiver connectionReceiver;
 	boolean loading = false;
 	final Handler mHandler = new Handler();
 	Drawable drawable = null;
@@ -47,11 +54,15 @@ public class URLImageView extends TouchImageView{
 
 	public URLImageView(Context context) {
 		super(context);
+		cont=context;
+//		setBroadcast();
 		// TODO Auto-generated constructor stub
 	}
 
 	public URLImageView(Context context, AttributeSet attrs){
 		super(context, attrs);
+		cont=context;
+//		setBroadcast();
 		//focus = R.drawable.green;
 	}
 
@@ -157,6 +168,10 @@ public class URLImageView extends TouchImageView{
 
 	final Runnable setImageFailedToLoad = new Runnable() {
 		public void run() {	
+			if(progress != null){
+				progress.setVisibility(View.GONE);
+			}
+			
 			loading = false;
 			if(mListener != null){
 				mListener.imageDidFailLoad();
@@ -171,6 +186,10 @@ public class URLImageView extends TouchImageView{
 
 	final Runnable setImageFailedToDownload = new Runnable() {
 		public void run() {	
+
+			if(progress != null){
+				progress.setVisibility(View.GONE);
+			}
 			loading = false;
 			if(imageweb != null){
 				imageweb = null;
@@ -297,37 +316,57 @@ public class URLImageView extends TouchImageView{
 			//imgV = im;
 			url2 = u;
 		}
+		
+		public void loadImage(int time){
+			try{
+			if(TYPE == CROSSFADE_IMAGE){
+				Bitmap end = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), null);
+				Bitmap start = BitmapFactory.decodeResource(getContext().getResources(), Res.drawable.black);
+				drawable = new CrossFadeDrawable(start,end);
+				((CrossFadeDrawable)drawable).setCrossFadeEnabled(true);
+
+			}else{
+				drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+			}
+			
+			
+			if(drawable == null){
+				try{
+					File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+					f.delete();
+				}catch(Throwable t){
+				}
+				try{
+					File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
+					f.delete();
+				}catch(Throwable t){
+					
+				}
+			}
+			}catch(Throwable t){
+				if(time < 20000){
+					try{
+						Thread.sleep(2000);
+						loadImage(time+2000);
+					}catch(Throwable t2){
+						
+					}
+				}
+			}
+		}
+		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			//Drawable drawable;
 			//File cache = imgV.getContext().getCacheDir();
 			try{
-				if(TYPE == CROSSFADE_IMAGE){
-					Bitmap end = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), null);
-					Bitmap start = BitmapFactory.decodeResource(getContext().getResources(), Res.drawable.black);
-					drawable = new CrossFadeDrawable(start,end);
-					((CrossFadeDrawable)drawable).setCrossFadeEnabled(true);
-
-				}else{
-					drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-				}
-				
-				
+				loadImage(0);
 				if(drawable == null){
-					try{
-						File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-						f.delete();
-					}catch(Throwable t){
-					}
-					try{
-						File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
-						f.delete();
-					}catch(Throwable t){
-						
-					}
+					mHandler.post(setImageFailedToLoad);
+				}else{
+					mHandler.post(setImageLoaded);
 				}
-				mHandler.post(setImageLoaded);
 			}catch(Throwable e){
 				mHandler.post(setImageFailedToLoad);
 			}
@@ -369,19 +408,24 @@ public class URLImageView extends TouchImageView{
 			//File cache = imgV.getContext().getCacheDir();
 			URLConnection conn;
 			do{
+				//Log.v("URL",tmpURL);
 				u = new URL(tmpURL);
-				conn = u.openConnection();
+				conn =  u.openConnection();
 				conn.setRequestProperty("Content-Language", "en-US");
 				conn.setRequestProperty("User-Agent", "Android/SuperGlued");
 				conn.setUseCaches(false);
 				conn.setDoInput(true);
+				try{
+					((HttpsURLConnection)conn).setHostnameVerifier(new AllowAllHostnameVerifier());
+				}catch(Throwable t){
+					
+				}
 				conn.connect();
 				tmpURL = conn.getHeaderField("location");
 			} while(conn.getHeaderField("location")!= null);
 			
 			
 			InputStream inputStream = conn.getInputStream();
-			
 			//cache.
 			//cache.
 			FileOutputStream out;
@@ -398,11 +442,90 @@ public class URLImageView extends TouchImageView{
 			}
 			out.close();
 			inputStream.close();
+			}catch(java.io.FileNotFoundException e){
+				e.printStackTrace();
 			}catch(Throwable t){
+			 t.printStackTrace();
+				t.printStackTrace();
 				if(time < 20000){
 					try{
 						Thread.sleep(2000);
 						downloadNow(time+2000);
+					}catch(Throwable t2){
+						
+					}
+				}
+			}
+		}
+		
+		public void loadImage(int time){
+			try{
+			if(TYPE==COVERFLOW_IMAGE){
+				BitmapFactory.Options opts = new BitmapFactory.Options();
+				DisplayMetrics metrics = new DisplayMetrics();
+				((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+				opts.outHeight = (int)(150*metrics.density);
+				opts.outWidth = (int)(150*metrics.density);
+				//opts.inScreenDensity = metrics.densityDpi;
+				opts.inPurgeable = true;
+				opts.inSampleSize = 4;
+				Bitmap bitmap = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), opts);
+				FileOutputStream out2 = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+				bitmap.compress(CompressFormat.PNG, 100, out2);
+				out2.flush();
+				out2.close();
+				drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+				createReflectedImages();
+			}else if(TYPE == THUMBNAIL_IMAGE){
+				BitmapFactory.Options opts = new BitmapFactory.Options();
+				DisplayMetrics metrics = new DisplayMetrics();
+				((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+				opts.outHeight = (int)(80*metrics.density);
+				opts.outWidth = (int)(80*metrics.density);
+				//opts.in
+				//opts.inScreenDensity = metrics.densityDpi;
+				opts.inPurgeable = true;
+				opts.inSampleSize = 4;
+				Bitmap bitmap = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), opts);
+				FileOutputStream out2 = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+				bitmap.compress(CompressFormat.PNG, 100, out2);
+				out2.flush();
+				out2.close();
+
+				drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+
+			}else if(TYPE == CROSSFADE_IMAGE){
+				Bitmap end = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), null);
+				Bitmap start = BitmapFactory.decodeResource(getContext().getResources(), Res.drawable.black);
+				drawable = new CrossFadeDrawable(start,end);
+				((CrossFadeDrawable)drawable).setCrossFadeEnabled(true);
+
+			}else{
+				drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+				
+			}
+			
+			if(drawable == null){
+				try{
+					File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
+					f.delete();
+				}catch(Throwable t){
+				}
+				try{
+					File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
+					f.delete();
+				}catch(Throwable t){
+					
+				}
+			}
+			}catch(Throwable t){
+				t.printStackTrace();
+				if(time < 20000){
+					try{
+						Thread.sleep(2000);
+						loadImage(time+2000);
 					}catch(Throwable t2){
 						
 					}
@@ -416,68 +539,14 @@ public class URLImageView extends TouchImageView{
 			try {
 				//Log.v("Adding Image to Collection", url2);
 				downloadNow(0);
-				if(TYPE==COVERFLOW_IMAGE){
-					BitmapFactory.Options opts = new BitmapFactory.Options();
-					DisplayMetrics metrics = new DisplayMetrics();
-					((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-					opts.outHeight = (int)(150*metrics.density);
-					opts.outWidth = (int)(150*metrics.density);
-					//opts.inScreenDensity = metrics.densityDpi;
-					opts.inPurgeable = true;
-					opts.inSampleSize = 4;
-					Bitmap bitmap = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), opts);
-					FileOutputStream out2 = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-					bitmap.compress(CompressFormat.PNG, 100, out2);
-					out2.flush();
-					out2.close();
-					drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-					createReflectedImages();
-				}else if(TYPE == THUMBNAIL_IMAGE){
-					BitmapFactory.Options opts = new BitmapFactory.Options();
-					DisplayMetrics metrics = new DisplayMetrics();
-					((Activity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-					opts.outHeight = (int)(80*metrics.density);
-					opts.outWidth = (int)(80*metrics.density);
-					//opts.in
-					//opts.inScreenDensity = metrics.densityDpi;
-					opts.inPurgeable = true;
-					opts.inSampleSize = 4;
-					Bitmap bitmap = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), opts);
-					FileOutputStream out2 = new FileOutputStream(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-					bitmap.compress(CompressFormat.PNG, 100, out2);
-					out2.flush();
-					out2.close();
-
-					drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-
-				}else if(TYPE == CROSSFADE_IMAGE){
-					Bitmap end = BitmapFactory.decodeFile(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),1024), null);
-					Bitmap start = BitmapFactory.decodeResource(getContext().getResources(), Res.drawable.black);
-					drawable = new CrossFadeDrawable(start,end);
-					((CrossFadeDrawable)drawable).setCrossFadeEnabled(true);
-
-				}else{
-					drawable = Drawable.createFromPath(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-					
-				}
-				
+				loadImage(20000);
 				if(drawable == null){
-					try{
-						File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),128));
-						f.delete();
-					}catch(Throwable t){
-					}
-					try{
-						File f = new File(createFilePathFromCrc64(GlobalFunctions.Crc64Long(url2),1024));
-						f.delete();
-					}catch(Throwable t){
-						
-					}
+					mHandler.post(setImageFailedToDownload);
+				}else{
+					mHandler.post(setImageDownloaded);
 				}
 				
-				mHandler.post(setImageDownloaded);
+				//mHandler.post(setImageDownloaded);
 			}catch(Throwable e){
 				//e.printStackTrace();
 				mHandler.post(setImageFailedToDownload);
@@ -530,5 +599,26 @@ public class URLImageView extends TouchImageView{
 	public interface OnLoadListener{
 		public void imageDidLoad();
 		public void imageDidFailLoad();
+	}
+	
+//	protected void setBroadcast(){
+//		 connectionReceiver = new BroadcastReceiver() {
+//	        @Override
+//	        public void onReceive(Context context, Intent intent) {
+//	        	Log.v("Bozuko",getContext().getClass().toString());
+//	        	Log.v("Bozuko",intent.getStringExtra("parentClass"));
+//	        	 if(getContext().getClass().toString().trim().compareToIgnoreCase(intent.getStringExtra("parentClass").trim())==0){
+//	        		 	cont.unregisterReceiver(connectionReceiver);
+//	        			setURL(null);
+//	        			connectionReceiver = null;
+//	        			Log.v("Bozuko","URLview destroyed");
+//	        		}
+//	        }
+//	    };
+//	    cont.registerReceiver(connectionReceiver, new IntentFilter("destroyURLImage"));
+//	    
+//	}
+	public void onDestroy(){
+		//Log.v("Bozuko","urlview is now gone");
 	}
 }

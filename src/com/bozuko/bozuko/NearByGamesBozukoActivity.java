@@ -5,24 +5,24 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
 import com.bozuko.bozuko.datamodel.PageObject;
 import com.bozuko.bozuko.views.PageView;
+import com.bozuko.bozuko.views.PrizeView;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.globals.GlobalConstants;
 import com.fuzz.android.http.HttpRequest;
 import com.fuzz.android.ui.CheckView;
 import com.fuzz.android.ui.MergeAdapter;
 import android.widget.EditText;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,29 +39,65 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 	ArrayList<PageObject> featured = new ArrayList<PageObject>();
 	ArrayList<PageObject> games = new ArrayList<PageObject>();
 	ArrayList<PageObject> otherPlaces = new ArrayList<PageObject>();
-	ArrayList<PageObject> search = new ArrayList<PageObject>();
+	
+	
+	ArrayList<PageObject> searchFeatured = new ArrayList<PageObject>();
+	ArrayList<PageObject> searchGames = new ArrayList<PageObject>();
+	ArrayList<PageObject> searchPlaces = new ArrayList<PageObject>();
+	
+	PrizeView loadMore;
+	
+	
 	String lat = "0.0";
 	String lon = "0.0";
 	private int currentPage = 0;
 	private int searchCurrentPage = 0;
 
-	boolean loadMore = false;
-	boolean loadMoreSearch = false;
+	boolean loaded = false;
+	boolean loadedSearch = false;
 
-
+	String nextSearchURL = "";
+	String nextURL = "";
+	
+	public void onDestroy(){
+//		Intent backToIntent = new Intent("destroyURLImage");
+//		backToIntent.putExtra("parentClass",this.getClass().toString());
+//		sendBroadcast(backToIntent);
+		
+		ListView listview = (ListView)findViewById(R.id.ListView01);
+		listview.setAdapter(new SimpleAdapter());
+		featured.clear();
+		games.clear();
+		otherPlaces.clear();
+		searchFeatured.clear();
+		searchGames.clear();
+		searchPlaces.clear();
+		super.onDestroy();
+	}
+	
 	public void progressRunnableComplete(){
+		SENDING=false;
 		if(isFinishing()){
 			return;
 		}
-
+		
+		
+		loadMore.display(null);
 		if(((BozukoApplication)getApp()).searchTerm.trim().compareTo("")==0){
+			if(!loaded){
+				loaded = true;
 			setupList();
+			}
 		}else{
+			if(!loadedSearch){
+				loadedSearch = true;
 			setupSearch();
+			}
 		}	
 	}
 
 	public void progressRunnableError(){
+		SENDING=false;
 		if(isFinishing()){
 			return;
 		}
@@ -81,22 +117,29 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setSelector(R.drawable.listbutton);
 		listview.setItemsCanFocus(false);
-		if(search.size()<30){
-			MergeAdapter mergeAdapter = new MergeAdapter();
-			if(search.size()>0){
-				mergeAdapter.addView(getTitleView("Search"), false);
-				mergeAdapter.addAdapter(new PagesListAdapter(search,true));
-				((TextView)findViewById(R.id.errmessage)).setVisibility(View.GONE);
-			}else{
-				((TextView)findViewById(R.id.errmessage)).setText("Sorry, your search yielded no results.");
-				((TextView)findViewById(R.id.errmessage)).setVisibility(View.VISIBLE);
-			}
-
-			listview.setAdapter(mergeAdapter);
-		}else{
+		MergeAdapter mergeAdapter = new MergeAdapter();
+		if(searchFeatured.size()>0){
+			mergeAdapter.addView(getTitleView("Featured"), false);
+			mergeAdapter.addAdapter(new PagesListAdapter(searchFeatured,false));
+			//makeDialog(featured.size()+"","FEATURE COUNTING",null);
 		}
-		
-	
+		if(searchGames.size()>0){
+			mergeAdapter.addView(getTitleView("Nearby Games"), false);
+			mergeAdapter.addAdapter(new PagesListAdapter(searchGames,false));
+		}
+		if(searchPlaces.size()>0){
+			mergeAdapter.addView(getTitleView("Other Places"), false);
+			mergeAdapter.addAdapter(new PagesListAdapter(searchPlaces,false));
+		}
+
+		if(searchPlaces.size()==0 && searchGames.size()==0 && searchFeatured.size()==0){
+			((TextView)findViewById(R.id.errmessage)).setText("Sorry, your search yielded no results.");
+			((TextView)findViewById(R.id.errmessage)).setVisibility(View.VISIBLE);
+		}else{
+			((TextView)findViewById(R.id.errmessage)).setVisibility(View.GONE);
+		}
+		mergeAdapter.addView(loadMore, true);
+		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
 
 		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -129,7 +172,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 		}else{
 			((TextView)findViewById(R.id.errmessage)).setVisibility(View.GONE);
 		}
-
+		mergeAdapter.addView(loadMore, true);
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
 
@@ -150,57 +193,90 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 
 		((EditText)findViewById(R.id.search)).setImeOptions(EditorInfo.IME_ACTION_SEARCH);
 
-		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-		lat = mprefs.getString("clat", "0.00");
-		lon = mprefs.getString("clon", "0.00");
+		//SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+		//lat = mprefs.getString("clat", "0.00");
+		//lon = mprefs.getString("clon", "0.00");
+		lat = "0.00";
+		lon = "0.00";
+		
+		if(loadMore==null){
+			loadMore = new PrizeView(this);
+		}
 	}
 
+	boolean SENDING = false;
 	public void getGames(){
+		if(!SENDING){
+			SENDING = true;
+			
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			String tempLat = mprefs.getString("clat", "0.00");
+			String tempLon = mprefs.getString("clon", "0.00");
+			lat = tempLat;
+			lon = tempLon;
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		MergeAdapter mergeAdapter = new MergeAdapter();
 		listview.setAdapter(mergeAdapter);
 		featured.clear();
 		games.clear();
+		nextURL = "";
+		loaded = false;
 		otherPlaces.clear();
 		currentPage = 0;
 		progressRunnable(new Runnable(){
 			public void run(){
 				EntryPointObject entry = new EntryPointObject("1");
-				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+				entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(NearByGamesBozukoActivity.this));
 				sendRequest(entry);
 			}
-		},"Loading...",CANCELABLE);
+		},"Loading...",NOT_CANCELABLE);
+		
+		}
 	}
 
+	boolean firstLoad = true;
+	LocationReceiver mLocationReceiver = new LocationReceiver();
 	public void onResume(){
 		super.onResume();
-		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		String tempLat = mprefs.getString("clat", "0.00");
-		String tempLon = mprefs.getString("clon", "0.00");
-		if(mprefs.getBoolean("ReloadNearby", false)){
-			SharedPreferences.Editor edit = mprefs.edit();
-			edit.putBoolean("ReloadNearby", false);
-			edit.commit();
-			getGames();
-		}else if(featured.size()==0 && games.size()==0 && otherPlaces.size()==0){
-			getGames();
-		}else if(lat.compareTo(tempLat)!=0 && lon.compareTo(tempLon)!=0){
-			Double distance = BozukoDataBaseHelper.distanceAsDouble(Double.valueOf(lat), Double.valueOf(tempLat), Double.valueOf(lon), Double.valueOf(tempLon));
-			if(distance > 5){
-				lat = tempLat;
-				lon = tempLon;
+		registerReceiver(mLocationReceiver, new IntentFilter("LOCATIONSUPDATED"));
+		
+		if(firstLoad){
+			progressMessage = "Getting Location...";
+			showDialog(NOT_CANCELABLE);
+			getApp().startLocation();
+		}else{
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			String tempLat = mprefs.getString("clat", "0.00");
+			String tempLon = mprefs.getString("clon", "0.00");
+			if(mprefs.getBoolean("ReloadNearby", false)){
+				SharedPreferences.Editor edit = mprefs.edit();
+				edit.putBoolean("ReloadNearby", false);
+				edit.commit();
 				getGames();
+			}else if(featured.size()==0 && games.size()==0 && otherPlaces.size()==0){
+				getGames();
+			}else if(lat.compareTo(tempLat)!=0 && lon.compareTo(tempLon)!=0){
+				Double distance = BozukoDataBaseHelper.distanceAsDouble(Double.valueOf(lat), Double.valueOf(tempLat), Double.valueOf(lon), Double.valueOf(tempLon));
+				if(distance > 0.5){
+					getGames();
+				}
 			}
-		}
 
+			
+		}
 		if(((EditText)findViewById(R.id.search)).getText().toString().compareTo(((BozukoApplication)getApp()).searchTerm)!=0){
 			doQuery(((BozukoApplication)getApp()).searchTerm);
 		}
 		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(((EditText)findViewById(R.id.search)).getWindowToken(), 0);
+	
 	}
 
+	public void onPause(){
+		super.onPause();
+		unregisterReceiver(mLocationReceiver);
+	}
+	
 	public void sendRequest(EntryPointObject entry){
 		if(!DataBaseHelper.isOnline(this,0)){
 			errorMessage = "Unable to connect to the internet";
@@ -209,35 +285,49 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			return;
 		}
 		try {
-			games.clear();
-			otherPlaces.clear();
-			featured.clear();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			lat = mprefs.getString("clat","0.00");
-			lon = mprefs.getString("clon","0.00");
-			url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage);
-			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url + "&token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			ArrayList<PageObject> feature = new ArrayList<PageObject>();
+			ArrayList<PageObject> game = new ArrayList<PageObject>();
+			ArrayList<PageObject> other = new ArrayList<PageObject>();
+			String url = GlobalConstants.BASE_URL;
+			if(nextURL.compareTo("")==0){
+				url += entry.requestInfo("linkspages");
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				lat = mprefs.getString("clat","0.00");
+				lon = mprefs.getString("clon","0.00");
+				url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage);
+				//Log.v("URL",url);
+				url += "&token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION;
+			}else{
+				url += nextURL;
+				nextURL = "";
+			}
+			
+			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
 			JsonParser jp = req.AutoStreamJSONError();
-			jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			JsonToken start = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			if(start == JsonToken.START_OBJECT){
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String fieldname = jp.getCurrentName();
-				jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				JsonToken token = jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
+				}
 				if ("pages".equals(fieldname)) { 
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
 						//Log.v("Page",page.toString());
 						if(page.requestInfo("featured").compareTo("true")==0){
-							featured.add(page);
+							feature.add(page);
 						}else if(page.requestInfo("registered").compareTo("true")==0){
-							games.add(page);
+							//Log.v("Page",page.toString());
+							game.add(page);
 						}else{
-							otherPlaces.add(page);
+							other.add(page);
 						}
 					}
+				
 					RUNNABLE_STATE = RUNNABLE_SUCCESS;
 				}else if ("title".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -248,32 +338,25 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				}else if ("name".equals(fieldname)) { 
 					RUNNABLE_STATE = RUNNABLE_FAILED;
 					errorType = jp.getText();
+				}else if ("next".equals(fieldname)) { 
+					nextURL = jp.getText();
 				}
 			}
+			}else{
+				errorMessage = "Failed to get places from server.";
+				errorTitle = "Request Error";
+				RUNNABLE_STATE = RUNNABLE_FAILED;
+			}
 			jp.close();
-			//			try{
-			//			JSONArray objects = json.getJSONArray("pages");
-			//			for(int i=0; i<objects.length(); i++){
-			//				PageObject page = new PageObject(objects.getJSONObject(i));
-			//				//Log.v("Page",page.toString());
-			//				if(page.requestInfo("featured").compareTo("true")==0){
-			//					featured.add(page);
-			//				}else if(page.requestInfo("registered").compareTo("true")==0){
-			//					games.add(page);
-			//				}else{
-			//					otherPlaces.add(page);
-			//				}
-			//			}
-			//			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			//			}catch(Throwable t){
-			//				errorTitle = json.getString("title");
-			//				errorMessage = json.getString("message");
-			//				errorType = json.getString("name");
-			//				RUNNABLE_STATE = RUNNABLE_FAILED;
-			//			}
+			mHandler.post(new AddAllRunnable(feature,featured));
+			mHandler.post(new AddAllRunnable(game,games));
+			mHandler.post(new AddAllRunnable(other,otherPlaces));
+			
+			//TODO
+			
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
-			//e.printStackTrace();
+			e.printStackTrace();
 			errorMessage = "Failed to get places from server.";
 			errorTitle = "Request Error";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -288,30 +371,70 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			return;
 		}
 		try {
-			ArrayList<PageObject> pages = new ArrayList<PageObject>();
-			String url = GlobalConstants.BASE_URL + entry.requestInfo("linkspages");
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage);
+			ArrayList<PageObject> feature = new ArrayList<PageObject>();
+			ArrayList<PageObject> game = new ArrayList<PageObject>();
+			ArrayList<PageObject> other = new ArrayList<PageObject>();
+			String url = GlobalConstants.BASE_URL;
+			if(nextSearchURL.compareTo("")==0){
+				url += entry.requestInfo("linkspages");
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage);
+				url += "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION;
+				url += "&token=" + mprefs.getString("token", "");
+			}else{
+				url += nextSearchURL;
+				nextSearchURL = "";
+			}
+			HttpRequest req = new HttpRequest(new URL(url));
 			//Log.v("URL",url);
-			HttpRequest req = new HttpRequest(new URL(url + "&query=" + URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) + "&token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			JSONObject json = req.AutoJSONError();
-			try{
-				JSONArray objects = json.getJSONArray("pages");
-				for(int i=0; i<objects.length(); i++){
-					PageObject page = new PageObject(objects.getJSONObject(i));
-					pages.add(page);
+			//JSONObject json = req.AutoJSONError();
+			//Log.v("JSON",json.toString());
+			JsonParser jp = req.AutoStreamJSONError();
+			JsonToken start = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
+			if(start == JsonToken.START_OBJECT){
+			while (jp.nextToken() != JsonToken.END_OBJECT) {
+				String fieldname = jp.getCurrentName();
+				JsonToken token = jp.nextToken(); // move to value, or START_OBJECT/START_ARRAY
+				if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
 				}
-				
-
-				mHandler.post(new AddAllRunnable(pages,search));
-				RUNNABLE_STATE = RUNNABLE_SUCCESS;
-			}catch(Throwable t){
-				errorTitle = json.getString("title");
-				errorMessage = json.getString("message");
-				errorType = json.getString("name");
+				if ("pages".equals(fieldname)) { 
+					//DO parse json
+					while (jp.nextToken() != JsonToken.END_ARRAY) {
+						PageObject page = new PageObject(jp);
+						//Log.v("Page",page.toString());
+						if(page.requestInfo("featured").compareTo("true")==0){
+							feature.add(page);
+						}else if(page.requestInfo("registered").compareTo("true")==0){
+							game.add(page);
+						}else{
+							other.add(page);
+						}
+					}
+					RUNNABLE_STATE = RUNNABLE_SUCCESS;
+				}else if ("title".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorTitle = jp.getText();
+				}else if ("message".equals(fieldname)) {
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorMessage = jp.getText();
+				}else if ("name".equals(fieldname)) { 
+					RUNNABLE_STATE = RUNNABLE_FAILED;
+					errorType = jp.getText();
+				}else if ("next".equals(fieldname)) { 
+					nextSearchURL = jp.getText();
+				}
+			}
+			}else{
+				errorMessage = "Failed to get places from server.";
+				errorTitle = "Request Error";
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
+			jp.close();
+			mHandler.post(new AddAllRunnable(feature,searchFeatured));
+			mHandler.post(new AddAllRunnable(game,searchGames));
+			mHandler.post(new AddAllRunnable(other,searchPlaces));
 		} catch (Throwable e) {
 			mHandler.post(new DisplayThrowable(e));
 			//e.printStackTrace();
@@ -323,36 +446,24 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 
 	private class PagesListAdapter extends BaseAdapter{
 		ArrayList<PageObject> pages;
-		boolean type;
+		//boolean type;
 
 		public PagesListAdapter(ArrayList<PageObject> inArray,boolean inType){
 			pages = inArray;
-			type = inType;
+			//type = inType;
 		}
 
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			if(type){
-				if(loadMoreSearch){
-					return pages.size()+1;
-				}else{
-					return pages.size();
-				}
-			}else{
-				return pages.size();
-			}
+			return pages.size();
 
 		}
 
 		@Override
 		public Object getItem(int position) {
 			// TODO Auto-generated method stub
-			if(position < pages.size()){
-				return pages.get(position);
-			}else{
-				return null;
-			}
+			return pages.get(position);
 		}
 
 		@Override
@@ -370,12 +481,12 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				groupView = (CheckView)masterConvertView;
 				convertView = groupView.getContentView();
 			}else{
-				groupView = new CheckView(getBaseContext());
+				groupView = new CheckView(NearByGamesBozukoActivity.this);
 			}
 
 			PageView movieView = null;
 			if (convertView == null) {
-				movieView = new PageView(getBaseContext());
+				movieView = new PageView(NearByGamesBozukoActivity.this);
 				groupView.setContentView(movieView);
 			}
 			else {
@@ -397,8 +508,8 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
 		Object obj = arg0.getItemAtPosition(arg2);
-
-		if(obj != null){
+		
+		if(obj.getClass() == PageObject.class){
 			PageObject page = (PageObject)obj;
 			((BozukoApplication)getApp()).currentPageObject = page;
 			//Log.v("Page",page.toString());
@@ -438,16 +549,25 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 
 		if(query.trim().compareTo("")==0){
 			setupList();
+			searchFeatured.clear();
+			searchPlaces.clear();
+			searchGames.clear();
+			nextSearchURL = "";
+			searchCurrentPage=0;
 		}else{
 			ListView listview = (ListView)findViewById(R.id.ListView01);
 			MergeAdapter mergeAdapter = new MergeAdapter();
 			listview.setAdapter(mergeAdapter);
-			search.clear();
+			searchFeatured.clear();
+			searchPlaces.clear();
+			searchGames.clear();
+			nextSearchURL = "";
+			loadedSearch = false;
 			searchCurrentPage=0;
 			progressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(NearByGamesBozukoActivity.this));
 					sendSearchRequest(entry);
 				}
 			},"Searching...",NOT_CANCELABLE);
@@ -460,7 +580,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			unProgressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(NearByGamesBozukoActivity.this));
 					sendRequest(entry);
 				}
 			});
@@ -469,7 +589,7 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			unProgressRunnable(new Runnable(){
 				public void run(){
 					EntryPointObject entry = new EntryPointObject("1");
-					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+					entry.getObject("1", BozukoDataBaseHelper.getSharedInstance(NearByGamesBozukoActivity.this));
 					sendSearchRequest(entry);
 				}
 			});
@@ -477,6 +597,12 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 	}
 
 	public void refresh(){
+		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+		String tempLat = mprefs.getString("clat", "0.00");
+		String tempLon = mprefs.getString("clon", "0.00");
+		lat = tempLat;
+		lon = tempLon;
 		getGames();
 	}
 
@@ -520,6 +646,43 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 			}catch(Throwable t){
 
 			}
+			
+			if(dstArray==featured){
+			if(nextURL.compareTo("")==0){
+				loadMore.setVisibility(View.GONE);
+			}else{
+				loadMore.setVisibility(View.VISIBLE);
+			}
+			}
+			if(dstArray==searchFeatured){
+				if(nextSearchURL.compareTo("")==0){
+					loadMore.setVisibility(View.GONE);
+				}else{
+					loadMore.setVisibility(View.VISIBLE);
+				}
+				}
+		}
+	}
+
+
+	protected class LocationReceiver extends BroadcastReceiver{
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			// TODO Auto-generated method stub
+			if(firstLoad){
+				firstLoad = false;
+				//dismissDialog(NOT_CANCELABLE);
+				getGames();
+			}else{
+				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(arg0);
+				String tempLat = mprefs.getString("clat", "0.00");
+				String tempLon = mprefs.getString("clon", "0.00");
+				Double distance = BozukoDataBaseHelper.distanceAsDouble(Double.valueOf(lat), Double.valueOf(tempLat), Double.valueOf(lon), Double.valueOf(tempLon));
+				if(distance > 0.5){
+					getGames();
+				}
+			}
+			
 		}
 	}
 }

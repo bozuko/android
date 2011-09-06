@@ -195,11 +195,14 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		try {
 			String url = GlobalConstants.BASE_URL + page.requestInfo("linksfavorite");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+			
+			//Log.v("PAGE", page.toString());
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("token", mprefs.getString("token", ""));
 			req.setMethodType("POST");
 			JSONObject json = req.AutoJSONError();
+			//Log.v("JSON",json.toString());
 			try{
 			try{
 				if(json.getBoolean("added")){
@@ -234,7 +237,7 @@ public class PageView extends RelativeLayout implements OnClickListener {
 			((BozukoControllerActivity)getContext()).progressRunnableError();
 		}
 		} catch (Throwable e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			post(new Runnable(){
 				public void run(){
 					Toast.makeText(getContext(), "Failed to add to favorites", Toast.LENGTH_SHORT).show();

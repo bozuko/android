@@ -6,7 +6,6 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import android.util.Log;
 import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.datahandler.DataObject;
 

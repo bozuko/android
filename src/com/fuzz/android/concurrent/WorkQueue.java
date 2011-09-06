@@ -37,8 +37,12 @@ public class WorkQueue
 	public void execute(Runnable r) {
         synchronized(queue) {
         	//if(canAdd){
+        	if(queue.size()>5){
+        		queue.add(3, r);
+        	}else{
         		queue.addLast(r);
         		queue.notify();
+        	}	
         	//}
         }
     }

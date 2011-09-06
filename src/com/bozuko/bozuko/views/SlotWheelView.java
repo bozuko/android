@@ -1,6 +1,7 @@
 package com.bozuko.bozuko.views;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,7 +25,7 @@ public class SlotWheelView extends NoTouchScrollView {
 		createUI(context);
 	}
 
-	int spinPosition = 0;
+	public int spinPosition = 0;
 	public static int RESETPOSITION;
 
 	ArrayList<Drawable> images = new ArrayList<Drawable>();
@@ -42,6 +43,10 @@ public class SlotWheelView extends NoTouchScrollView {
 
 	int SPEED = 20;
 	int STOPPING_SPEED = 0;
+	
+	public ArrayList<String> rIconsHardCopy;
+	
+	
 
 
 	public SlotWheelView(Context context, AttributeSet attrs) {
@@ -74,12 +79,20 @@ public class SlotWheelView extends NoTouchScrollView {
 		_animateTimer = new Timer();
 	}
 
-	public void setImages(ArrayList<Drawable> inList){
+	@SuppressWarnings("unchecked")
+	public void setImages(ArrayList<Drawable> inList, ArrayList<String> icons){
+		ArrayList<String> rIcons=(ArrayList<String>) icons.clone();
+		Collections.shuffle(rIcons);
+		rIconsHardCopy= rIcons;
+		
+		
 		images.clear();
 		layout.removeAllViews();
 		images.addAll(inList);
+		
+		//Collections.shuffle(images);
 		int size = (int)(80*getResources().getDisplayMetrics().density);
-		for(int i=0; i<images.size()*3; i++){
+		for(int i=0; i<rIconsHardCopy.size()*3; i++){
 
 			ImageView image = new ImageView(getContext());
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size,size);
@@ -92,39 +105,48 @@ public class SlotWheelView extends NoTouchScrollView {
 			layout.addView(image);
 
 			if(i<4){
-				Drawable url = inList.get(inList.size()-(4-i));
+				Drawable url = inList.get(icons.indexOf((rIcons.get(inList.size()-(4-i)))));
 				image.setImageDrawable(url);
 			}else if((i-3)>images.size()*2){
-				Drawable url = inList.get((i-4) - inList.size()*2);
+				Drawable url = inList.get(icons.indexOf((rIcons.get((i-4) - inList.size()*2))));
 				image.setImageDrawable(url);
 			}else if((i-3)>images.size()){
-				Drawable url = inList.get((i-4) - inList.size());
+				Drawable url = inList.get(icons.indexOf((rIcons.get((i-4) - inList.size()))));
 				image.setImageDrawable(url);
 			}else{
-				Drawable url = inList.get(i-4);
+				Drawable url = inList.get(icons.indexOf((rIcons.get(i-4))));
 				image.setImageDrawable(url);
 			}
 		}
 		_isPopulated = true;
-		randomizeScrollPosition();
+		randomizeScrollPosition(-1);
 	}
 
-	public void randomizeScrollPosition(){
+	public void randomizeScrollPosition(final int spinPosition2){
 		post(new Runnable(){
 			public void run(){
 				Random seedRandom = new Random();
 				
 				Random random = new Random(seedRandom.nextInt(1000000) + System.currentTimeMillis());
-				int number = random.nextInt(images.size());
+				int number = random.nextInt(images.size()*2);
 				int size = (int)(80*getResources().getDisplayMetrics().density);
 				spinPosition = (int) (number*size);
+				if(spinPosition2==-1){
+					
+				}else{
+					if(spinPosition2 == spinPosition){
+						//randomizeScrollPosition(spinPosition2);
+						//return;
+					}
+				}
+				
 				listView.scrollTo(0, spinPosition);
 			}
 		});
 
 	}
 
-	public void spin() {
+	public void spin(int spinPosition2) {
 		// TODO Auto-generated method stub
 		if (_isSpinning == true || _isPopulated == false)
 			return;
@@ -133,7 +155,11 @@ public class SlotWheelView extends NoTouchScrollView {
 			_animateTimer = new Timer();
 			animateWheel = new AnimateWheel();
 		}
-		randomizeScrollPosition();
+		randomizeScrollPosition(spinPosition2);
+		
+		if(mListener != null){
+			mListener.didStart(SlotWheelView.this);
+		}
 		
 		CURRENT_SPEED = FAST_SPEED;
 		SPEED = 10;
@@ -144,9 +170,7 @@ public class SlotWheelView extends NoTouchScrollView {
 		_isStopping = false;
 		_isSlowing = false;
 		_isSlowingDown = false;
-		if(mListener != null){
-			mListener.didStart(SlotWheelView.this);
-		}
+		
 	}
 
 	public void stop(){
@@ -157,9 +181,13 @@ public class SlotWheelView extends NoTouchScrollView {
 	}
 
 	public void pause(){
+		try{
 		_animateTimer.cancel();
 		_animateTimer.purge();
 		_animateTimer = null;
+		}catch(Throwable t){
+			
+		}
 	}
 
 	public void resume(){

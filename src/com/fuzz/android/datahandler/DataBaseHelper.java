@@ -20,7 +20,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 

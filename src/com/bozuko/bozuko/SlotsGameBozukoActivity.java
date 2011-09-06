@@ -39,7 +39,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -100,9 +99,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				bitmaps.add(bitmap);
 			}
 		}
-		((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps);
-		((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps);
-		((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps);
+		((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps,game.icons);
+		((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps,game.icons);
+		((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps,game.icons);
 	}
 
 	public void onCreate(Bundle savedInstanceState){
@@ -136,13 +135,13 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				public void run(){
 					enterGame();
 				}
-			},"Entering...",NOT_CANCELABLE);
+			},"Entering...",CLOSEABLE);
 		}else{
 			progressRunnable(new Runnable(){
 				public void run(){
 					loadImages();
 				}
-			},"Loading...",NOT_CANCELABLE);
+			},"Loading...",CLOSEABLE);
 		}
 
 		findViewById(R.id.prizestext).setOnClickListener(this);
@@ -232,7 +231,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		}
 		if(imagesFailed){
 			
-			makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+			AlertDialog alert = makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -240,16 +239,26 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					finish();
 				}
 			});
+			if(alert != null){
+				alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+				}
 		}
 		if(!imagesFailed){
 			if(METHOD_TYPE == LOAD_IMAGES){
-				((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps);
-				((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps);
-				((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps);
+				((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps,game.icons);
+				((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps,game.icons);
+				((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps,game.icons);
 			}else if(METHOD_TYPE == GAME_ENTER){
-			((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps);
-			((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps);
-			((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps);
+			((SlotWheelView)findViewById(R.id.slotwheel1)).setImages(bitmaps,game.icons);
+			((SlotWheelView)findViewById(R.id.slotwheel2)).setImages(bitmaps,game.icons);
+			((SlotWheelView)findViewById(R.id.slotwheel3)).setImages(bitmaps,game.icons);
 			
 			if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 				findViewById(R.id.spin).setEnabled(false);
@@ -282,9 +291,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 			try{
 
-				((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex = game.icons.indexOf(result.results.get(0))+3;
-				((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex = game.icons.indexOf(result.results.get(1))+3;
-				((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex = game.icons.indexOf(result.results.get(2))+3;
+				((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex = ((SlotWheelView)findViewById(R.id.slotwheel1)).rIconsHardCopy.indexOf(result.results.get(0))+3;
+				((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex = ((SlotWheelView)findViewById(R.id.slotwheel2)).rIconsHardCopy.indexOf(result.results.get(1))+3;
+				((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex = ((SlotWheelView)findViewById(R.id.slotwheel3)).rIconsHardCopy.indexOf(result.results.get(2))+3;
 
 
 				//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex + "");
@@ -301,7 +310,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				((SlotWheelView)findViewById(R.id.slotwheel1)).stop();
 				((SlotWheelView)findViewById(R.id.slotwheel2)).stop();
 				((SlotWheelView)findViewById(R.id.slotwheel3)).stop();
-				makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+				AlertDialog alert = makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -309,6 +318,17 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 						finish();
 					}
 				});
+				
+				if(alert != null){
+					alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						
+						@Override
+						public void onDismiss(DialogInterface dialog) {
+							// TODO Auto-generated method stub
+							finish();
+						}
+					});
+					}
 				findViewById(R.id.spin).setEnabled(true);
 			}
 		}
@@ -322,7 +342,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		}
 		if(imagesFailed){
 			
-			makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
+			AlertDialog alert = makeDialog("Couldn't load game try again later.","Request Error",new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -330,13 +350,25 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					finish();
 				}
 			});
+			
+			if(alert != null){
+				alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+				}
 		}
 		
 		if(!imagesFailed){
 		if(METHOD_TYPE == GAME_ENTER){
+			AlertDialog alert = null;
 			findViewById(R.id.spin).setEnabled(false);
 			if(errorType.compareTo("facebook/auth")==0){
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -352,7 +384,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					((BozukoApplication)getApp()).getUser();
 				}
 				
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -361,7 +393,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					}
 				});
 			}else{
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -370,6 +402,18 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					}
 				});
 			}
+			
+			if(alert != null){
+				alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+				}
+			
 		}else if(METHOD_TYPE == GAME_RESULTS){
 			((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex = ((int)(Math.random()*(bitmaps.size())))+3;
 			((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex = ((int)(Math.random()*(bitmaps.size())))+3;
@@ -385,8 +429,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			((SlotWheelView)findViewById(R.id.slotwheel3)).stop();
 
 			((SequencerImageView)findViewById(R.id.sequencer)).stopSequence();
+			AlertDialog alert = null;
 			if(errorType.compareTo("facebook/auth")==0){
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -402,7 +447,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					((BozukoApplication)getApp()).getUser();
 				}
 				
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -411,7 +456,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					}
 				});
 			}else{
-				makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+				alert = makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -421,6 +466,16 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 			}
 
+			if(alert != null){
+				alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+				}
 
 			findViewById(R.id.spin).setEnabled(true);
 		}
@@ -445,7 +500,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_entry");
 			HttpRequest req = new HttpRequest(new URL(url));
 			//Log.v("url",url);
@@ -498,7 +553,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			String phone_id = mTelephonyMgr.getDeviceId(); // Requires
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			User user = new User("1");
-			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(getBaseContext()));
+			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			if(!gameState.checkInfo("linksgame_result")){
 				errorTitle = "No more plays";
 				errorMessage = "No more plays";
@@ -578,9 +633,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			}
 
 			findViewById(R.id.spin).setEnabled(false);
-			((SlotWheelView)findViewById(R.id.slotwheel1)).spin();
-			((SlotWheelView)findViewById(R.id.slotwheel2)).spin();
-			((SlotWheelView)findViewById(R.id.slotwheel3)).spin();
+			((SlotWheelView)findViewById(R.id.slotwheel1)).spin(-1);
+			//((SlotWheelView)findViewById(R.id.slotwheel2)).spin();
+			//((SlotWheelView)findViewById(R.id.slotwheel3)).spin();
 
 			((SequencerImageView)findViewById(R.id.sequencer)).stopSequence();
 			((SequencerImageView)findViewById(R.id.sequencer)).setResources(AnimationSequence.GOOD_LUCK);
@@ -590,11 +645,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 			((SlotBannerAnimator)findViewById(R.id.animator)).playGoodLuck();
 
-			unProgressRunnable(new Runnable(){
-				public void run(){
-					getGameResults();
-				}
-			});
+			
 		}
 
 	}
@@ -616,7 +667,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			((SlotWheelView)findViewById(R.id.slotwheel3)).resume();
 		}
 
-		if(((SlotWheelView)findViewById(R.id.slotwheel3)).isSpinning()){
+		if(!((SlotWheelView)findViewById(R.id.slotwheel3)).isSpinning()){
 			if(gameState.requestInfo("button_action").compareTo("enter")!=0){
 				if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 					AlertDialog alert = makeDialog("Please come back later.","No More Plays",new DialogInterface.OnClickListener() {
@@ -672,11 +723,16 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	}
 	
 	public void onDestroy(){
-		super.onDestroy();
+//		Intent backToIntent = new Intent("destroyURLImage");
+//		backToIntent.putExtra("parentClass",this.getClass().toString());
+//		sendBroadcast(backToIntent);
+		
+		//Log.v("Bozuko","Slots destroyed");
 		((SlotWheelView)findViewById(R.id.slotwheel1)).clear();
 		((SlotWheelView)findViewById(R.id.slotwheel2)).clear();
 		((SlotWheelView)findViewById(R.id.slotwheel3)).clear();
 		bitmaps.clear();
+		super.onDestroy();
 	}
 	
 	public void onPause(){
@@ -732,7 +788,17 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	@Override
 	public void didStart(SlotWheelView view) {
 		// TODO Auto-generated method stub
-
+		if(view.getId() == R.id.slotwheel1){
+			((SlotWheelView)findViewById(R.id.slotwheel2)).spin(((SlotWheelView)findViewById(R.id.slotwheel1)).spinPosition);
+		}else if(view.getId() == R.id.slotwheel2){
+			((SlotWheelView)findViewById(R.id.slotwheel3)).spin(((SlotWheelView)findViewById(R.id.slotwheel2)).spinPosition);
+		}else if(view.getId() == R.id.slotwheel3){
+			unProgressRunnable(new Runnable(){
+				public void run(){
+					getGameResults();
+				}
+			});
+		}
 	}
 
 	@Override
@@ -747,8 +813,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		}
 		if(view.getId() == R.id.slotwheel3){
 			((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
-
+			thisMethodIsDone = false;
 			if(gameState.requestInfo("user_tokens").compareTo("0") != 0){
+				
 				findViewById(R.id.spin).setEnabled(true);
 			}
 			if(result != null){
@@ -805,7 +872,9 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	}
 
+	boolean thisMethodIsDone = false;
 	public void resultsCheck(){
+		
 		if(timer != null){
 			timer.cancel();
 			timer.purge();
@@ -835,6 +904,7 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					}
 				});
 			}else{
+				if(result.requestInfo("free_play").compareTo("true") != 0){
 				if(gameState.requestInfo("user_tokens").compareTo("0") == 0){
 					AlertDialog alert = makeDialog("Please come back later.","No More Plays",new DialogInterface.OnClickListener() {
 
@@ -861,6 +931,12 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					((SequencerImageView)findViewById(R.id.sequencer)).setResources(AnimationSequence.PLAY_AGAIN);
 					((SequencerImageView)findViewById(R.id.sequencer)).startSequence();
 				}
+				}else{
+					count=0;
+					((SequencerImageView)findViewById(R.id.sequencer)).stopSequence();
+					((SequencerImageView)findViewById(R.id.sequencer)).setResources(AnimationSequence.PLAY_AGAIN);
+					((SequencerImageView)findViewById(R.id.sequencer)).startSequence();
+				}
 			}
 
 		}else{
@@ -877,7 +953,10 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	}
 
 	public void goRedeem(){
-
+		if(thisMethodIsDone){
+			//return;
+		}
+		thisMethodIsDone = true;
 		if(timer != null){
 			timer.cancel();
 			timer.purge();

@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ public class PrizeView extends RelativeLayout{
 	TextView _subtitle;
 	TextView _expired;
 	TextView _won;
+	TextView _loadMore;
 	
 	public PrizeView(Context context) {
 		super(context);
@@ -40,6 +43,17 @@ public class PrizeView extends RelativeLayout{
 		_image.setScaleType(ScaleType.CENTER);
 		_image.setId(100);
 		addView(_image);
+		
+		
+		_loadMore = new TextView(mContext);
+		_loadMore.setTextColor(Color.BLACK);
+		_loadMore.setTypeface(Typeface.DEFAULT_BOLD);
+		_loadMore.setTextSize(16);
+		_loadMore.setSingleLine(true);
+		_loadMore.setEllipsize(TruncateAt.END);
+		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,(int)(44*getResources().getDisplayMetrics().density));
+		_loadMore.setLayoutParams(params);
+		addView(_loadMore);
 		
 		_title = new TextView(mContext);
 		_title.setTextColor(Color.BLACK);
@@ -99,6 +113,25 @@ public class PrizeView extends RelativeLayout{
 	}
 
 	public void display(PrizeObject page){
+		if(page == null){
+			_image.setVisibility(View.GONE);
+			_title.setVisibility(View.GONE);
+			_subtitle.setVisibility(View.GONE);
+			_expired.setVisibility(View.GONE);
+			_won.setVisibility(View.GONE);
+			_loadMore.setVisibility(View.VISIBLE);
+			_loadMore.setText("Load More");
+			_loadMore.setGravity(Gravity.CENTER);
+			return;
+		}else{
+			_image.setVisibility(View.VISIBLE);
+			_title.setVisibility(View.VISIBLE);
+			_subtitle.setVisibility(View.VISIBLE);
+			_expired.setVisibility(View.VISIBLE);
+			_won.setVisibility(View.VISIBLE);
+			_loadMore.setVisibility(View.GONE);
+		}
+		
 		//Log.v("GAME",page.toString());
 		//_image.setURL(page.requestInfo("image"));
 		_title.setText(page.requestInfo("name"));

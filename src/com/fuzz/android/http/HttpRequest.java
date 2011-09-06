@@ -27,7 +27,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.helpers.DefaultHandler;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.util.Log;
 import android.util.Xml;
 
 public class HttpRequest {
@@ -397,7 +396,7 @@ public class HttpRequest {
 	            }
 	        }
 	    } catch (SocketException ex) {
-	        Log.e("SOCKETEXCEPTION", ex.toString());
+	       // Log.e("SOCKETEXCEPTION", ex.toString());
 	    }
 	    return null;
 	}

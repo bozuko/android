@@ -2,15 +2,17 @@ package com.bozuko.bozuko.datamodel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import com.fuzz.android.datahandler.DataBaseHelper;
 import com.fuzz.android.datahandler.DataObject;
 
 public class GameObject extends DataObject {
@@ -71,6 +73,13 @@ public class GameObject extends DataObject {
 		tablename = "games";
 	}
 	
+
+	public GameObject(Cursor r) {
+		// TODO Auto-generated constructor stub
+		super(r);
+		queryid = "id";
+		tablename = "games";
+	}
 
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
@@ -180,6 +189,8 @@ public class GameObject extends DataObject {
 						while (jp.nextToken() != JsonToken.END_ARRAY) {
 						}
 					}
+				}else if(token == JsonToken.NOT_AVAILABLE){
+					throw new Exception("Parser failed");
 				}else{
 					map.put(masterKey+key, jp.getText());
 				}
@@ -213,5 +224,117 @@ public class GameObject extends DataObject {
 		}
 		
 		return ret;
+	}
+
+	public void saveToDb(String id,DataBaseHelper dbh){
+		super.saveToDb(id, dbh);
+		
+		gameState.saveToDb(id, dbh);
+		
+		for(int i=0; i<prizes.size(); i++){
+			prizes.get(i).add("gameid", id);
+			prizes.get(i).add("prizetype", 1+"");
+			prizes.get(i).tablename = "listprizes";
+			prizes.get(i).saveToDb(id, dbh);
+		}
+		
+		for(int i=0; i<consoldationPrizes.size(); i++){
+			consoldationPrizes.get(i).add("gameid", id);
+			consoldationPrizes.get(i).add("prizetype", 2+"");
+			consoldationPrizes.get(i).tablename = "listprizes";
+			consoldationPrizes.get(i).saveToDb(id, dbh);
+		}
+		
+		if(icons!=null){
+			for(int i=0; i<icons.size(); i++){
+				DataObject object = new DataObject();
+				object.queryid = "id";
+				object.tablename = "gameicons";
+				object.add("gameid", id);
+				object.add("icon", icons.get(i));
+				object.saveToDb(null, dbh);
+				//Log.v("ICON",object.toString());
+			}
+		}
+		
+		if(iconsImages!=null){
+			for(int i=0; i<iconsImages.size(); i++){
+				DataObject object = new DataObject();
+				object.queryid = "id";
+				object.tablename = "gameiconimages";
+				object.add("gameid", id);
+				object.add("icon", iconsImages.get(i));
+				object.saveToDb(null, dbh);
+				
+				//Log.v("ICONIMAGE",object.toString());
+			}
+		}
+	}
+	
+	public void getObject(String id,DataBaseHelper dbh){
+		super.getObject(id, dbh);
+		
+		gameState = new GameState(id);
+		gameState.getObject(id, dbh);
+		
+		String selection[] = {id,"2"};
+		Cursor r = dbh.getDB().query("listprizes", null, "gameid=? and prizetype=?", selection, null, null, null);
+		consoldationPrizes = new ArrayList<PrizeObject>();
+		while(r.moveToNext()){
+			PrizeObject object = new PrizeObject(r);
+			consoldationPrizes.add(object);
+		}
+		r.close();
+		
+		String selection2[] = {id,"1"};
+		Cursor r2 = dbh.getDB().query("listprizes", null, "gameid=? and prizetype=?", selection2, null, null, null);
+		prizes = new ArrayList<PrizeObject>();
+		while(r2.moveToNext()){
+			PrizeObject object = new PrizeObject(r2);
+			prizes.add(object);
+		}
+		r2.close();
+		
+		try{
+		String selection3[] = {id};
+		Cursor r3 = dbh.getDB().query("gameicons", null, "gameid=?", selection3, null, null, null);
+		
+		while(r3.moveToNext()){
+			DataObject object = new DataObject(r3);
+			//Log.v("ICON",object.toString());
+			if(icons==null){
+				icons = new ArrayList<String>();
+			}
+			icons.add(object.requestInfo("icon"));
+		}
+		r3.close();
+		}catch(Throwable t){
+		}
+		
+		try{
+		String selection4[] = {id};
+		Cursor r4 = dbh.getDB().query("gameiconimages", null, "gameid=?", selection4, null, null, null);
+		
+		while(r4.moveToNext()){
+			DataObject object = new DataObject(r4);
+			//Log.v("ICONIMAGE",object.toString());
+			if(iconsImages==null){
+				iconsImages = new ArrayList<String>();
+			}
+			iconsImages.add(object.requestInfo("icon"));
+		}
+		r4.close();
+		}catch(Throwable t){
+		}
+	}
+	
+	public void createTable(SQLiteDatabase db) throws SQLException{
+		String sql = "create table " + tablename + " (_id integer primary key autoincrement, ";
+		for (String s: map.keySet()) {
+				sql = sql + s + " text, ";
+		}
+		sql = sql.substring(0, sql.length()-2);
+		sql = sql + ")";
+		db.execSQL(sql);
 	}
 }

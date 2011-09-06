@@ -23,7 +23,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +50,7 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	public View getGreyCellView(String inString){
 		GroupView groupView = new GroupView(this);
 
-		TextView textView = new TextView(getBaseContext());
+		TextView textView = new TextView(this);
 		textView.setLayoutParams(new ListView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 		textView.setTextColor(Color.WHITE);
 		textView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -69,9 +68,13 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	public View getHeaderView(){
 		GroupView groupView = new GroupView(this);
 
+		
+		
 
 		PageHeaderView pageView = new PageHeaderView(this);
 		pageView.display(page);
+		
+		pageView.setId(999);
 		groupView.setContentView(pageView);
 
 		if(page.requestInfo("is_place").compareTo("false")==0){
@@ -95,12 +98,20 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		if(getIntent().hasExtra("PageLink")){
 			pageLink = getIntent().getStringExtra("PageLink");
 			page = null;
+			((BozukoApplication)getApp()).currentPageObject=null;
 		}else{
 			setupView();
 		}
 	}
 
 	public void setupView(){
+		if(findViewById(999)!=null){
+			((PageHeaderView)findViewById(999)).pauseTimers();
+		}
+		if(findViewById(999)!=null){
+			((PageHeaderView)findViewById(999)).destroy();
+		}
+		
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setBackgroundColor(Color.argb(255, 205, 205, 205));
 		listview.setCacheColorHint(Color.argb(255, 205, 205, 205));
@@ -161,40 +172,6 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	}
 	
 	UpdateReceiver mReceiver = new UpdateReceiver();
-	public void onPause(){
-		super.onPause();
-		unregisterReceiver(mReceiver);
-	}
-
-	public void onResume(){
-		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
-		if(page != null){
-			//setupView();
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			if(mprefs.getBoolean("ReloadPage",false)){
-				SharedPreferences.Editor edit = mprefs.edit();
-				edit.putBoolean("ReloadPage", false);
-				edit.commit();
-				if(page.checkInfo("linkspage")){
-				progressRunnable(new Runnable(){
-					public void run(){
-						sendRequest();
-					}
-				},"Loading...",CANCELABLE);
-				}
-			}
-		}else{
-			//LOAD DATA
-			progressRunnable(new Runnable(){
-				public void run(){
-					sendRequest();
-				}
-			},"Loading...",CANCELABLE);
-		}
-		
-
-		super.onResume();
-	}
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
@@ -307,12 +284,12 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 				groupView = (GroupView)masterConvertView;
 				convertView = groupView.getContentView();
 			}else{
-				groupView = new GroupView(getBaseContext());
+				groupView = new GroupView(PageBozukoActivity.this);
 			}
 
 			GameView movieView = null;
 			if (convertView == null) {
-				movieView = new GameView(getBaseContext());
+				movieView = new GameView(PageBozukoActivity.this);
 				groupView.setContentView(movieView);
 			}
 			else {
@@ -424,5 +401,59 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 			},"Loading...",CANCELABLE);
 			}
 		}
+	}
+
+	public void onPause(){
+		super.onPause();
+		unregisterReceiver(mReceiver);
+		if(findViewById(999)!=null){
+			((PageHeaderView)findViewById(999)).pauseTimers();
+		}
+		//CookieSyncManager.getInstance().stopSync();
+		//page = null;
+	}
+	
+
+	public void onResume(){
+		 ((BozukoApplication)getApp()).currentGameObject=null;
+		page = ((BozukoApplication)getApp()).currentPageObject;
+		super.onResume();
+		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
+		if(page != null){
+			//setupView();
+			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+			if(mprefs.getBoolean("ReloadPage",false)){
+				SharedPreferences.Editor edit = mprefs.edit();
+				edit.putBoolean("ReloadPage", false);
+				edit.commit();
+				if(page.checkInfo("linkspage")){
+				progressRunnable(new Runnable(){
+					public void run(){
+						sendRequest();
+					}
+				},"Loading...",NOT_CANCELABLE);
+				}
+			}
+		}else{
+			//LOAD DATA
+			progressRunnable(new Runnable(){
+				public void run(){
+					sendRequest();
+				}
+			},"Loading...",NOT_CANCELABLE);
+		}
+		if(findViewById(999)!=null){
+			((PageHeaderView)findViewById(999)).resumeTimers();
+		}
+		//CookieSyncManager.getInstance().startSync();
+	}
+	
+	public void onDestroy(){
+		page=null;
+		if(findViewById(999)!=null){
+			((PageHeaderView)findViewById(999)).destroy();
+		}
+		super.onDestroy();
+		
 	}
 }
