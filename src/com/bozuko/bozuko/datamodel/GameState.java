@@ -28,5 +28,6 @@ public class GameState extends DataObject {
 		queryid = "game_id";
 		tablename = "gameState";
 	}
+	
 
 }

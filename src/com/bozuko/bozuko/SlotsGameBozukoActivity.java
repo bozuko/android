@@ -596,11 +596,22 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	@Override
 	public void onClick(View arg0) {
+		if(R.id.spin == arg0.getId() && !findViewById(R.id.spin).isEnabled()){
+			return;
+		}
+		findViewById(R.id.spin).setEnabled(false);
+		
 		// TODO Auto-generated method stub
 		if(arg0.getId() == R.id.prizestext){
+			if(!((SlotWheelView)findViewById(R.id.slotwheel3)).isSpinning()){
+			findViewById(R.id.spin).setEnabled(true);
+			}
 			Intent intent = new Intent(this,PrizeListBozukoActivity.class);
 			startActivity(intent);
 		}else if(arg0.getId() == R.id.officialrules){
+			if(!((SlotWheelView)findViewById(R.id.slotwheel3)).isSpinning()){
+				findViewById(R.id.spin).setEnabled(true);
+			}
 			Intent intent = new Intent(this,OfficialBozukoActivity.class);
 			startActivity(intent);
 		}else{
@@ -614,11 +625,13 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 					if(result.requestInfo("free_play").compareTo("true") != 0){
 						goRedeem();
 						result = null;
+						findViewById(R.id.spin).setEnabled(true);
 						return;
 					}
 				}else if(result.requestInfo("consolation").compareTo("true")==0){
 					goRedeem();
 					result = null;
+					findViewById(R.id.spin).setEnabled(true);
 					return;
 				}
 			}
@@ -652,6 +665,11 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 
 	public void onResume(){
 		super.onResume();
+		if(game == null){
+			game = ((BozukoApplication)getApp()).currentGameObject;
+			page = ((BozukoApplication)getApp()).currentPageObject;
+			gameState = game.gameState;
+		}
 		if(sequencing){
 			((SlotBannerAnimator)findViewById(R.id.animator)).onResume();
 			((SequencerImageView)findViewById(R.id.sequencer)).startSequence();

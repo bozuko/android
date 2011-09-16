@@ -158,7 +158,12 @@ public class SlotWheelView extends NoTouchScrollView {
 		randomizeScrollPosition(spinPosition2);
 		
 		if(mListener != null){
-			mListener.didStart(SlotWheelView.this);
+			post(new Runnable(){
+				public void run(){
+					mListener.didStart(SlotWheelView.this);
+				}
+			});
+			
 		}
 		
 		CURRENT_SPEED = FAST_SPEED;
@@ -184,10 +189,11 @@ public class SlotWheelView extends NoTouchScrollView {
 		try{
 		_animateTimer.cancel();
 		_animateTimer.purge();
-		_animateTimer = null;
+		
 		}catch(Throwable t){
 			
 		}
+		_animateTimer = null;
 	}
 
 	public void resume(){
@@ -195,7 +201,12 @@ public class SlotWheelView extends NoTouchScrollView {
 			_animateTimer = new Timer();
 			animateWheel = new AnimateWheel();
 		}
-		_animateTimer.schedule(animateWheel, 0, SPEED+(STOPPING_SPEED/2));
+		
+		try{
+			_animateTimer.schedule(animateWheel, 0, SPEED+(STOPPING_SPEED/2));
+		}catch(Throwable t){
+			
+		}
 	}
 
 	AnimateWheel animateWheel = new AnimateWheel();

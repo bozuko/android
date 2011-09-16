@@ -1,6 +1,32 @@
 package com.bozuko.bozuko;
 
 import java.net.URL;
+
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bozuko.bozuko.datamodel.Bozuko;
 import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.EntryPointObject;
@@ -14,26 +40,6 @@ import com.fuzz.android.ui.GroupView;
 import com.fuzz.android.ui.MenuOption;
 import com.fuzz.android.ui.MergeAdapter;
 import com.fuzz.android.ui.OptionCell;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class SettingsBozukoActivity extends BozukoControllerActivity implements OnItemClickListener {
 
@@ -223,22 +229,15 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-		//menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
+		menu.add(0, 1, 0, "Servers");
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item){
+		Log.v("Bozuko","Item selected: "+item.getItemId());
 		switch(item.getItemId()){
-			case R.drawable.icongames:
-				Intent games = new Intent(this,GamesTabController.class);
-				games.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(games);
-				break;
-			case R.drawable.iconprizes:
-				Intent prizes = new Intent(this,PrizesBozukoActivity.class);
-				prizes.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(prizes);
+			case 1:
+				serverSelect();
 				break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -303,4 +302,47 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 		}
 
 	}
+	protected void serverSelect(){
+		final CharSequence[] items = {"API","Playground"};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Pick a Server");
+		builder.setItems(items, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	 SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(SettingsBozukoActivity.this);
+		 		if(mprefs.getBoolean("facebook_login", false)){
+		 			facebook();
+		 		}
+		        switch(item){
+		        case 0:
+		        	GlobalConstants.BASE_URL = "https://api.bozuko.com";
+		        	GlobalConstants.API_URL = "https://api.bozuko.com/api";
+		        	GlobalConstants.FACEBOOK_URL2 = "https://api.bozuko.com/user?token=";
+		        	GlobalConstants.FACEBOOK_URL = "https://api.bozuko.com/user/login?token=";
+		        	GlobalConstants.MOBILE_VERSION = "android-1.1";
+		        	
+		        	Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+
+		        break;
+		        	
+		        case 1:
+		        	GlobalConstants.BASE_URL = "https://playground.bozuko.com";
+		        	GlobalConstants.API_URL = "https://playground.bozuko.com/api";
+		        	GlobalConstants.FACEBOOK_URL2 = "https://playground.bozuko.com/user?token=";
+		        	GlobalConstants.FACEBOOK_URL = "https://playground.bozuko.com/user/login?token=";
+		        	GlobalConstants.MOBILE_VERSION = "android-1.1";
+		        	
+		        	Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
+
+		        break;
+		        
+		       
+		        }
+		        progressRunnableComplete();
+		    }
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
 }

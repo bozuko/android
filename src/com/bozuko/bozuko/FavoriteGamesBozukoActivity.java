@@ -300,11 +300,12 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
 						//Log.v("Page",page.toString());
-						if(page.requestInfo("featured").compareTo("true")==0){
-							pages.add(page);
-						}else if(page.requestInfo("registered").compareTo("true")==0){
-							pages.add(page);
-						}
+//						if(page.requestInfo("featured").compareTo("true")==0){
+//							pages.add(page);
+//						}else if(page.requestInfo("registered").compareTo("true")==0){
+//							pages.add(page);
+//						}
+						pages.add(page);
 					}
 					
 
@@ -370,9 +371,10 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 					PageObject page = new PageObject(objects.getJSONObject(i));
 
 					//Log.v("Page",page.toString());
-					if(page.requestInfo("registered").compareTo("true")==0){
-						pages.add(page);
-					}
+//					if(page.requestInfo("registered").compareTo("true")==0){
+//						pages.add(page);
+//					}
+					pages.add(page);
 				}
 
 				try{

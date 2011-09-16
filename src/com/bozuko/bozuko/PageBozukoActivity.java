@@ -415,9 +415,10 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 	
 
 	public void onResume(){
+		super.onResume();
 		 ((BozukoApplication)getApp()).currentGameObject=null;
 		page = ((BozukoApplication)getApp()).currentPageObject;
-		super.onResume();
+		
 		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
 		if(page != null){
 			//setupView();

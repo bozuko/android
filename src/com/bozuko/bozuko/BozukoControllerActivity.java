@@ -298,6 +298,11 @@ public class BozukoControllerActivity extends ControllerActivity {
 		((BozukoApplication)getApp()).saveData();
 	}
 	
+	public void onResume(){
+		super.onResume();
+		((BozukoApplication)getApp()).loadData();
+	}
+	
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		((BozukoApplication)getApp()).loadData();

@@ -31,6 +31,7 @@ import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
 import com.bozuko.bozuko.datamodel.GameObject;
 import com.bozuko.bozuko.datamodel.GameResult;
 import com.bozuko.bozuko.datamodel.PrizeObject;
+import com.bozuko.bozuko.datamodel.User;
 import com.bozuko.bozuko.views.GameHeaderView;
 import com.bozuko.bozuko.views.PrizeCell;
 import com.fuzz.android.datahandler.DataBaseHelper;
@@ -202,7 +203,9 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 		if(game.requestInfo("type").compareTo("scratch")==0){
 			try{
 				GameResult result = new GameResult(game.gameState.requestInfo("game_id"));
-				result.getObject(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				User usr =new User("1");
+				usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+				result.getObject(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
 				PrizeObject prize = null;
 				try{
 					prize = new PrizeObject(game.gameState.requestInfo("game_id"));
@@ -218,8 +221,10 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 					((Button)findViewById(R.id.entergame)).setText("Play");
 					findViewById(R.id.entergame).setEnabled(true);
 				}else{
-					result.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-					prize.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					if(result.checkInfo("bozukoid")){
+						result.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+						prize.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					}
 					loadButton();
 				}
 			}catch(Throwable t){
@@ -256,10 +261,11 @@ public class GameEntryBozukoActivity extends BozukoControllerActivity implements
 	}
 
 	public void onResume(){
+		super.onResume();
 		game = ((BozukoApplication)getApp()).currentGameObject;
 		
 		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
-		super.onResume();
+		
 		setupView();
 		
 		unProgressRunnable(new Runnable(){

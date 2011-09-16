@@ -204,6 +204,8 @@ public class DataObject implements Parcelable{
 		}
 		r.close();
 	}
+	
+
 
 	public void delete(String id, DataBaseHelper dbh){
 		boolean ret = openDataBase(dbh);
@@ -231,9 +233,7 @@ public class DataObject implements Parcelable{
 		Cursor r = null;
 		if(id != null && tablename.compareTo("") != 0){
 			try{ 
-				String columns[] = {queryid};
-				String selection[] = {id};
-				r = db.query(tablename, columns , queryid+"=?", selection, null, null, null);
+				r = getObjectCursor(db,id);
 				if(r.moveToNext()){
 					r.close();
 					updateStatement(db,values,id);
@@ -261,9 +261,7 @@ public class DataObject implements Parcelable{
 		Cursor r = null;
 		if(id != null && tablename.compareTo("") != 0){
 			try{ 
-				String columns[] = {queryid};
-				String selection[] = {id};
-				r = db.query(tablename, columns , queryid+"=?", selection, null, null, null);
+				r = getObjectCursor(db,id);
 				
 				if(r.moveToNext()){
 					r.close();
@@ -278,6 +276,12 @@ public class DataObject implements Parcelable{
 		}else if(tablename.compareTo("") != 0){
 			insertStatement(db,values);
 		}
+	}
+	
+	public Cursor getObjectCursor(SQLiteDatabase db, String id){
+		String columns[] = {queryid};
+		String selection[] = {id};
+		return db.query(tablename, columns , queryid+"=?", selection, null, null, null);
 	}
 
 	public void alterDB(SQLiteDatabase db){

@@ -179,6 +179,8 @@ public class PagingLayout extends LinearLayout {
         			//provider.clearView(i);
         		}
         	}
+        	
+        	provider.onPage(page);
     	}
     }
 
@@ -195,6 +197,7 @@ public class PagingLayout extends LinearLayout {
 		 * @return
 		 */
 		public int getCount();
+		public void onPage(int page);
 		/**
 		 * returns the item for position
 		 * @param position

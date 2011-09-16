@@ -145,4 +145,8 @@ public class PagingScrollView extends HorizontalScrollView {
 	    	
 	    	return ret;
 	    }
+
+	    public int getCurrentPage(){
+	    	return mActiveFeature;
+	    }
 }

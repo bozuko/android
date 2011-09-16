@@ -35,6 +35,6 @@ public class Res {
 //    	public static final R.raw raw = new R.raw();
     	public static final R.string string = new R.string();
     	public static final R.style style = new R.style();
-//    	public static final R.styleable = new R.styleable();
+    	public static final R.styleable styleable = new R.styleable();
 //    	public static final R.xml xml = new R.xml();
 }

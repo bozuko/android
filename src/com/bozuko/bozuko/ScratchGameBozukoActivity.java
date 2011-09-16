@@ -67,7 +67,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			if(result != null){
 				result.add("scratchBitmap", popped.toString());
 				//Log.v("SCRATCH",popped.toString());
-				result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				
+				User usr =new User("1");
+				usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+				result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
 				
 				
 				if(prize != null){
@@ -280,6 +283,13 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 	public void onResume(){
 		super.onResume();
+		
+		if(game == null){
+			game = ((BozukoApplication)getApp()).currentGameObject;
+			page = ((BozukoApplication)getApp()).currentPageObject;
+			gameState = game.gameState;
+		}
+		
 		if(gameState.requestInfo("button_action").compareTo("enter")!=0){
 			if(gameState.requestInfo("user_tokens").compareTo("0") == 0 && result == null){
 				allButtonsHaveBeenScratched();
@@ -354,7 +364,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		if(result != null){
 			result.add("scratchBitmap", popped.toString());
 			//Log.v("SCRATCH",popped.toString());
-			result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+			User usr =new User("1");
+			usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+			result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
 			
 			
 			if(prize != null){
@@ -371,7 +383,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		try{
 			result = new GameResult(gameState.requestInfo("game_id"));
 			//Log.v("SCRATCH",result.toString());
-			result.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+			
+			User usr =new User("1");
+			usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+			result.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
 			//Log.v("SCRATCH",result.toString());
 			try{
 				prize = new PrizeObject(gameState.requestInfo("game_id"));
@@ -398,8 +413,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				}
 				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}else{
-				result.delete(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-				prize.delete(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				if(result.checkInfo("bozukoid")){
+					result.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+					prize.delete(game.gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
+				}
 				getGameState();
 			}
 		}catch(Throwable t){
@@ -525,6 +542,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			}catch(Throwable t){
 				result = new GameResult(json);
 				result.add("gameid", gameState.requestInfo("game_id"));
+				User usr =new User("1");
+				usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
+				result.add("bozukoid", usr.requestInfo("bozukoid"));
 				JSONObject state = json.getJSONObject("game_state");
 				gameState.processJson(state, "");
 				try{
