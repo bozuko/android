@@ -38,8 +38,12 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 	
 	public void onDestroy(){
 		super.onDestroy();
+		try{
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setAdapter(new SimpleAdapter());
+		}catch(Throwable t){
+			
+		}
 		activePrizes.clear();
 		pastPrizes.clear();
 		tmpActivePrizes.clear();
@@ -186,11 +190,8 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			}
 			
 			
-			//Log.v("ENTRY",entry.toString());
-			//Log.v("URL",url);
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
-			//Log.v("PRIZESLISTSTRING",req.AutoPlain());
 			
 			JsonParser jp = req.AutoStreamJSONError();
 			
@@ -207,8 +208,6 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PrizeObject page = new PrizeObject(jp);
-						//Log.v("Page",page.toString());
-						//prizes.add(page);
 						if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
 							tmpPastPrizes.add(page);
 						}else{
@@ -234,26 +233,7 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 			}
 			}
 			jp.close();
-//			JSONObject json = req.AutoJSONError();
-//			try{
-//			JSONArray objects = json.getJSONArray("prizes");
-//			for(int i=0; i<objects.length(); i++){
-//				PrizeObject page = new PrizeObject(objects.getJSONObject(i));
-//				//Log.v("Page",page.toString());
-//				//prizes.add(page);
-//				if(page.requestInfo("state").compareTo("expired") == 0 || page.requestInfo("state").compareTo("redeemed") == 0){
-//					tmpPastPrizes.add(page);
-//				}else{
-//					tmpActivePrizes.add(page);
-//				}
-//			}
-//			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-//			}catch(Throwable t){
-//				errorTitle = json.getString("title");
-//				errorMessage = json.getString("message");
-//				errorType = json.getString("name");
-//				RUNNABLE_STATE = RUNNABLE_FAILED;
-//			}
+
 		} catch (Throwable e) {
 			//e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
@@ -271,7 +251,6 @@ public class PrizesBozukoActivity extends BozukoControllerActivity implements On
 		public PrizeListAdapter(ArrayList<PrizeObject> inArray, boolean inSearchable){
 			pages = inArray;
 			searchable = inSearchable;
-			//Log.v("NEXTURL",nextURL);
 		}
 
 		@Override

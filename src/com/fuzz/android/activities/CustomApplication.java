@@ -12,6 +12,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 public class CustomApplication extends Application implements SocialMediaApplication,DataApplication,LocationApplication, LocationFinderListener{
 	
 	public DataBaseHelper dHandler = null;
@@ -27,17 +28,31 @@ public class CustomApplication extends Application implements SocialMediaApplica
 			DataBaseHelper helper=new DataBaseHelper(this);
 			try {
 				helper.createDataBase();
+				helper.close();
+				helper.openDataBase();
+				helper.addTable();
+				helper.setAppStateForDevice();
+				helper.close();
+				SharedPreferences.Editor editor = mprefs.edit();
+				editor.putBoolean("load", true);
+				editor.commit();
 			} catch (Throwable e) {
 				//e.printStackTrace();
-				helper.getWritableDatabase();
+				try{
+					helper.getWritableDatabase();
+					helper.close();
+					helper.openDataBase();
+					helper.addTable();
+					helper.setAppStateForDevice();
+					helper.close();
+					SharedPreferences.Editor editor = mprefs.edit();
+					editor.putBoolean("load", true);
+					editor.commit();
+				}catch(Throwable t){
+					//Toast.makeText(this, "Sorry could not initialize", Toast.LENGTH_LONG).show();
+				}
 			}
-			helper.openDataBase();
-			helper.addTable();
-			helper.setAppStateForDevice();
-			helper.close();
-			SharedPreferences.Editor editor = mprefs.edit();
-			editor.putBoolean("load", true);
-			editor.commit();
+			
 		}
         getCacheDir();
         

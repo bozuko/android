@@ -281,7 +281,8 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			GeoPoint center = this.mapView.getMapCenter();
 			url += String.format("?ll=%f,%f&limit=25&offset=%d",((float)center.getLatitudeE6())/1000000,((float)center.getLongitudeE6())/1000000,0);
 			url += String.format("&bounds=%f,%f,%f,%f", bounds[1][0],bounds[1][1],bounds[0][0],bounds[0][1]);
-			//Log.v("MAPURL",url);
+			
+			url += "&accuracy=" + mprefs.getString("acc", "0");
 			if(url.toLowerCase().contains("null")){
 				if(time<20000){
 					Thread.sleep(2000);
@@ -305,11 +306,12 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
-						//Log.v("Page",page.toString());
 						if(page.requestInfo("registered").compareTo("true")==0){
 							if(!gamesLoaded.containsKey(page.requestInfo("id"))){
+								if(page.checkInfo("locationlat")){
 								tempGames.add(page);
 								gamesLoaded.put(page.requestInfo("id"), "1");
+								}
 							}
 						}
 					}
@@ -376,12 +378,14 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			games.addAll(tempGames);
 			for(int page = 0; page<tempGames.size(); page++){
 				PageObject v = tempGames.get(page);
-				Double latp = Double.valueOf(v.requestInfo("locationlat"));
-				Double lonp = Double.valueOf(v.requestInfo("locationlng"));
-				GeoPoint p1 = new GeoPoint((int)(latp.floatValue()*1E6), (int) (lonp.floatValue()*1E6));
-				MapItem overlayitem = new MapItem(p1, v.requestInfo("name"), v.requestInfo("locationstreet"));
-				overlayitem.setObject(v);
-				itemizedoverlay.addOverlay(overlayitem);
+				if((v.requestInfo("locationlat")!="")&&(v.requestInfo("locationlng")!="")){
+					Double latp = Double.valueOf(v.requestInfo("locationlat"));
+					Double lonp = Double.valueOf(v.requestInfo("locationlng"));
+					GeoPoint p1 = new GeoPoint((int)(latp.floatValue()*1E6), (int) (lonp.floatValue()*1E6));
+					MapItem overlayitem = new MapItem(p1, v.requestInfo("name"), v.requestInfo("locationstreet"));
+					overlayitem.setObject(v);
+					itemizedoverlay.addOverlay(overlayitem);
+				}
 			}
 			if(itemizedoverlay.shouldAdd() && !mapOverlays.contains(itemizedoverlay)){
 				mapOverlays.add(itemizedoverlay);
@@ -429,7 +433,6 @@ public class GamesMapController extends MapControllerActivity implements OnClick
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version="+ GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			//Log.v("LOGOUT",req.AutoPlain());
 			removeCookies();
 			
 			mHandler.post(new Runnable(){

@@ -66,7 +66,6 @@ public class GameView extends RelativeLayout{
 	}
 
 	public void display(GameObject page){
-		//Log.v("GAME",page.toString());
 		if(page.requestInfo("type").compareTo("scratch")==0){
 			//_image.setPlaceHolder(R.drawable.scratchicon);
 		}else if(page.requestInfo("type").compareTo("scratch")==0){

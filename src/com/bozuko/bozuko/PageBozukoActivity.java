@@ -23,35 +23,40 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PageBozukoActivity extends BozukoControllerActivity implements OnItemClickListener{
+public class PageBozukoActivity extends BozukoControllerActivity implements
+		OnItemClickListener {
 
 	PageObject page;
 	String pageLink;
-	
-	public void progressRunnableComplete(){
-		if(isFinishing()){
+
+	public void progressRunnableComplete() {
+		if (isFinishing()) {
 			return;
 		}
 		setupView();
 	}
 
-	public View getGreyCellView(String inString){
+	public View getGreyCellView(String inString) {
 		GroupView groupView = new GroupView(this);
 
 		TextView textView = new TextView(this);
-		textView.setLayoutParams(new ListView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+		textView.setLayoutParams(new ListView.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		textView.setTextColor(Color.WHITE);
 		textView.setTypeface(Typeface.DEFAULT_BOLD);
 		textView.setTextSize(14);
@@ -65,24 +70,20 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		return groupView;
 	}
 
-	public View getHeaderView(){
+	public View getHeaderView() {
 		GroupView groupView = new GroupView(this);
-
-		
-		
 
 		PageHeaderView pageView = new PageHeaderView(this);
 		pageView.display(page);
-		
+
 		pageView.setId(999);
 		groupView.setContentView(pageView);
 
-		if(page.requestInfo("is_place").compareTo("false")==0){
+		if (page.requestInfo("is_place").compareTo("false") == 0) {
 			groupView.setImage(R.drawable.cellbtn);
-		}else{
+		} else {
 			groupView.setImage(R.drawable.cellbutton);
 		}
-		
 
 		return groupView;
 	}
@@ -92,138 +93,172 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		super.onCreate(savedInstanceState);
 		setContent(R.layout.listview);
 		setHeader(R.layout.detailheader);
+//		CookieSyncManager.createInstance(this);
+		page = ((BozukoApplication) getApp()).currentPageObject;
 
-		page = ((BozukoApplication)getApp()).currentPageObject;
-
-		if(getIntent().hasExtra("PageLink")){
+		if (getIntent().hasExtra("PageLink")) {
 			pageLink = getIntent().getStringExtra("PageLink");
 			page = null;
-			((BozukoApplication)getApp()).currentPageObject=null;
-		}else{
+			((BozukoApplication) getApp()).currentPageObject = null;
+			((BozukoApplication)getApp()).saveData();
+		} else {
 			setupView();
 		}
+		
 	}
 
-	public void setupView(){
-		if(findViewById(999)!=null){
-			((PageHeaderView)findViewById(999)).pauseTimers();
+	public void setupView() {
+	
+		if (findViewById(999) != null) {
+			((PageHeaderView) findViewById(999)).pauseTimers();
 		}
-		if(findViewById(999)!=null){
-			((PageHeaderView)findViewById(999)).destroy();
+		if (findViewById(999) != null) {
+			((PageHeaderView) findViewById(999)).destroy();
 		}
 		
-		ListView listview = (ListView)findViewById(R.id.ListView01);
+
+		ListView listview = (ListView) findViewById(R.id.ListView01);
 		listview.setBackgroundColor(Color.argb(255, 205, 205, 205));
 		listview.setCacheColorHint(Color.argb(255, 205, 205, 205));
 		listview.setSelector(R.drawable.blank);
 		listview.setDividerHeight(0);
-		
+
 		listview.setItemsCanFocus(true);
 		MergeAdapter mergeAdapter = new MergeAdapter();
 
 		mergeAdapter.addView(getSpacer(), false);
-		mergeAdapter.addView(getHeaderView(),true);
+		mergeAdapter.addView(getHeaderView(), true);
 
-		if(page.games.size()>0){
+		if (page.games.size() > 0) {
 			mergeAdapter.addView(getSpacer(), false);
 			mergeAdapter.addAdapter(new GameListAdapter());
-			
-			if(page.checkInfo("announcement") && page.requestInfo("announcement").compareTo("") != 0){
+
+			if (page.checkInfo("announcement")
+					&& page.requestInfo("announcement").compareTo("") != 0) {
 				mergeAdapter.addView(getSpacer(), false);
-				mergeAdapter.addView(getGreyCellView(page.requestInfo("announcement")),false);
+				mergeAdapter.addView(
+						getGreyCellView(page.requestInfo("announcement")),
+						false);
 			}
-		}else{
+		} else {
 			mergeAdapter.addView(getSpacer(), false);
-			mergeAdapter.addView(getLongCellView("<font color='#000000'><b>Bummer!</b></font><BR>This place has no games.<BR>Recommend Bozuko to this business.",R.drawable.tableviewtopbutton), false);
-			mergeAdapter.addView(getCellView("Recommend",R.drawable.tableviewbtmbutton), true);
+			mergeAdapter
+					.addView(
+							getLongCellView(
+									"<font color='#000000'><b>Bummer!</b></font><BR>This place has no games.<BR>Recommend Bozuko to this business.",
+									R.drawable.tableviewtopbutton), false);
+			mergeAdapter.addView(
+					getCellView("Recommend", R.drawable.tableviewbtmbutton),
+					true);
 		}
 
-		
-		
-
-
-		if(page.games.size()>0){
-			if(page.checkInfo("linksfeedback") && page.checkInfo("share_url")){
+		if (page.games.size() > 0) {
+			if (page.checkInfo("linksfeedback") && page.checkInfo("share_url")) {
 				mergeAdapter.addView(getSpacer(), false);
-				mergeAdapter.addView(getCellView("Feedback",R.drawable.tableviewtopbutton), true);
-				mergeAdapter.addView(getCellView("Share",R.drawable.tableviewbtmbutton), true);
-			}else if(page.checkInfo("linksfeedback")){
+				mergeAdapter.addView(
+						getCellView("Feedback", R.drawable.tableviewtopbutton),
+						true);
+				mergeAdapter.addView(
+						getCellView("Share", R.drawable.tableviewbtmbutton),
+						true);
+			} else if (page.checkInfo("linksfeedback")) {
 				mergeAdapter.addView(getSpacer(), false);
-				mergeAdapter.addView(getCellView("Feedback",R.drawable.cellbutton), true);
-			}else if(page.checkInfo("share_url")){
+				mergeAdapter.addView(
+						getCellView("Feedback", R.drawable.cellbutton), true);
+			} else if (page.checkInfo("share_url")) {
 				mergeAdapter.addView(getSpacer(), false);
-				mergeAdapter.addView(getCellView("Share",R.drawable.cellbutton), true);
+				mergeAdapter.addView(
+						getCellView("Share", R.drawable.cellbutton), true);
 			}
 		}
 
-
-		try{
-			if(page.checkInfo("linksfacebook_checkin") && page.requestInfo("is_place").compareTo("false")!=0){
+		try {
+			if (page.checkInfo("linksfacebook_checkin")
+					&& page.requestInfo("is_place").compareTo("false") != 0) {
 				mergeAdapter.addView(getSpacer(), false);
-				MenuOption option = new MenuOption(R.drawable.facebookicon, "Facebook Check In", "", false, this.getClass().getMethod("checkIn", (Class<?>[])null));
-				mergeAdapter.addView(getOptionView(option,R.drawable.cellbutton),true);
+				MenuOption option = new MenuOption(R.drawable.facebookicon,
+						"Facebook Check In", "", false, null);
+				mergeAdapter.addView(
+						getOptionView(option, R.drawable.cellbutton), true);
 			}
-		}catch(Throwable t){
-
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 		mergeAdapter.addView(getSpacer(), false);
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
 	}
-	
+
 	UpdateReceiver mReceiver = new UpdateReceiver();
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
-		if(arg1.getClass() == OptionCell.class){
-			OptionCell cell = (OptionCell)arg1;
-			invoke(cell.option);
-		}else if(arg1.getClass() == GroupView.class){
-			View innerView = ((GroupView)arg1).getContentView();
-			if(innerView.getClass() == TextView.class){
-				String text = ((TextView)innerView).getText().toString();
-				if(text.compareTo("Share")==0){
-					Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-					sendIntent.setData(Uri.parse("mailto:?subject=Bozuko&body="+page.requestInfo("share_url")));
+		if (arg1.getClass() == OptionCell.class) {
+			// OptionCell cell = (OptionCell)arg1;
+			checkIn();
+		} else if (arg1.getClass() == GroupView.class) {
+			View innerView = ((GroupView) arg1).getContentView();
+			if (innerView.getClass() == TextView.class) {
+				String text = ((TextView) innerView).getText().toString();
+				if (text.compareTo("Share") == 0) {
+					Intent sendIntent = new Intent(Intent.ACTION_SEND);
+					
+					sendIntent.setType("text/plain");
+					sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Bozuko");
+					sendIntent.putExtra(Intent.EXTRA_TEXT, page.requestInfo("share_url"));
+
+//					sendIntent.setData(Uri.parse("mailto:?subject=Bozuko&body="
+//							+ page.requestInfo("share_url")));
+//					sendIntent.putExtra("sms_body", page.requestInfo("share_url"));
 					startActivity(Intent.createChooser(sendIntent, "Share"));
-				}else if(text.compareTo("Feedback")==0){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-					if(mprefs.getBoolean("facebook_login", false)){
-						Intent intent = new Intent(this,FeedbackBozukoActivity.class);
-						intent.putExtra("URL", page.requestInfo("linksfeedback"));
-						intent.putExtra("HintText", "Tell us what you think about this game and press \"Submit\"");
+				} else if (text.compareTo("Feedback") == 0) {
+					SharedPreferences mprefs = PreferenceManager
+							.getDefaultSharedPreferences(this);
+					if (mprefs.getBoolean("facebook_login", false)) {
+						Intent intent = new Intent(this,
+								FeedbackBozukoActivity.class);
+						intent.putExtra("URL",
+								page.requestInfo("linksfeedback"));
+						intent.putExtra("HintText",
+								"Tell us what you think about this game and press \"Submit\"");
 						startActivity(intent);
-					}else{
+					} else {
 						notLoggedIn();
 					}
-				}else if(text.compareTo("Recommend")==0){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-					if(mprefs.getBoolean("facebook_login", false)){
-						Intent intent = new Intent(this,FeedbackBozukoActivity.class);
-						intent.putExtra("URL", page.requestInfo("linksrecommend"));
-						intent.putExtra("HintText", "Think this place should rock Bozuko? Tell them here and hit submit.");
+				} else if (text.compareTo("Recommend") == 0) {
+					SharedPreferences mprefs = PreferenceManager
+							.getDefaultSharedPreferences(this);
+					if (mprefs.getBoolean("facebook_login", false)) {
+						Intent intent = new Intent(this,
+								FeedbackBozukoActivity.class);
+						intent.putExtra("URL",
+								page.requestInfo("linksrecommend"));
+						intent.putExtra("HintText",
+								"Think this place should rock Bozuko? Tell them here and hit submit.");
 						startActivity(intent);
-					}else{
+					} else {
 						notLoggedIn();
 					}
 				}
-			}else if(innerView.getClass() == PageHeaderView.class){
-				//TODO map
-				if(page.requestInfo("is_place").compareTo("false")!=0){
-				Intent intent = new Intent(this,MapItMapActivity.class);
-				intent.putExtra("Package", page);
-				startActivity(intent);
+			} else if (innerView.getClass() == PageHeaderView.class) {
+				// TODO map
+				if (page.requestInfo("is_place").compareTo("false") != 0) {
+					Intent intent = new Intent(this, MapItMapActivity.class);
+					intent.putExtra("Package", page);
+					startActivity(intent);
 				}
-			}else if(innerView.getClass() == GameView.class){
+			} else if (innerView.getClass() == GameView.class) {
 				Object object = arg0.getItemAtPosition(arg2);
-				if(object.getClass() == GameObject.class){
-					SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-					if(mprefs.getBoolean("facebook_login", false)){
-						((BozukoApplication)getApp()).currentGameObject = (GameObject)object;
-						Intent intent = new Intent(this,GameEntryBozukoActivity.class);
+				if (object.getClass() == GameObject.class) {
+					SharedPreferences mprefs = PreferenceManager
+							.getDefaultSharedPreferences(this);
+					if (mprefs.getBoolean("facebook_login", false)) {
+						((BozukoApplication) getApp()).currentGameObject = (GameObject) object;
+						Intent intent = new Intent(this,
+								GameEntryBozukoActivity.class);
 						startActivity(intent);
-					}else{
+					} else {
 						notLoggedIn();
 					}
 				}
@@ -231,31 +266,34 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		}
 	}
 
-	public void likeUs(){
-		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if(mprefs.getBoolean("facebook_login", false)){
-			Intent intent = new Intent(this,SocialMediaWebViewActivity.class);
+	public void likeUs() {
+		SharedPreferences mprefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (mprefs.getBoolean("facebook_login", false)) {
+			Intent intent = new Intent(this, SocialMediaWebViewActivity.class);
 			intent.setData(Uri.parse(page.requestInfo("like_url")));
 			startActivity(intent);
-		}else{
+		} else {
 			notLoggedIn();
 		}
 	}
 
-	public void checkIn(){
-		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if(mprefs.getBoolean("facebook_login", false)){
-			Intent intent = new Intent(this,FeedbackBozukoActivity.class);
+	public void checkIn() {
+		SharedPreferences mprefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		if (mprefs.getBoolean("facebook_login", false)) {
+			Intent intent = new Intent(this, FeedbackBozukoActivity.class);
 			intent.putExtra("URL", page.requestInfo("linksfacebook_checkin"));
-			intent.putExtra("HintText", "Type a message, then\npress \"Submit\" to Check In");
+			intent.putExtra("HintText",
+					"Type a message, then\npress \"Submit\" to Check In");
 			intent.putExtra("DoInputCheck", false);
 			startActivity(intent);
-		}else{
+		} else {
 			notLoggedIn();
 		}
 	}
 
-	private class GameListAdapter extends BaseAdapter{
+	private class GameListAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
@@ -276,14 +314,15 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 		}
 
 		@Override
-		public View getView(int position, View masterConvertView, ViewGroup parent) {
+		public View getView(int position, View masterConvertView,
+				ViewGroup parent) {
 			// TODO Auto-generated method stub
 			GroupView groupView = null;
 			View convertView = null;
-			if(masterConvertView != null){
-				groupView = (GroupView)masterConvertView;
+			if (masterConvertView != null) {
+				groupView = (GroupView) masterConvertView;
 				convertView = groupView.getContentView();
-			}else{
+			} else {
 				groupView = new GroupView(PageBozukoActivity.this);
 			}
 
@@ -291,18 +330,17 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 			if (convertView == null) {
 				movieView = new GameView(PageBozukoActivity.this);
 				groupView.setContentView(movieView);
-			}
-			else {
+			} else {
 				movieView = (GameView) convertView;
 			}
-			movieView.display((GameObject)getItem(position));
+			movieView.display((GameObject) getItem(position));
 			int resource = R.drawable.tableviewtopbutton;
-			if(position > 0 && position < page.games.size()-1){
+			if (position > 0 && position < page.games.size() - 1) {
 				resource = R.drawable.tableviewmidbutton;
-			}else if(position > 0){
+			} else if (position > 0) {
 				resource = R.drawable.tableviewbtmbutton;
 			}
-			if(getCount()==1){
+			if (getCount() == 1) {
 				resource = R.drawable.cellbutton;
 			}
 
@@ -313,148 +351,155 @@ public class PageBozukoActivity extends BozukoControllerActivity implements OnIt
 
 	}
 
-	public void sendRequest(){
-		if(!DataBaseHelper.isOnline(this,0)){
+	public void sendRequest() {
+		if (!DataBaseHelper.isOnline(this, 0)) {
 			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
+			errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 			return;
 		}
 		try {
 			String url;
-			if(pageLink != null){
+			if (pageLink != null) {
 				url = GlobalConstants.BASE_URL + pageLink;
-			}else{
-				
-				
+			} else {
+
 				url = GlobalConstants.BASE_URL + page.requestInfo("linkspage");
 			}
-			//Log.v("URL", url);
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION));
+			
+			SharedPreferences mprefs = PreferenceManager
+					.getDefaultSharedPreferences(this);
+			
+			HttpRequest req = new HttpRequest(new URL(url + "?token="
+					+ mprefs.getString("token", "") + "&mobile_version="
+					+ GlobalConstants.MOBILE_VERSION + "&accuracy=" + mprefs.getString("acc", "0")));
 			req.setMethodType("GET");
 			JSONObject json = req.AutoJSONError();
-			try{
-			if(page == null){
-				page = new PageObject(json);
-			}else{
-				page.processJson(json, "");
+			try {
+				if (page == null) {
+					page = new PageObject(json);
+				} else {
+					page.processJson(json, "");
+				}
+				((BozukoApplication) getApp()).currentPageObject = page;
+				RUNNABLE_STATE = RUNNABLE_SUCCESS;
+			} catch (Throwable t) {
+				errorTitle = json.getString("title");
+				errorMessage = json.getString("message");
+				errorType = json.getString("name");
+				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
-			((BozukoApplication)getApp()).currentPageObject=page;
-			RUNNABLE_STATE = RUNNABLE_SUCCESS;
-		}catch(Throwable t){
-			errorTitle = json.getString("title");
-			errorMessage = json.getString("message");
-			errorType = json.getString("name");
-			RUNNABLE_STATE = RUNNABLE_FAILED;
-		}
 		} catch (Throwable e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			mHandler.post(new DisplayThrowable(e));
 			errorMessage = "Unable to connect to the internet";
-    		errorTitle = "No Connection";
+			errorTitle = "No Connection";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
 		}
 	}
-	
-	public boolean onCreateOptionsMenu(Menu menu){
-		
-		//menu.add(0, R.drawable.icongames, 0, "Games").setIcon(R.drawable.icongames);
-		//menu.add(0, R.drawable.iconprizes, 0, "Prizes").setIcon(R.drawable.iconprizes);
-		//menu.add(0, R.drawable.iconbozuko, 0, "Bozuko").setIcon(R.drawable.iconbozuko);
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		// menu.add(0, R.drawable.icongames, 0,
+		// "Games").setIcon(R.drawable.icongames);
+		// menu.add(0, R.drawable.iconprizes, 0,
+		// "Prizes").setIcon(R.drawable.iconprizes);
+		// menu.add(0, R.drawable.iconbozuko, 0,
+		// "Bozuko").setIcon(R.drawable.iconbozuko);
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-			case R.drawable.icongames:
-				Intent games = new Intent(this,GamesTabController.class);
-				games.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(games);
-				finish();
-				break;
-			case R.drawable.iconprizes:
-				Intent prizes = new Intent(this,PrizesBozukoActivity.class);
-				prizes.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(prizes);
-				finish();
-				break;
-			case R.drawable.iconbozuko:
-				Intent bozuko = new Intent(this,SettingsBozukoActivity.class);
-				bozuko.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(bozuko);
-				finish();
-				break;
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.drawable.icongames:
+			Intent games = new Intent(this, GamesTabController.class);
+			games.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+			startActivity(games);
+			finish();
+			break;
+		case R.drawable.iconprizes:
+			Intent prizes = new Intent(this, PrizesBozukoActivity.class);
+			prizes.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+			startActivity(prizes);
+			finish();
+			break;
+		case R.drawable.iconbozuko:
+			Intent bozuko = new Intent(this, SettingsBozukoActivity.class);
+			bozuko.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+			startActivity(bozuko);
+			finish();
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	protected class UpdateReceiver extends BroadcastReceiver{
+	protected class UpdateReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			// TODO Auto-generated method stub
-			if(page.checkInfo("linkspage")){
-			progressRunnable(new Runnable(){
-				public void run(){
-					sendRequest();
-				}
-			},"Loading...",CANCELABLE);
+			if (page.checkInfo("linkspage")) {
+				progressRunnable(new Runnable() {
+					public void run() {
+						sendRequest();
+					}
+				}, "Loading...", CANCELABLE);
 			}
 		}
 	}
 
-	public void onPause(){
+	public void onPause() {
 		super.onPause();
+//		CookieSyncManager.getInstance().stopSync();
 		unregisterReceiver(mReceiver);
-		if(findViewById(999)!=null){
-			((PageHeaderView)findViewById(999)).pauseTimers();
+		if (findViewById(999) != null) {
+			((PageHeaderView) findViewById(999)).pauseTimers();
 		}
-		//CookieSyncManager.getInstance().stopSync();
-		//page = null;
+		// page = null;
 	}
-	
 
-	public void onResume(){
+	public void onResume() {
 		super.onResume();
-		 ((BozukoApplication)getApp()).currentGameObject=null;
-		page = ((BozukoApplication)getApp()).currentPageObject;
-		
+				
+		((BozukoApplication) getApp()).currentGameObject = null;
+		page = ((BozukoApplication) getApp()).currentPageObject;
 		registerReceiver(mReceiver, new IntentFilter("LIKECHANGED"));
-		if(page != null){
-			//setupView();
-			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
-			if(mprefs.getBoolean("ReloadPage",false)){
+		if (page != null) {
+			// setupView();
+			SharedPreferences mprefs = PreferenceManager
+					.getDefaultSharedPreferences(this);
+			if (mprefs.getBoolean("ReloadPage", false)) {
 				SharedPreferences.Editor edit = mprefs.edit();
 				edit.putBoolean("ReloadPage", false);
 				edit.commit();
-				if(page.checkInfo("linkspage")){
-				progressRunnable(new Runnable(){
-					public void run(){
-						sendRequest();
-					}
-				},"Loading...",NOT_CANCELABLE);
+				if (page.checkInfo("linkspage")) {
+					progressRunnable(new Runnable() {
+						public void run() {
+							sendRequest();
+						}
+					}, "Loading...", NOT_CANCELABLE);
+				}else if(!page.checkInfo("linkspage")){
+					setupView();
 				}
 			}
-		}else{
-			//LOAD DATA
-			progressRunnable(new Runnable(){
-				public void run(){
+		} else {
+			// LOAD DATA
+			progressRunnable(new Runnable() {
+				public void run() {
 					sendRequest();
 				}
-			},"Loading...",NOT_CANCELABLE);
+			}, "Loading...", NOT_CANCELABLE);
 		}
-		if(findViewById(999)!=null){
-			((PageHeaderView)findViewById(999)).resumeTimers();
+		if (findViewById(999) != null) {
+			((PageHeaderView) findViewById(999)).resumeTimers();
 		}
-		//CookieSyncManager.getInstance().startSync();
+//		 CookieSyncManager.getInstance().startSync();
 	}
-	
-	public void onDestroy(){
-		page=null;
-		if(findViewById(999)!=null){
-			((PageHeaderView)findViewById(999)).destroy();
+
+	public void onDestroy() {
+		if (findViewById(999) != null) {
+			((PageHeaderView) findViewById(999)).destroy();
 		}
 		super.onDestroy();
-		
+
 	}
 }

@@ -20,6 +20,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.RotateAnimation;
@@ -66,7 +67,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		if(isFinishing()){
 			if(result != null){
 				result.add("scratchBitmap", popped.toString());
-				//Log.v("SCRATCH",popped.toString());
 				
 				User usr =new User("1");
 				usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
@@ -75,7 +75,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				
 				if(prize != null){
 					prize.add("gameid", gameState.requestInfo("game_id"));
-					//Log.v("Prize",prize.toString());
 					prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 				}
 			}
@@ -84,7 +83,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		
 		requestDONE = true;
 		closeDialogs();
-		//Log.v("GAMESTATE",gameState.toString());
 		if(gameState.requestInfo("user_tokens").compareTo("0") == 0 && result == null){
 			allButtonsHaveBeenScratched();
 		}else{
@@ -119,10 +117,8 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 					view.setEnabled(false);
 					view.setScratched();
 					if(scoreCard.containsKey(view.getText().toString())){
-						//Log.v("CONTAINS",view.getText().toString());
 						scoreCard.put(view.getText().toString(), scoreCard.get(view.getText().toString())+1);
 					}else{
-						//Log.v("NOTCONTAINS",view.getText().toString());
 						scoreCard.put(view.getText().toString(), 1);
 					}
 
@@ -247,9 +243,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		game = ((BozukoApplication)getApp()).currentGameObject;
 		page = ((BozukoApplication)getApp()).currentPageObject;
 		gameState = game.gameState;
-		//Log.v("GAMEFORPLAY",game.toString());
-		//Log.v("URL", game.requestInfo("configthemebase")+"2x/"+game.requestInfo("configthemeimagesbackground"));
-
 		if(getResources().getDisplayMetrics().density>=2){
 			setContent(R.layout.scratch_two);
 			findViewById(R.id.credits).setVisibility(View.GONE);
@@ -363,7 +356,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 
 		if(result != null){
 			result.add("scratchBitmap", popped.toString());
-			//Log.v("SCRATCH",popped.toString());
 			User usr =new User("1");
 			usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			result.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
@@ -371,7 +363,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			
 			if(prize != null){
 				prize.add("gameid", gameState.requestInfo("game_id"));
-				//Log.v("Prize",prize.toString());
 				prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 			}
 		}
@@ -382,16 +373,15 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		scoreCard.clear();
 		try{
 			result = new GameResult(gameState.requestInfo("game_id"));
-			//Log.v("SCRATCH",result.toString());
 			
 			User usr =new User("1");
 			usr.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			result.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this),usr.requestInfo("bozukoid"));
-			//Log.v("SCRATCH",result.toString());
+			
 			try{
 				prize = new PrizeObject(gameState.requestInfo("game_id"));
 				prize.getObject(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
-				//Log.v("PRIZE",prize.toString());
+				
 			}catch(Throwable t){
 
 			}
@@ -407,7 +397,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 					for(int i=0; i<poppedarray.length; i++){
 
 						String id = poppedarray[i];
-						//Log.v("SCRATCHED",id);
 						popped.add(Integer.valueOf(id));
 					}
 				}
@@ -461,6 +450,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			req.add("token", mprefs.getString("token", ""));
 			req.add("phone_type", "android");
 			req.add("phone_id", phone_id);
+			req.add("accuracy", mprefs.getString("acc", "0"));
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			String string = req.AutoPlain();
@@ -469,8 +459,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				JSONArray array = new JSONArray(string);
 				for(int i=0; i<array.length(); i++){
 					JSONObject json = array.getJSONObject(i);
-
-					//Log.v("JSONENTER",json.toString());
 					GameState gameStateTemp = new GameState(json);
 					if(gameStateTemp.requestInfo("game_id").compareTo(gameState.requestInfo("game_id"))==0){
 						gameState.processJson(json, "");
@@ -530,7 +518,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			JSONObject json = req.AutoJSONError();
-			//Log.v("JSON",json.toString());
 			try{
 				result = null;
 				prize = null;
@@ -603,12 +590,9 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		if(!popped.contains(id)){
 			popped.add(id);
 			ScratchView view = (ScratchView)findViewById(id);
-			//Log.v("TEXT",view.getText().toString());
 			if(scoreCard.containsKey(view.getText().toString())){
-				//Log.v("CONTAINS",view.getText().toString());
 				scoreCard.put(view.getText().toString(), scoreCard.get(view.getText().toString())+1);
 			}else{
-				//Log.v("NOTCONTAINS",view.getText().toString());
 				scoreCard.put(view.getText().toString(), 1);
 			}
 
@@ -846,16 +830,18 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		// TODO Auto-generated method stub
 		imageDONE = true;
 		closeDialogs();
-		
-		((URLImageView)findViewById(R.id.businessimage)).setScaleType(ScaleType.CENTER_CROP);
-		RotateAnimation rotate = new RotateAnimation(0,-15,findViewById(R.id.businessimage).getWidth()/2, findViewById(R.id.businessimage).getHeight()/2);
+		URLImageView businessimage = (URLImageView)findViewById(R.id.businessimage);
+		int x = businessimage.getWidth()/2;
+		int y = businessimage.getHeight()/2; 
+		businessimage.setScaleType(ScaleType.CENTER_CROP);
+		RotateAnimation rotate = new RotateAnimation(0,-15,x, y);
 		rotate.setFillAfter(true);
 		rotate.setDuration(0);
-		((URLImageView)findViewById(R.id.businessimage)).setAnimation(rotate);
+		businessimage.setAnimation(rotate);
 		rotate.startNow();
 
-		((URLImageView)findViewById(R.id.businessimage)).setPlaceHolder(R.drawable.defaultphoto);
-		((URLImageView)findViewById(R.id.businessimage)).setURL(page.requestInfo("image"));
+		businessimage.setPlaceHolder(R.drawable.defaultphoto);
+		businessimage.setURL(page.requestInfo("image"));
 		
 		//((TextView)findViewById(R.id.credits)).setText(gameState.requestInfo("user_tokens"));
 	}
@@ -868,11 +854,6 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 	}
 		
 	public void onDestroy(){
-//		Intent backToIntent = new Intent("destroyURLImage");
-//		backToIntent.putExtra("parentClass",this.getClass().toString());
-//		sendBroadcast(backToIntent);
-		
-		//Log.v("Bozuko","Scratch destroyed");
 		((URLImageView)findViewById(R.id.ticket)).setURL(null);
 		((URLImageView)findViewById(R.id.businessimage)).setURL(null);
 		

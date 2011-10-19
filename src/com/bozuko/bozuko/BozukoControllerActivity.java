@@ -145,7 +145,6 @@ public class BozukoControllerActivity extends ControllerActivity {
 
 	public String challengeResponse(String url,String challenge){
 		url = url.replace(GlobalConstants.BASE_URL, "");
-		//Log.v("challengeResponse",url+challenge);
 		return BozukoDataBaseHelper.sha1(url+challenge);
 	}
 
@@ -211,7 +210,6 @@ public class BozukoControllerActivity extends ControllerActivity {
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version="+ GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			//Log.v("LOGOUT",req.AutoPlain());
 			removeCookies();
 			
 			mHandler.post(new Runnable(){

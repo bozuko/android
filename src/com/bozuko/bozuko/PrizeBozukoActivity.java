@@ -52,8 +52,6 @@ public class PrizeBozukoActivity extends BozukoControllerActivity implements OnL
 		}else{
 			redemption = (RedemptionObject)object;
 			prize = (PrizeObject)getIntent().getParcelableExtra("Prize");
-			//Log.v("Prize",prize.toString());
-			//Log.v("Redemption",redemption.toString());
 			if(prize.requestInfo("is_barcode").compareTo("true") == 0){
 				setContent(R.layout.prizebarcode);
 				setupBasic();

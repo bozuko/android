@@ -42,7 +42,7 @@ public class ControllerActivity extends Activity implements OnCancelListener {
 	public final static int STATE_PAUSED = 1;
 	public final static int STATE_ACTIVE = 2;
 	
-	public int RUNNABLE_STATE = RUNNABLE_RUNNING;
+	public int RUNNABLE_STATE = RUNNABLE_STOPPED;
 	public final static int RUNNABLE_FAILED = 1;
 	public final static int RUNNABLE_SUCCESS = 0;
 	public final static int RUNNABLE_RUNNING = 2;

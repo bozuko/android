@@ -1,6 +1,5 @@
 package com.bozuko.bozuko;
 
-import com.fuzz.android.globals.GlobalConstants;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -9,13 +8,17 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 
+import com.fuzz.android.globals.GlobalConstants;
+
 public class SocialMediaWebViewActivity extends InAppWebViewControllerActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		removeCookies();
 		
 		super.onCreate(savedInstanceState);
-		
+		CookieSyncManager.createInstance(this);
+		CookieManager cookieMonster = CookieManager.getInstance();
+		cookieMonster.setAcceptCookie(true);
 		webview.setWebViewClient(new SocialWebClient());
 	}
 	
@@ -38,12 +41,13 @@ public class SocialMediaWebViewActivity extends InAppWebViewControllerActivity {
 
 		public void onPageStarted (WebView view, String url, Bitmap favicon){
 			super.onPageStarted(view, url, favicon);
-			//Log.v("URL",url);
 			if(url.startsWith(GlobalConstants.FACEBOOK_URL) || url.startsWith(GlobalConstants.FACEBOOK_URL2)){
-				//Log.v("URL",url);
+				
+//				CookieSyncManager.createInstance(this);
+//				 CookieSyncManager.getInstance().sync();
+				 
 				String token = url.replace(GlobalConstants.FACEBOOK_URL, "");
 				token = token.replace(GlobalConstants.FACEBOOK_URL2, "");
-				//Log.v("TOKEN",token);
 				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(SocialMediaWebViewActivity.this);
 				SharedPreferences.Editor edit = mprefs.edit();
 				edit.putBoolean("facebook_login", true);
@@ -56,7 +60,7 @@ public class SocialMediaWebViewActivity extends InAppWebViewControllerActivity {
 				edit.commit();
 				//TODO get user info
 				((BozukoApplication)getApp()).getEntry();
-				
+				CookieSyncManager.getInstance().sync();
 				finish();
 //				makeDialog("Welcome to Bozuko.","Success",new DialogInterface.OnClickListener() {
 //					
@@ -72,8 +76,11 @@ public class SocialMediaWebViewActivity extends InAppWebViewControllerActivity {
 				SharedPreferences.Editor edit = mprefs.edit();
 				edit.putBoolean("ReloadPage", true);
 				edit.commit();
+				CookieSyncManager.getInstance().sync();
 				finish();
 			}
 		}
+		
+		
 	}
 }

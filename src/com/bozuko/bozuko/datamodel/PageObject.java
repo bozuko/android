@@ -40,7 +40,9 @@ public class PageObject extends DataObject {
 	public void processJson(JSONObject object,String masterKey){
 		for(Iterator<String> it = object.keys(); it.hasNext();){
 			String key = it.next();
+			
 			try {
+				
 				if(object.get(key).getClass() == JSONObject.class){
 					processJson((JSONObject)object.get(key),masterKey+key);
 				}else if(object.get(key).getClass() == JSONArray.class){
@@ -56,8 +58,9 @@ public class PageObject extends DataObject {
 					map.put(masterKey+key, object.getString(key));
 				}
 			} catch (JSONException e) {
+				
 				// TODO Auto-generated catch block
-				//e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 	}
@@ -88,7 +91,7 @@ public class PageObject extends DataObject {
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	

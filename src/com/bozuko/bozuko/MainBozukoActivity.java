@@ -25,6 +25,23 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 			return;
 		}
 		
+		SharedPreferences mprefs = PreferenceManager
+		.getDefaultSharedPreferences(this);
+		 if(!mprefs.getBoolean("load", false)){
+			 errorMessage = "Could not create database. Make sure there is space.";
+	    		errorTitle = "Internal Error";
+	    		errorType = "";
+			 makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+			 return;
+		 }
+		
 		Intent myIntent = new Intent();
 		myIntent.setClassName("com.bozuko.bozuko","com.bozuko.bozuko.TabController");
 		startActivity(myIntent);
@@ -36,6 +53,23 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 		if(isFinishing()){
 			return;
 		}
+		SharedPreferences mprefs = PreferenceManager
+		.getDefaultSharedPreferences(this);
+		 if(!mprefs.getBoolean("load", false)){
+			 errorMessage = "Could not create database. Make sure there is space.";
+	    		errorTitle = "Internal Error";
+	    		errorType = "";
+			 makeDialog(errorMessage,errorTitle,new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						finish();
+					}
+				});
+			 return;
+		 }
+		
 		if(errorType.compareTo("")==0){
 		try{
 		Bozuko bozuko = new Bozuko("1");
@@ -167,7 +201,6 @@ public class MainBozukoActivity extends BozukoControllerActivity {
 					user.add("userid", "1");
 					user.add("bozukoid", user.requestInfo("id"));
 					user.remove("id");
-					//Log.v("UserObject",user.toString());
 					BozukoDataBaseHelper.getSharedInstance(this).eraseTable("user");
 					user.saveToDb("1", BozukoDataBaseHelper.getSharedInstance(this));
 				}

@@ -6,6 +6,7 @@ import com.fuzz.android.ui.URLImageView;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -52,8 +53,7 @@ public class PrizeCell extends RelativeLayout{
 	
 	public void display(PrizeObject game){
 		_title.setText(game.requestInfo("name"));
-		
-		if(game.checkInfo("result_image")){
+		if((game.checkInfo("result_image"))&&(game.requestInfo("result_image").trim().compareToIgnoreCase("")!=0)){
 			_image.setURL(game.requestInfo("result_image"));
 			_image.setVisibility(View.VISIBLE);
 		}else{

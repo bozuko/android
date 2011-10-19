@@ -91,7 +91,6 @@ public class AboutBozukoActivity extends BozukoControllerActivity implements
 			// TODO Auto-generated method stub
 			ImageView view = null;
 			if (ConvertView == null) {
-				// Log.v("MAKING VIEW", "VIEW WAS NULL SAD");
 				view = new ImageView(AboutBozukoActivity.this);
 				DisplayMetrics metrics = new DisplayMetrics();
 				getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -99,7 +98,6 @@ public class AboutBozukoActivity extends BozukoControllerActivity implements
 						LayoutParams.WRAP_CONTENT);
 				view.setLayoutParams(params);
 			} else {
-				// Log.v("GETTING VIEW", "VIEW BEING REUSED HAPPY");
 				view = (ImageView) ConvertView;
 			}
 			view.setImageResource(about.get(position));

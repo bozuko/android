@@ -132,7 +132,6 @@ public class PrizeView extends RelativeLayout{
 			_loadMore.setVisibility(View.GONE);
 		}
 		
-		//Log.v("GAME",page.toString());
 		//_image.setURL(page.requestInfo("image"));
 		_title.setText(page.requestInfo("name"));
 		_subtitle.setText(page.requestInfo("page_name"));

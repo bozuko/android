@@ -120,7 +120,6 @@ public class GameObject extends DataObject {
 	
 	@SuppressWarnings("unchecked")
 	public void processJson(JSONObject object,String masterKey){
-		//Log.v("JSON",object.toString());
 		for(Iterator<String> it = object.keys(); it.hasNext();){
 			String key = it.next();
 			try {
@@ -139,7 +138,6 @@ public class GameObject extends DataObject {
 						for(int i=0; i<array.length(); i++){
 							PrizeObject game = new PrizeObject(array.getJSONObject(i));
 							prizes.add(game);
-							//Log.v("Prize",game.toString());
 						}
 					}
 					if(key.compareTo("consolation_prizes")==0){
@@ -253,7 +251,6 @@ public class GameObject extends DataObject {
 				object.add("gameid", id);
 				object.add("icon", icons.get(i));
 				object.saveToDb(null, dbh);
-				//Log.v("ICON",object.toString());
 			}
 		}
 		
@@ -265,8 +262,6 @@ public class GameObject extends DataObject {
 				object.add("gameid", id);
 				object.add("icon", iconsImages.get(i));
 				object.saveToDb(null, dbh);
-				
-				//Log.v("ICONIMAGE",object.toString());
 			}
 		}
 	}
@@ -301,7 +296,6 @@ public class GameObject extends DataObject {
 		
 		while(r3.moveToNext()){
 			DataObject object = new DataObject(r3);
-			//Log.v("ICON",object.toString());
 			if(icons==null){
 				icons = new ArrayList<String>();
 			}
@@ -317,7 +311,6 @@ public class GameObject extends DataObject {
 		
 		while(r4.moveToNext()){
 			DataObject object = new DataObject(r4);
-			//Log.v("ICONIMAGE",object.toString());
 			if(iconsImages==null){
 				iconsImages = new ArrayList<String>();
 			}

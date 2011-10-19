@@ -57,8 +57,6 @@ public class GameResult extends DataObject {
 							HashMap<String,String> temp = new HashMap<String,String>();
 							temp.put("number", json.getString("number"));
 							temp.put("text", json.getString("text"));
-							//Log.v("TEXT",json.getString("text"));
-							//Log.v("NUMBER",json.getString("number"));
 							results.add(temp);
 						}
 					}
@@ -117,14 +115,11 @@ public class GameResult extends DataObject {
 		boolean ret = openDataBase(dbh);
 		SQLiteDatabase db = dbh.getDB();
 		String selection[] = {id,bozukoid};
-		DatabaseUtils.dumpCursor(db.query(tablename, null, null,null, null, null, null));
-		DatabaseUtils.dumpCursor(db.query(tablename, null, queryid + "=? AND bozukoid=?",  selection, null, null, null));
 		Cursor r = db.query(tablename, null, queryid + "=? AND bozukoid=?",  selection, null, null, null);
 		while(r.moveToNext()){
 			for(String key : r.getColumnNames()){
 				String value = r.getString(r.getColumnIndex(key));
 				if(value != null){
-					//Log.v("ObjectData","Key: " + key + " Data: " + value);
 					map.put(key.replace("&QUOTE;", "'"), value.replace("&QUOTE;", "'"));
 				}
 			}

@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -408,7 +409,6 @@ public class URLImageView extends TouchImageView{
 			//File cache = imgV.getContext().getCacheDir();
 			URLConnection conn;
 			do{
-				//Log.v("URL",tmpURL);
 				u = new URL(tmpURL);
 				conn =  u.openConnection();
 				conn.setRequestProperty("Content-Language", "en-US");

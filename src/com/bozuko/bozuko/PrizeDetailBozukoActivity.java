@@ -12,7 +12,6 @@ public class PrizeDetailBozukoActivity extends BozukoControllerActivity {
 		setHeader(R.layout.detailheader);
 		
 		PrizeObject prize = (PrizeObject)getIntent().getParcelableExtra("Package");
-		//Log.v("Prize",prize.toString());
 		TextView prizeName = (TextView)findViewById(R.id.prizename);
 		prizeName.setText(prize.requestInfo("name"));
 		

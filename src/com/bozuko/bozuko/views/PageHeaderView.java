@@ -4,16 +4,6 @@ import java.net.URL;
 
 import org.json.JSONObject;
 
-import com.bozuko.bozuko.BozukoControllerActivity;
-import com.bozuko.bozuko.R;
-import com.bozuko.bozuko.SocialMediaWebViewActivity;
-import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
-import com.bozuko.bozuko.datamodel.EntryPointObject;
-import com.bozuko.bozuko.datamodel.PageObject;
-import com.fuzz.android.datahandler.DataBaseHelper;
-import com.fuzz.android.globals.GlobalConstants;
-import com.fuzz.android.http.HttpRequest;
-import com.fuzz.android.ui.URLImageView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,11 +23,22 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ImageView.ScaleType;
+
+import com.bozuko.bozuko.BozukoControllerActivity;
+import com.bozuko.bozuko.R;
+import com.bozuko.bozuko.SocialMediaWebViewActivity;
+import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
+import com.bozuko.bozuko.datamodel.EntryPointObject;
+import com.bozuko.bozuko.datamodel.PageObject;
+import com.fuzz.android.datahandler.DataBaseHelper;
+import com.fuzz.android.globals.GlobalConstants;
+import com.fuzz.android.http.HttpRequest;
+import com.fuzz.android.ui.URLImageView;
 
 public class PageHeaderView extends RelativeLayout implements OnClickListener {
 
@@ -111,7 +112,7 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 		CookieManager cookieManager = CookieManager.getInstance();
 		cookieManager.setAcceptCookie(true);
 		_likeView = new WebView(mContext.getApplicationContext());
-		params = new RelativeLayout.LayoutParams((int)(50*getResources().getDisplayMetrics().density),(int)(20*getResources().getDisplayMetrics().density));
+		params = new RelativeLayout.LayoutParams((int)(51*getResources().getDisplayMetrics().density),(int)(24*getResources().getDisplayMetrics().density));
 		_likeView.setId(99);
 		params.setMargins(0, 10, 0, 0);
 		params.addRule(RelativeLayout.BELOW,102);
@@ -187,7 +188,6 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 
 	public void display(PageObject inPage){
 		page = inPage;
-		//Log.v("PAGE",page.toString());
 		//_likeView.loadUrl(inPage.requestInfo("like_button_url"));
 		SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 		if(!mprefs.getBoolean("facebook_login", false)){
@@ -297,7 +297,6 @@ public class PageHeaderView extends RelativeLayout implements OnClickListener {
 
 		public boolean shouldOverrideUrlLoading (WebView view, String url){
 			//TODO do like commands
-			//Log.v("URL",url);
 			if(url.startsWith("bozuko://facebook/liked")){
 				Intent intent = new Intent("LIKECHANGED");
 				getContext().sendBroadcast(intent);

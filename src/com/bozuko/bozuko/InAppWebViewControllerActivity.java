@@ -151,7 +151,6 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 		
 		public void onPageStarted (WebView view, String url, Bitmap favicon){
 			loading.setVisibility(View.VISIBLE);
-			//Log.v("URL",url);
 		}
 	}
 }

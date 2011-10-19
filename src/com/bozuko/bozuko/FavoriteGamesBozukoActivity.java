@@ -49,8 +49,12 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 	String nextSearchURL = "";
 
 	public void onDestroy(){
+		try{
 		ListView listview = (ListView)findViewById(R.id.ListView01);
 		listview.setAdapter(new SimpleAdapter());
+		}catch(Throwable t){
+			
+		}
 		games.clear();
 		search.clear();
 		super.onDestroy();
@@ -275,15 +279,20 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 		try {
 			ArrayList<PageObject> pages = new ArrayList<PageObject>();
 			String url = GlobalConstants.BASE_URL;
+			
 			if(nextURL.compareTo("")==0){
 				url += entry.requestInfo("linkspages");
 				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
+				
 				url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage,mprefs.getString("token", ""));
 				url += "&mobile_version="+GlobalConstants.MOBILE_VERSION;
+				url += "&accuracy=" + mprefs.getString("acc", "0");
 			}else{
 				url += nextURL;
 				nextURL = "";
 			}
+
+			
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.setMethodType("GET");
 			JsonParser jp = req.AutoStreamJSONError();
@@ -299,12 +308,6 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
-						//Log.v("Page",page.toString());
-//						if(page.requestInfo("featured").compareTo("true")==0){
-//							pages.add(page);
-//						}else if(page.requestInfo("registered").compareTo("true")==0){
-//							pages.add(page);
-//						}
 						pages.add(page);
 					}
 					
@@ -355,7 +358,8 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				url += entry.requestInfo("linkspages");
 				SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 				url += String.format("?ll=%s,%s&limit=25&favorites=true&offset=%d&token=%s",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage,mprefs.getString("token", ""));
-				//Log.v("URL",url);
+				
+				url += "&accuracy=" + mprefs.getString("acc", "0");
 				url += "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION;
 			}else{
 				url += nextSearchURL;
@@ -370,10 +374,6 @@ public class FavoriteGamesBozukoActivity extends BozukoControllerActivity implem
 				for(int i=0; i<objects.length(); i++){
 					PageObject page = new PageObject(objects.getJSONObject(i));
 
-					//Log.v("Page",page.toString());
-//					if(page.requestInfo("registered").compareTo("true")==0){
-//						pages.add(page);
-//					}
 					pages.add(page);
 				}
 

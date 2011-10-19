@@ -3,19 +3,10 @@ package com.bozuko.bozuko;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
-import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
-import com.bozuko.bozuko.datamodel.EntryPointObject;
-import com.bozuko.bozuko.datamodel.PageObject;
-import com.bozuko.bozuko.views.PageView;
-import com.bozuko.bozuko.views.PrizeView;
-import com.fuzz.android.datahandler.DataBaseHelper;
-import com.fuzz.android.globals.GlobalConstants;
-import com.fuzz.android.http.HttpRequest;
-import com.fuzz.android.ui.CheckView;
-import com.fuzz.android.ui.MergeAdapter;
-import android.widget.EditText;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,11 +20,23 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
+
+import com.bozuko.bozuko.datamodel.BozukoDataBaseHelper;
+import com.bozuko.bozuko.datamodel.EntryPointObject;
+import com.bozuko.bozuko.datamodel.PageObject;
+import com.bozuko.bozuko.views.PageView;
+import com.bozuko.bozuko.views.PrizeView;
+import com.fuzz.android.datahandler.DataBaseHelper;
+import com.fuzz.android.globals.GlobalConstants;
+import com.fuzz.android.http.HttpRequest;
+import com.fuzz.android.ui.CheckView;
+import com.fuzz.android.ui.MergeAdapter;
 
 public class NearByGamesBozukoActivity extends BozukoControllerActivity implements OnItemClickListener, OnEditorActionListener {
 	ArrayList<PageObject> featured = new ArrayList<PageObject>();
@@ -172,10 +175,19 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 		}else{
 			((TextView)findViewById(R.id.errmessage)).setVisibility(View.GONE);
 		}
+		
+		
 		mergeAdapter.addView(loadMore, true);
 		listview.setAdapter(mergeAdapter);
 		listview.setOnItemClickListener(this);
 
+		
+		if(nextURL != null){
+			loadMore.setVisibility(View.VISIBLE);
+		}else{
+			loadMore.setVisibility(View.GONE);
+		}
+		
 		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(((EditText)findViewById(R.id.search)).getWindowToken(), 0);
 	}
@@ -295,7 +307,8 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				lat = mprefs.getString("clat","0.00");
 				lon = mprefs.getString("clon","0.00");
 				url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),currentPage);
-				//Log.v("URL",url);
+				
+				url += "&accuracy=" + mprefs.getString("acc", "0");
 				url += "&token=" + mprefs.getString("token", "") + "&mobile_version="+GlobalConstants.MOBILE_VERSION;
 			}else{
 				url += nextURL;
@@ -317,11 +330,9 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
-						//Log.v("Page",page.toString());
 						if(page.requestInfo("featured").compareTo("true")==0){
 							feature.add(page);
 						}else if(page.requestInfo("registered").compareTo("true")==0){
-							//Log.v("Page",page.toString());
 							game.add(page);
 						}else{
 							other.add(page);
@@ -381,15 +392,13 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 				url += String.format("?ll=%s,%s&limit=25&offset=%d",mprefs.getString("clat","0.00"),mprefs.getString("clon","0.00"),searchCurrentPage);
 				url += "&query=" +  URLEncoder.encode(((BozukoApplication)getApp()).searchTerm) +"&mobile_version="+GlobalConstants.MOBILE_VERSION;
 				url += "&token=" + mprefs.getString("token", "");
+				url += "&accuracy=" + mprefs.getString("acc", "0");
 			}else{
 				url += nextSearchURL;
 				nextSearchURL = "";
 			}
 			HttpRequest req = new HttpRequest(new URL(url));
-			//Log.v("URL",url);
 			req.setMethodType("GET");
-			//JSONObject json = req.AutoJSONError();
-			//Log.v("JSON",json.toString());
 			JsonParser jp = req.AutoStreamJSONError();
 			JsonToken start = jp.nextToken(); // will return JsonToken.START_OBJECT (verify?)
 			if(start == JsonToken.START_OBJECT){
@@ -403,7 +412,6 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 					//DO parse json
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						PageObject page = new PageObject(jp);
-						//Log.v("Page",page.toString());
 						if(page.requestInfo("featured").compareTo("true")==0){
 							feature.add(page);
 						}else if(page.requestInfo("registered").compareTo("true")==0){
@@ -512,7 +520,6 @@ public class NearByGamesBozukoActivity extends BozukoControllerActivity implemen
 		if(obj.getClass() == PageObject.class){
 			PageObject page = (PageObject)obj;
 			((BozukoApplication)getApp()).currentPageObject = page;
-			//Log.v("Page",page.toString());
 			Intent intent = new Intent(this,PageBozukoActivity.class);
 			//intent.putExtra("Package", page);
 			startActivity(intent);

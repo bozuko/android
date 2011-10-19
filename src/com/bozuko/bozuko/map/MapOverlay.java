@@ -50,7 +50,6 @@ public class MapOverlay extends ItemizedOverlay
 	}
 	
 	public boolean checktype(String str){
-		//Log.v("CHECKTYPE",type + " " + str);
 		return (str.compareTo(type) == 0);
 	}
 	
@@ -125,10 +124,6 @@ public class MapOverlay extends ItemizedOverlay
 	  OverlayItem item = mOverlays.get(index);
 	  p = item.getPoint();
 	  ind = index;
-	  /*AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-	  dialog.setTitle(item.getTitle());
-	  dialog.setMessage(item.getSnippet());
-	  dialog.show();*/
 	  return true;
 	}
 	

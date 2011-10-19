@@ -229,12 +229,11 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(0, 1, 0, "Servers");
+		//menu.add(0, 1, 0, "Servers");
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item){
-		Log.v("Bozuko","Item selected: "+item.getItemId());
 		switch(item.getItemId()){
 			case 1:
 				serverSelect();
@@ -280,7 +279,6 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(this);
 			HttpRequest req = new HttpRequest(new URL(url + "?token=" + mprefs.getString("token", "") + "&mobile_version="+ GlobalConstants.MOBILE_VERSION));
 			req.setMethodType("GET");
-			//Log.v("LOGOUT",req.AutoPlain());
 			removeCookies();
 			RUNNABLE_STATE = RUNNABLE_SUCCESS;
 		}catch(Throwable t){

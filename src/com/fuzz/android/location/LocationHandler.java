@@ -98,7 +98,9 @@ public class LocationHandler{
 					}
 				}
 			}else{
-				getLastKnownLocation();
+                if(loc != null){
+                    getLastKnownLocation();
+                }
 			}
 		
 			return;
@@ -117,13 +119,13 @@ public class LocationHandler{
 				
 				int failcount = 0;
 				try{
-					lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000*20, 5000, agps,l.getMainLooper());
+					lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60000*1, 500, agps,l.getMainLooper());
 				}catch(Exception e1){
 					failcount++;
 				}
 				
 				try{
-					lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000*20, 5000, gps,l.getMainLooper());
+					lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000*5, 500, gps,l.getMainLooper());
 				}catch(Exception e){
 					failcount++;
 				}
@@ -134,19 +136,27 @@ public class LocationHandler{
 					if(loc == null)
 						throw new Exception("Failed to get location");
 				}else{
-					getLastKnownLocation();
+					
 					TimerTask task = new TimerTask(){
 						public void run(){
+							
 							if(loc == null){
+								getLastKnownLocation();
+								
 								STATE = NOT_RUNNING;
 								if(delegate != null){
-									delegate.LocationFailed();
+                                    if(loc == null){
+                                        STATE = NOT_RUNNING;
+                                        delegate.LocationFailed();  
+                                    }
 								}
+							}else{
+								delegate.LocationFound(loc);
 							}
 						}
 					};
 					Timer timer = new Timer();
-					timer.schedule(task, 1000 * 20);
+					timer.schedule(task, 1000 * 10);
 				
 				}
 			}catch(Exception e){
@@ -196,11 +206,18 @@ public class LocationHandler{
 	public void onLocationChanged(Location argLocation) {
 		// TODO Auto-generated method stub
 		if(isBetterLocation(argLocation,loc)){
-		loc = argLocation;
-		
-		if(delegate != null){
-			delegate.LocationFound(loc);
-		}
+            if(loc == null){
+                if(delegate != null && argLocation.getAccuracy()<500){
+                    loc = argLocation;
+                    delegate.LocationFound(loc);
+                } 
+                return;
+            }
+            
+            loc = argLocation;
+			if(delegate != null){
+				delegate.LocationFound(loc);
+			}
 		}
 	}
 
@@ -240,10 +257,17 @@ public class LocationHandler{
 		public void onLocationChanged(Location argLocation) {
 			// TODO Auto-generated method stub
 			if(isBetterLocation(argLocation,loc)){
-			loc = argLocation;
-			if(delegate != null){
-				delegate.LocationFound(loc);
-			}
+                if(loc == null){
+                    if(delegate != null && argLocation.getAccuracy()<500){
+                        loc = argLocation;
+                        delegate.LocationFound(loc);
+                    } 
+                    return;
+                }
+				loc = argLocation;
+				if(delegate != null){
+                    delegate.LocationFound(loc);
+                }
 			}
 		}
 

@@ -68,7 +68,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		for(int i=0; i<game.icons.size(); i++){
 			String url = game.iconsImages.get(i);
 			String image = game.icons.get(i);
-			//Log.v("image",image);
 			if(url.startsWith("http")){
 				Drawable bitmap;
 				try{
@@ -156,7 +155,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 		for(int i=0; i<game.icons.size(); i++){
 			String url = game.iconsImages.get(i);
 			String image = game.icons.get(i);
-			//Log.v("image",image);
 			if(url.startsWith("http")){
 				Drawable bitmap;
 				if(DataBaseHelper.isImageCached(URLBitmapDrawable.createFilePathFromCrc64(GlobalFunctions.Crc64Long(url),128),this)){
@@ -296,10 +294,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex = ((SlotWheelView)findViewById(R.id.slotwheel3)).rIconsHardCopy.indexOf(result.results.get(2))+3;
 
 
-				//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex + "");
-				//Log.v("SLOTWHEEL2",((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex + "");
-				//Log.v("SLOTWHEEL3",((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex + "");
-
 
 				((SlotWheelView)findViewById(R.id.slotwheel1)).stop();
 			}catch(Throwable t){
@@ -419,11 +413,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex = ((int)(Math.random()*(bitmaps.size())))+3;
 			((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex = ((int)(Math.random()*(bitmaps.size())))+3;
 
-			//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel1)).stopIndex + "");
-			//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel2)).stopIndex + "");
-			//Log.v("SLOTWHEEL1",((SlotWheelView)findViewById(R.id.slotwheel3)).stopIndex + "");
-
-
 			((SlotWheelView)findViewById(R.id.slotwheel1)).stop();
 			((SlotWheelView)findViewById(R.id.slotwheel2)).stop();
 			((SlotWheelView)findViewById(R.id.slotwheel3)).stop();
@@ -503,12 +492,12 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			user.getObject("1", BozukoDataBaseHelper.getSharedInstance(this));
 			String url = GlobalConstants.BASE_URL + gameState.requestInfo("linksgame_entry");
 			HttpRequest req = new HttpRequest(new URL(url));
-			//Log.v("url",url);
 			req.setMethodType("POST");
 			req.add("ll", String.format("%s,%s", mprefs.getString("clat", "0.00"),mprefs.getString("clon", "0.00")));
 			req.add("token", mprefs.getString("token", ""));
 			req.add("phone_type", "android");
 			req.add("phone_id", phone_id);
+			req.add("accuracy", mprefs.getString("acc", "0"));
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			String string = req.AutoPlain();
@@ -517,7 +506,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 				for(int i=0; i<array.length(); i++){
 					JSONObject json = array.getJSONObject(i);
 
-					//Log.v("JSONENTER",json.toString());
 					GameState gameStateTemp = new GameState(json);
 					if(gameStateTemp.requestInfo("game_id").compareTo(gameState.requestInfo("game_id"))==0){
 						gameState.processJson(json, "");
@@ -569,7 +557,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			JSONObject json = req.AutoJSONError();
-			//Log.v("JSON",json.toString());
 			try{
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
@@ -741,11 +728,6 @@ public class SlotsGameBozukoActivity extends BozukoControllerActivity implements
 	}
 	
 	public void onDestroy(){
-//		Intent backToIntent = new Intent("destroyURLImage");
-//		backToIntent.putExtra("parentClass",this.getClass().toString());
-//		sendBroadcast(backToIntent);
-		
-		//Log.v("Bozuko","Slots destroyed");
 		((SlotWheelView)findViewById(R.id.slotwheel1)).clear();
 		((SlotWheelView)findViewById(R.id.slotwheel2)).clear();
 		((SlotWheelView)findViewById(R.id.slotwheel3)).clear();

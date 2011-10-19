@@ -146,7 +146,6 @@ public class PageView extends RelativeLayout implements OnClickListener {
 		
 		
 		page = inPage;
-		//Log.v("PAGE",page.toString());
 		_image.setURL(page.requestInfo("image"));
 		_distance.setText(page.requestInfo("distance"));
 		_title.setText(page.requestInfo("name"));
@@ -196,13 +195,11 @@ public class PageView extends RelativeLayout implements OnClickListener {
 			String url = GlobalConstants.BASE_URL + page.requestInfo("linksfavorite");
 			SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 			
-			//Log.v("PAGE", page.toString());
 			HttpRequest req = new HttpRequest(new URL(url));
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("token", mprefs.getString("token", ""));
 			req.setMethodType("POST");
 			JSONObject json = req.AutoJSONError();
-			//Log.v("JSON",json.toString());
 			try{
 			try{
 				if(json.getBoolean("added")){
