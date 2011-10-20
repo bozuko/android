@@ -229,7 +229,7 @@ public class SettingsBozukoActivity extends BozukoControllerActivity implements 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu){
-		//menu.add(0, 1, 0, "Servers");
+		menu.add(0, 1, 0, "Servers");
 		return super.onCreateOptionsMenu(menu);
 	}
 

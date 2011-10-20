@@ -216,6 +216,10 @@ public class PageView extends RelativeLayout implements OnClickListener {
 
 					try{
 						((FavoriteGamesBozukoActivity)getContext()).update(page);
+						SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+						SharedPreferences.Editor edit = mprefs.edit();
+						edit.putBoolean("ReloadNearby", true);
+						edit.commit();
 					}catch(Throwable t){
 						SharedPreferences mprefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 						SharedPreferences.Editor edit = mprefs.edit();
