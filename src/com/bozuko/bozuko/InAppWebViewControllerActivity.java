@@ -38,7 +38,7 @@ public class InAppWebViewControllerActivity extends BozukoControllerActivity{
 	    rel.setLayoutParams(params);
 	    setContent(rel);
 	    
-	    webview = new WebView(getApplicationContext());
+	    webview = new WebView(this);
 		RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
 		webview.setLayoutParams(params2);
 		webview.getSettings().setBuiltInZoomControls(true);

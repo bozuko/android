@@ -354,6 +354,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		}
 
 
+        synchronized(result){
 		if(result != null){
 			result.add("scratchBitmap", popped.toString());
 			User usr =new User("1");
@@ -366,6 +367,7 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				prize.saveToDb(gameState.requestInfo("game_id"), BozukoDataBaseHelper.getSharedInstance(this));
 			}
 		}
+        }
 	}
 
 	public void loadGameState(){
@@ -428,8 +430,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		popped.clear();
 		scoreCard.clear();
 		if(!DataBaseHelper.isOnline(this,0)){
-			result = null;
-			prize = null;
+            synchronized(result){
+                result = null;
+                prize = null;
+            }
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -467,8 +471,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				getGameResults();
 				RUNNABLE_STATE = RUNNABLE_SUCCESS;
 			}catch(Throwable t){
-				result = null;
-				prize = null;
+                synchronized(result){
+                    result = null;
+                    prize = null;
+                }
 				JSONObject json = new JSONObject(string);
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
@@ -476,8 +482,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 				RUNNABLE_STATE = RUNNABLE_FAILED;
 			}
 		}catch(Throwable t){
-			result = null;
-			prize = null;
+            synchronized(result){
+                result = null;
+                prize = null;
+            }
 			mHandler.post(new DisplayThrowable(t));
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
@@ -489,8 +497,11 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 		popped.clear();
 		scoreCard.clear();
 		if(!DataBaseHelper.isOnline(this,0)){
-			result = null;
-			prize = null;
+            synchronized(result){
+                result = null;
+                prize = null;
+            }
+			
 			errorTitle = "Connection Error";
 			errorMessage = "Unable to reach the internet.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;
@@ -519,8 +530,11 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			req.add("challenge_response", challengeResponse(url,user.requestInfo("challenge")));
 			JSONObject json = req.AutoJSONError();
 			try{
-				result = null;
-				prize = null;
+                
+				synchronized(result){
+                    result = null;
+                    prize = null;
+                }
 				errorTitle = json.getString("title");
 				errorMessage = json.getString("message");
 				errorType = json.getString("name");
@@ -546,8 +560,10 @@ public class ScratchGameBozukoActivity extends BozukoControllerActivity implemen
 			}
 		}catch(Throwable t){
 			mHandler.post(new DisplayThrowable(t));
-			result = null;
-			prize = null;
+			synchronized(result){
+                result = null;
+                prize = null;
+            }
 			errorTitle = "Request Error";
 			errorMessage = "Couldn't load game try again later.";
 			RUNNABLE_STATE = RUNNABLE_FAILED;

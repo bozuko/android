@@ -98,6 +98,7 @@ public class FeedbackBozukoActivity extends BozukoControllerActivity implements 
 			req.add("mobile_version", GlobalConstants.MOBILE_VERSION);
 			req.add("challenge_response", challengeResponse(request,user.requestInfo("challenge")));
 			req.add("ll", mprefs.getString("clat","0.00")+","+mprefs.getString("clon","0.00"));
+			req.add("accuracy", mprefs.getString("acc", "0"));
 			if(request.contains("feedback")){
 				req.setMethodType("PUT");
 				
